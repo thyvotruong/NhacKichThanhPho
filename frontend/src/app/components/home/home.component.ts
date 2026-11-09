@@ -244,4 +244,27 @@ export class HomeComponent implements OnInit {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   }
+
+  // Trạng thái quản lý Modal xác nhận ưu đãi
+  isConsentModalOpen = signal<boolean>(false);
+  openConsentModal(): void {
+    const inputElement = document.getElementById('userEmailInput') as HTMLInputElement;
+    if (inputElement && inputElement.value.trim() !== '') {
+      this.isConsentModalOpen.set(true);
+    } else {
+      alert('Vui lòng nhập địa chỉ email của bạn trước khi nhận ưu đãi!');
+      inputElement?.focus();
+    }
+  }
+
+  closeConsentModal(): void {
+    this.isConsentModalOpen.set(false);
+  }
+
+  confirmConsent(): void {
+    this.isConsentModalOpen.set(false);
+    alert('Đăng ký thành công! Chúng tôi sẽ sớm thông tin đến bạn các chương trình ưu đãi.');
+    const inputElement = document.getElementById('userEmailInput') as HTMLInputElement;
+    if (inputElement) inputElement.value = '';
+  }
 }

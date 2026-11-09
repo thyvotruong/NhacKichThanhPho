@@ -82,58 +82,61 @@
   </div>
 
   <!-- ==================== NỘI DUNG CÁC VỞ NHẠC KỊCH TRÊN SÂN KHẤU ==================== -->
+<!-- ==================== NỘI DUNG TRẢI ĐỀU TOÀN MÀN HÌNH ==================== -->
+<!-- ==================== NỘI DUNG CĂN GIỮA & CHỐNG BỂ KHUNG ==================== -->
   @for (slide of heroSlides; track slide.slug; let idx = $index) {
     <div
-      class="hero-slide-item position-absolute top-0 start-0 w-100 h-100"
+      class="hero-slide-item position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
       [class.active]="activeSlideIndex() === idx"
     >
-      <div class="container h-100 d-flex align-items-center position-relative z-10 pt-4">
-        <div class="row align-items-center w-100 g-5">
-          <!-- Cột thông tin vở diễn -->
-          <div class="col-lg-7 text-white py-4">
-            <!-- Huy hiệu vở diễn phong cách hoàng gia -->
-            <div class="d-inline-flex flex-wrap align-items-center gap-2 mb-3">
+      <!-- Sử dụng container chuẩn để nội dung nằm gọn gàng, cân đối ở giữa sân khấu -->
+      <div class="container position-relative z-10 py-4">
+        <div class="row align-items-center justify-content-between g-5">
+          
+          <!-- Cột thông tin vở diễn (Đã giới hạn max-width chuẩn, chữ co giãn an toàn không bể khung) -->
+          <div class="col-lg-7 text-white py-3">
+            <!-- <div class="d-inline-flex flex-wrap align-items-center gap-2 mb-3">
               <span class="badge badge-showman-ruby px-3 py-2 rounded-pill text-uppercase shadow">
                 <i class="bi bi-stars text-gold me-1"></i> {{ slide.badge }}
               </span>
               <span class="badge badge-showman-gold px-3 py-2 rounded-pill text-uppercase shadow">
                 <i class="bi bi-fire me-1"></i> Broadway Grand Season 2026
               </span>
-            </div>
+            </div> -->
 
-            <!-- Tên vở kịch chính nổi bật trên nền màn nhung với Montserrat 900 dát vàng -->
-            <h1 class="display-3 fw-bold text-gold-gradient mb-3 line-height-tight drop-shadow-theatrical">
+            <!-- Tên vở kịch dùng kích thước linh hoạt, tuyệt đối không rớt dòng lỗi khung -->
+            <h1 class="fw-bold text-gold-gradient mb-3 line-height-tight drop-shadow-theatrical" style="font-size: clamp(2.2rem, 3.8vw, 3.8rem);">
               {{ slide.title }}
             </h1>
 
-            <!-- Phụ đề & Giới thiệu ngắn gọn -->
-            <p class="lead text-secondary mb-4 fs-5 fw-normal max-w-550 leading-relaxed">
+            <!-- Phụ đề -->
+            <p class="lead text-white mb-4 fs-5 fw-normal leading-relaxed" style="max-width: 580px;">
               {{ slide.subtitle }}
             </p>
 
-            <!-- Thông tin đạo diễn & Thời lượng -->
-            <div class="d-flex flex-wrap align-items-center gap-3 text-secondary small mb-4 py-2 border-top border-bottom border-glass-glow">
-              <span class="d-inline-flex align-items-center text-white fw-bold">
+            <!-- Thông tin đạo diễn & thời lượng -->
+            <div class="d-flex flex-wrap align-items-center gap-3 text-white small mb-4 py-2 border-top border-bottom border-glass-glow" style="max-width: 580px;">
+              <span class="d-inline-flex align-items-center fw-bold">
                 <i class="bi bi-person-badge-fill text-ruby-glow me-2 fs-6"></i> {{ slide.director }}
               </span>
               <span class="text-gold">•</span>
-              <span class="d-inline-flex align-items-center text-white fw-bold">
+              <span class="d-inline-flex align-items-center fw-bold">
                 <i class="bi bi-clock-history text-gold-glow me-2 fs-6"></i> {{ slide.time }}
               </span>
             </div>
 
-            <!-- Cặp nút hành động: Đặt vé ngay & Xem lịch diễn -->
+            <!-- Nút hành động -->
             <div class="d-flex flex-wrap gap-2 pt-2">
               <a
                 [routerLink]="['/musical', slide.slug]"
-                class="btn btn-showman-ruby px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2"
+                class="btn btn-showman-ruby px-4 py-2.5 rounded-pill d-inline-flex align-items-center gap-2 fw-semibold shadow"
               >
                 <i class="bi bi-ticket-perforated-fill text-gold fs-5"></i>
                 <span>ĐẶT VÉ NGAY</span>
               </a>
               <button
                 (click)="scrollToSection('schedules-section')"
-                class="btn btn-showman-outline px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2"
+                class="btn btn-showman-outline px-4 py-2.5 rounded-pill d-inline-flex align-items-center gap-2 fw-semibold shadow"
               >
                 <i class="bi bi-calendar3 text-gold"></i>
                 <span>XEM LỊCH DIỄN</span>
@@ -141,9 +144,9 @@
             </div>
           </div>
 
-          <!-- Cột Poster hình ảnh ấn tượng trên bục sân khấu -->
-          <div class="col-lg-5 d-none d-lg-block text-center position-relative">
-            <div class="stage-poster-pedestal mx-auto position-relative">
+          <!-- Cột Poster bên phải cân đối, ngay ngắn -->
+          <div class="col-lg-5 d-none d-lg-flex justify-content-center position-relative">
+            <div class="position-relative" style="width: 375px; height: 500px; border-radius: 18px; padding: 8px; background: rgba(14, 22, 41, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(245, 158, 11, 0.5); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(190, 18, 60, 0.35);">
               <div class="poster-ambient-backlight"></div>
               <img
                 [src]="slide.bgImage"
@@ -152,16 +155,17 @@
               />
             </div>
           </div>
+
         </div>
       </div>
     </div>
   }
 
-  <!-- Nút điều hướng Slider Prev / Next -->
-  <button class="stage-ctrl stage-prev d-none d-md-flex" (click)="prevSlide()" aria-label="Vở kịch trước">
+  <!-- Nút điều hướng Slider dạt ra sát mép cân đối -->
+  <button class="stage-ctrl stage-prev d-none d-md-flex" style="left: 30px; width: 48px; height: 48px; font-size: 1.3rem;" (click)="prevSlide()" aria-label="Vở kịch trước">
     <i class="bi bi-chevron-left"></i>
   </button>
-  <button class="stage-ctrl stage-next d-none d-md-flex" (click)="nextSlide()" aria-label="Vở kịch tiếp theo">
+  <button class="stage-ctrl stage-next d-none d-md-flex" style="right: 30px; width: 48px; height: 48px; font-size: 1.3rem;" (click)="nextSlide()" aria-label="Vở kịch tiếp theo">
     <i class="bi bi-chevron-right"></i>
   </button>
 </section>
@@ -171,9 +175,9 @@
 <section id="musicals-section" class="py-5 position-relative">
   <div class="container py-4">
     <div class="text-center mb-5">
-      <h2 class="text-gold-gradient display-5 fw-bold mt-2 mb-2">CÁC VỞ NHẠC KỊCH TIÊU BIỂU</h2>
-      <div class="showman-divider"></div>
-      <p class="text-secondary max-w-600 mx-auto">
+      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">CÁC VỞ NHẠC KỊCH TIÊU BIỂU</h2>
+      <div class="showman-divider mx-auto mt-1 mb-4"></div>
+      <p class="text-white text-secondary max-w-800 mx-auto">
         Những tác phẩm được dàn dựng kỳ công với âm thanh giao hưởng trực tiếp, vũ đạo bùng nổ và ánh sáng sân khấu huyền ảo.
       </p>
     </div>
@@ -243,17 +247,14 @@
 <!-- ============================================================
      PHÂN HỆ LỊCH DIỄN NỔI BẬT (UPCOMING SCHEDULES)
      ============================================================ -->
-<!-- ============================================================
-      PHÂN HỆ LỊCH DIỄN NỔI BẬT (UPCOMING SCHEDULES)
-      ============================================================ -->
-<section id="schedules-section" class="py-5 position-relative schedules-bg-ambient border-top border-bottom border-gold-glow">
+<section id="schedules-section" class="py-5 position-relative schedules-bg-ambient" style="border-top: 1px solid rgba(245, 158, 11, 0.3); border-bottom: 1px solid rgba(245, 158, 11, 0.3);">
   <div class="container py-4">
-    <!-- Tiêu đề và mô tả căn giữa -->
+    <!-- Tiêu đề và nội dung bên trong giữ nguyên -->
     <div class="text-center mb-5">
-      <h2 class="text-gold-gradient display-5 fw-bold mb-3 pt-2 lh-base">LỊCH DIỄN SẮP TỚI</h2>
-      <div class="showman-divider mx-auto my-2"></div>
-      <p class="text-secondary mx-auto max-w-500 small leading-relaxed mt-2">
-        Khán phòng Nhà Hát Thành Phố với hệ thống âm thanh vòm Dolby Atmos và ghế nhung hoàng gia êm ái.
+      <h2 class="text-gold-gradient display-2 fw-bold mb-3 pt-2 lh-base">LỊCH DIỄN SẮP TỚI</h2>
+      <div class="showman-divider mx-auto mt-1 mb-4"></div>
+      <p class="text-white text-secondary max-w-800 mx-auto">
+        Khán phòng Nhạc kịch Thành Phố với hệ thống âm thanh vòm Dolby Atmos và ghế nhung, mang lại cho bạn những phút giây thư giãn trọn vẹn.
       </p>
     </div>
 
@@ -345,10 +346,10 @@
 <section id="artists-section" class="py-5 position-relative">
   <div class="container py-4">
     <div class="text-center mb-5">
-      <h2 class="text-gold-gradient display-5 fw-bold mt-2 mb-2">GƯƠNG MẶT NGHỆ SĨ TIÊU BIỂU</h2>
-      <div class="showman-divider"></div>
-      <p class="text-secondary max-w-600 mx-auto">
-        Đội ngũ Ban giám đốc nghệ thuật, đạo diễn hàng đầu cùng những ngôi sao nhạc kịch thắp sáng từng đêm diễn.
+      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">GƯƠNG MẶT NGHỆ SĨ TIÊU BIỂU</h2>
+      <div class="showman-divider mx-auto mt-1 mb-4"></div>
+      <p class="text-white text-secondary max-w-800 mx-auto">
+        Đội ngũ biên tập, đạo diễn tài năng cùng những ngôi sao nhạc kịch luôn sẵn sàng thắp sáng từng đêm diễn.
       </p>
     </div>
 
@@ -379,27 +380,72 @@
 <!-- ============================================================
      BANNER ĐĂNG KÝ (NEWSLETTER / EARLY BIRD)
      ============================================================ -->
-<section class="py-5 cta-banner-showman text-center position-relative border-top border-gold-glow">
-  <div class="container py-4 position-relative z-2">
-
-    <h2 class="display-6 fw-bold mb-2 text-gold-gradient">NHẬN THÔNG TIN SUẤT CHIẾU & ƯU ĐÃI VIP</h2>
-    <p class="text-secondary max-w-600 mx-auto mb-4">
+<!-- ============================================================
+     BANNER ĐĂNG KÝ (NEWSLETTER / EARLY BIRD) - GIỮ LẠI 1 LINE PHÍA TRÊN
+     ============================================================ -->
+<section class="py-5 cta-banner-showman text-center position-relative overflow-hidden w-100" 
+         style="background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.22) 0%, rgba(190, 18, 60, 0.18) 45%, #0A0F1D 85%); border-top: 1px solid rgba(245, 158, 11, 0.4);">
+  <div class="container py-5 position-relative z-2">
+    <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">NHẬN THÔNG TIN SUẤT CHIẾU & ƯU ĐÃI VIP</h2>
+    <div class="showman-divider mx-auto mt-1 mb-4"></div>
+    <p class="text-white text-secondary max-w-800 mx-auto mb-4">
       Đăng ký email để nhận thông báo sớm nhất về các đêm diễn mở bán vé và ưu đãi vé hạng VIP lên tới 20%.
     </p>
     <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-5">
-        <div class="input-group shadow-xl">
+      <div class="col-md-9 col-lg-6">
+        <!-- Khung tổng form đăng ký -->
+        <div class="d-flex align-items-center rounded-4 p-2 shadow-xl border border-gold-glow" style="background: rgba(14, 22, 41, 0.95); backdrop-filter: blur(12px);">
           <input
             type="email"
-            class="form-control form-control-lg text-white"
+            id="userEmailInput"
+            class="form-control form-control-lg text-white bg-transparent border-0 shadow-none px-4 py-2 me-2"
             placeholder="Nhập địa chỉ email của bạn..."
             aria-label="Email"
           />
-          <button class="btn btn-showman-gold px-4 fw-bold" type="button">
-            ĐĂNG KÝ
+          <button 
+            class="btn px-4 py-3 fw-bold rounded-3 text-dark text-nowrap shadow flex-shrink-0" 
+            type="button"
+            (click)="openConsentModal()"
+            style="background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 50%, #D97706 100%); color: #070A12 !important; border: 1px solid #FDE68A; box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); transition: all 0.3s ease;"
+          >
+            GỬI TÔI CÁC ƯU ĐÃI
           </button>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ============================================================
+     MODAL XÁC NHẬN QUYỀN RIÊNG TƯ (CONSENT MODAL)
+     ============================================================ -->
+@if (isConsentModalOpen()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(4, 3, 7, 0.85); backdrop-filter: blur(8px); z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border border-gold-glow text-white shadow-2lg" style="background: linear-gradient(135deg, #151D33 0%, #070A12 100%);">
+        <div class="modal-header border-bottom border-secondary border-opacity-25 pb-3">
+          <h5 class="modal-title text-gold-gradient fw-bold fs-4">
+            <i class="bi bi-shield-check text-gold me-2"></i> Xác nhận nhận ưu đãi VIP
+          </h5>
+          <button type="button" class="btn-close btn-close-white shadow-none" (click)="closeConsentModal()"></button>
+        </div>
+        <div class="modal-body py-4 text-secondary leading-relaxed">
+          <p class="text-white mb-3">
+            Bạn có cho phép chúng tôi gửi thông tin về các suất diễn mới, sự kiện độc quyền và mã giảm giá vé VIP đến địa chỉ Email của bạn không?
+          </p>
+          <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 text-white small fst-italic">
+            <i class="bi bi-info-circle text-gold me-1"></i> Chúng tôi cam kết bảo mật thông tin cá nhân và không bao giờ chia sẻ với bên thứ ba.
+          </div>
+        </div>
+        <div class="modal-footer border-top border-secondary border-opacity-25 pt-3 d-flex gap-2">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4 text-light" (click)="closeConsentModal()">
+            Để sau
+          </button>
+          <button type="button" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow" style="background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%); border: none;" (click)="confirmConsent()">
+            <i class="bi bi-check2-circle me-1"></i> Đồng ý & nhận ưu đãi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

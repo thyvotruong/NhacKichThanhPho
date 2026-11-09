@@ -161,7 +161,11 @@
   height: 95px;
   background: linear-gradient(180deg, transparent 0%, rgba(14, 22, 41, 0.6) 40%, rgba(7, 10, 18, 0.98) 100%),
               radial-gradient(ellipse at 50% 100%, rgba(245, 158, 11, 0.22) 0%, rgba(225, 29, 72, 0.18) 45%, transparent 75%);
-  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  
+  /* Đổi từ border-top thành border-bottom để line nằm sát đáy sân khấu */
+  border-bottom: 1px solid rgba(245, 158, 11, 0.4); 
+  border-top: none; /* Xóa bỏ viền trên nếu có */
+  
   z-index: 3;
 }
 
@@ -421,6 +425,8 @@
 .cta-banner-showman {
   background: radial-gradient(circle at 50% 50%, rgba(190, 18, 60, 0.22) 0%, rgba(37, 99, 235, 0.15) 50%, #070A12 85%),
               linear-gradient(180deg, #070A12 0%, #05070D 100%);
+  padding-bottom: calc(3rem + 1.5rem);
+  margin-bottom: -1.5rem;
 }
 
 .max-w-600 {
@@ -440,4 +446,57 @@
 
 .x-small {
   font-size: 0.72rem;
+}
+
+.showman-divider {
+  width: 120px; /* Bạn có thể tăng lên 150px, 200px hoặc 250px tùy ý thích */
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
+  border-radius: 2px;
+}
+
+/* Nút điều hướng Slider trải đều sát mép */
+.stage-ctrl {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 12;
+  border-radius: 50%;
+  background: rgba(14, 22, 41, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(245, 158, 11, 0.5);
+  color: #FDE68A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+  transition: all 0.25s ease;
+}
+
+.stage-ctrl:hover {
+  background: linear-gradient(135deg, #BE123C 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  border-color: #FEF08A;
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.75);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.poster-ambient-backlight {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  height: 90%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(190, 18, 60, 0.25) 50%, transparent 80%);
+  filter: blur(24px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Ép màu nền phần đăng ký chạm sát line trên */
+.cta-banner-custom-bg {
+  background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.25) 0%, rgba(190, 18, 60, 0.2) 45%, #0A0F1D 85%) !important;
+  border-top: 1px solid rgba(245, 158, 11, 0.4) !important;
 }
