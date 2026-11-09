@@ -1,0 +1,60 @@
+<!-- ============================================================
+     PHÂN HỆ TIN TỨC & SỰ KIỆN (/news)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<div class="news-page position-relative py-5">
+  <!-- Bụi tiên nền -->
+  <div class="stardust-container" aria-hidden="true">
+    <span class="stardust-sparkle" style="top: 12%; left: 14%;">✦</span>
+    <span class="stardust-sparkle" style="top: 35%; left: 82%;">✧</span>
+    <span class="stardust-sparkle" style="top: 70%; left: 16%;">★</span>
+    <span class="stardust-dot" style="top: 20%; left: 60%;"></span>
+  </div>
+
+  <div class="container position-relative z-2">
+    <!-- Header Phân Hệ -->
+    <div class="text-center mb-5">
+      <h1 class="display-5 fw-black text-gold-gradient mb-2">TIN TỨC & SỰ KIỆN NGHỆ THUẬT</h1>
+      <p class="text-secondary max-w-650 mx-auto small mb-0">
+        Cập nhật những chuyển động mới nhất từ hậu trường, thông tin mở bán vé, sự kiện giao lưu nghệ sĩ và cẩm nang thưởng thức nhạc kịch.
+      </p>
+      <div class="showman-divider"></div>
+    </div>
+
+    <!-- Lưới Bài Báo -->
+    <div class="row g-4">
+      @for (item of articles(); track item.id) {
+        <div class="col-md-6">
+          <div class="card card-showman-glass rounded-4 h-100 border border-gold-glow overflow-hidden news-card-hover">
+            <div class="news-img-box position-relative">
+              <img [src]="item.imageUrl" [alt]="item.title" class="w-100 news-cover-img">
+              <span class="badge badge-showman-ruby position-absolute top-0 start-0 m-3 px-3 py-1 rounded-pill small fw-bold">
+                {{ item.category }}
+              </span>
+            </div>
+
+            <div class="p-4 d-flex flex-column flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center text-secondary extra-small mb-2">
+                <span><i class="bi bi-calendar-event text-gold me-1"></i> {{ item.date | date:'dd/MM/yyyy' }}</span>
+                <span><i class="bi bi-clock me-1"></i> {{ item.readTime }}</span>
+              </div>
+
+              <h4 class="text-white fw-bold mb-2 news-title">{{ item.title }}</h4>
+              <p class="text-secondary small leading-relaxed mb-4 flex-grow-1">
+                {{ item.summary }}
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25 mt-auto">
+                <a routerLink="/musicals" class="text-gold text-decoration-none small fw-bold d-inline-flex align-items-center gap-1 hover-arrow">
+                  <span>Đặt vé các vở liên quan</span>
+                  <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

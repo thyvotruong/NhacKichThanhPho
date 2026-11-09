@@ -1,0 +1,439 @@
+<!-- ============================================================
+     PHÂN HỆ THANH TOÁN (CHECKOUT FUNNEL) & E-TICKET (BPMN 2.2.3)
+     Phong cách: The Greatest Showman
+     Font: 100% Montserrat
+     ============================================================ -->
+<div class="py-5 position-relative">
+  <div class="container">
+
+    <!-- TRƯỜNG HỢP 1: HIỂN THỊ KẾT QUẢ THANH TOÁN & E-TICKET QR (BPMN 2.2.3 Bước 12 Success) -->
+    @if (successOrder(); as order) {
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="e-ticket-card p-4 rounded-4 shadow-2xl position-relative overflow-hidden border border-gold-glow">
+            <div class="ticket-glow-circle"></div>
+
+            <div class="text-center mb-4">
+              <span class="badge badge-showman-ruby px-3 py-2 rounded-pill text-uppercase mb-2 shadow">
+                <i class="bi bi-patch-check-fill text-gold me-1"></i> THANH TOÁN THÀNH CÔNG
+              </span>
+              <h2 class="display-6 fw-bold text-gold-gradient mb-1">VÉ ĐIỆN TỬ (E-TICKET)</h2>
+              <p class="text-secondary small mb-1">Vui lòng xuất trình mã QR này tại cửa rạp để nhân viên quét check-in</p>
+              <div class="alert alert-success border-success-subtle p-2 rounded-3 small d-inline-block mt-2">
+                <i class="bi bi-envelope-check-fill text-success me-1"></i>
+                Hệ thống đã gửi xác nhận và vé điện tử đến email: <strong class="text-white">{{ order.customerEmail }}</strong>
+              </div>
+              <div class="showman-divider"></div>
+            </div>
+
+            <div class="row g-4 align-items-center mb-4 p-3 rounded-3 bg-dark-translucent border border-gold-glow">
+              <!-- Mã QR Code E-Ticket mô phỏng -->
+              <div class="col-md-4 text-center">
+                <div class="qr-code-box p-2 bg-white rounded-3 shadow-lg d-inline-block">
+                  <svg width="115" height="115" viewBox="0 0 100 100" class="img-fluid">
+                    <rect width="100" height="100" fill="white" />
+                    <rect x="10" y="10" width="25" height="25" fill="#090D16" />
+                    <rect x="15" y="15" width="15" height="15" fill="white" />
+                    <rect x="18" y="18" width="9" height="9" fill="#BE123C" />
+                    <rect x="65" y="10" width="25" height="25" fill="#090D16" />
+                    <rect x="70" y="15" width="15" height="15" fill="white" />
+                    <rect x="73" y="18" width="9" height="9" fill="#BE123C" />
+                    <rect x="10" y="65" width="25" height="25" fill="#090D16" />
+                    <rect x="15" y="70" width="15" height="15" fill="white" />
+                    <rect x="18" y="73" width="9" height="9" fill="#BE123C" />
+                    <rect x="42" y="15" width="8" height="8" fill="#F59E0B" />
+                    <rect x="45" y="35" width="12" height="12" fill="#090D16" />
+                    <rect x="65" y="65" width="10" height="10" fill="#090D16" />
+                    <rect x="78" y="75" width="12" height="12" fill="#F59E0B" />
+                    <rect x="40" y="70" width="10" height="10" fill="#090D16" />
+                  </svg>
+                </div>
+                <span class="d-block text-gold fw-bold small mt-2 font-monospace">{{ order.bookingCode }}</span>
+              </div>
+
+              <!-- Chi tiết thông tin vé -->
+              <div class="col-md-8">
+                <h4 class="text-white fw-bold mb-1">{{ order.musicalTitle }}</h4>
+                <div class="text-gold small mb-3">
+                  <i class="bi bi-clock-fill me-1"></i> {{ order.performanceTime }} • {{ order.performanceDate | date:'dd/MM/yyyy' }}
+                </div>
+                <div class="d-flex flex-column gap-1 text-secondary small">
+                  <div><strong class="text-white">Khán phòng:</strong> {{ order.hall }}</div>
+                  <div><strong class="text-white">Khách hàng:</strong> {{ order.customerName }} ({{ order.customerPhone }})</div>
+                  <div>
+                    <strong class="text-white">Vị trí ghế:</strong>
+                    @for (s of order.seats; track s.seatCode) {
+                      <span class="badge badge-showman-gold ms-1">{{ s.seatCode }} ({{ s.type }})</span>
+                    }
+                  </div>
+                  <div><strong class="text-white">Phương thức:</strong> {{ order.paymentMethod }} (Đã thanh toán)</div>
+                  <div class="mt-2 pt-2 border-top border-secondary border-opacity-25">
+                    <span class="text-white fw-bold">Tổng tiền: </span>
+                    <span class="text-gold-gradient fs-5 fw-bold">{{ order.totalPrice | number:'1.0-0' }} đ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nút in vé & Về trang cá nhân -->
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+              <button class="btn btn-showman-gold px-4 py-2 rounded-pill fw-bold" (click)="printTicket()">
+                <i class="bi bi-printer-fill me-2"></i> IN VÉ / TẢI E-TICKET
+              </button>
+              <a routerLink="/account/my-tickets" class="btn btn-showman-ruby px-4 py-2 rounded-pill fw-bold">
+                <i class="bi bi-ticket-perforated-fill me-2"></i> XEM VÉ CỦA TÔI
+              </a>
+              <a routerLink="/" class="btn btn-showman-outline px-4 py-2 rounded-pill fw-bold">
+                VỀ TRANG CHỦ
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TRƯỜNG HỢP 2: QUY TRÌNH NHẬP THÔNG TIN & CHỌN CỔNG THANH TOÁN -->
+    @if (!successOrder()) {
+      <!-- Thanh thời gian giữ ghế & Cảnh báo nếu thanh toán thất bại -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 p-3 rounded-4 card-showman-glass border border-gold-glow">
+        <div>
+          <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold mb-1">
+            <i class="bi bi-shield-check text-gold me-1"></i> BƯỚC CUỐI CÙNG
+          </span>
+          <h3 class="text-gold-gradient fw-bold mb-0 fs-5">XÁC NHẬN THÔNG TIN & THANH TOÁN VÉ</h3>
+        </div>
+
+        <!-- Đếm ngược 10 phút giữ ghế (BPMN 2.2.3 Bước 6 & 13) -->
+        <div class="d-flex align-items-center gap-2 bg-dark-glass p-2 px-3 rounded-pill border border-gold-glow">
+          <i class="bi bi-hourglass-split text-gold fs-5 animate-spin"></i>
+          <span class="text-secondary small">Thời gian giữ ghế:</span>
+          <span class="text-gold-glow fw-bold font-monospace fs-5">{{ formatTime(holdSecondsLeft()) }}</span>
+        </div>
+      </div>
+
+      <!-- Cảnh báo nếu giao dịch thanh toán thất bại (BPMN 2.2.3 Bước 12 & 13) -->
+      @if (paymentFailureMessage(); as failMsg) {
+        <div class="alert alert-danger border-danger-subtle p-3 rounded-4 mb-4 d-flex align-items-center justify-content-between animate-fade-in">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
+            <div>
+              <strong class="text-white d-block">GIAO DỊCH CHƯA THÀNH CÔNG</strong>
+              <span class="small text-light">{{ failMsg }}</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" (click)="paymentFailureMessage.set(null)"></button>
+        </div>
+      }
+
+      <div class="row g-5">
+        <!-- CỘT TRÁI (COL-LG-7): THÔNG TIN KHÁCH HÀNG & PHƯƠNG THỨC THANH TOÁN -->
+        <div class="col-lg-7">
+          <div class="d-flex flex-column gap-4">
+            <!-- 1. Thông tin khách hàng -->
+            <div class="card card-showman-glass rounded-4 p-4">
+              <h4 class="text-gold fw-bold mb-3 d-flex align-items-center">
+                <i class="bi bi-person-circle me-2 text-ruby-glow"></i> 1. THÔNG TIN KHÁCH HÀNG
+              </h4>
+              <form [formGroup]="customerForm" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Họ và Tên *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Nguyễn Văn A"
+                      formControlName="customerName"
+                      [class.is-invalid]="f['customerName'].touched && f['customerName'].invalid"
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Số Điện Thoại (10 số) *</label>
+                    <input
+                      type="tel"
+                      class="form-control"
+                      placeholder="0901234567"
+                      formControlName="customerPhone"
+                      [class.is-invalid]="f['customerPhone'].touched && f['customerPhone'].invalid"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label text-gold small fw-bold">Địa Chỉ Email (Nhận E-Ticket) *</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      placeholder="email@domain.com"
+                      formControlName="customerEmail"
+                      [class.is-invalid]="f['customerEmail'].touched && f['customerEmail'].invalid"
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label text-secondary small">Ghi Chú Yêu Cầu</label>
+                    <textarea rows="2" class="form-control small" placeholder="Hỗ trợ đặc biệt..." formControlName="notes"></textarea>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- 2. Chọn phương thức thanh toán (BPMN 2.2.3 Bước 10) -->
+            <div class="card card-showman-glass rounded-4 p-4">
+              <h4 class="text-gold fw-bold mb-3 d-flex align-items-center">
+                <i class="bi bi-wallet2 me-2 text-ruby-glow"></i> 2. CHỌN CỔNG THANH TOÁN TRỰC TUYẾN
+              </h4>
+
+              <div class="d-flex flex-column gap-3">
+                <!-- VietQR -->
+                <div
+                  class="payment-option-box p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                  [class.active-payment]="selectedPayment() === 'VIETQR'"
+                  (click)="selectedPayment.set('VIETQR')"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-qr-code-scan fs-3 text-gold"></i>
+                    <div>
+                      <strong class="text-white d-block">VietQR Chuyển Khoản Ngân Hàng 24/7</strong>
+                      <span class="text-secondary small">Quét mã QR từ mọi ứng dụng ngân hàng (Vietcombank, Techcombank, MB...)</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-showman-gold small">Khuyên dùng</span>
+                </div>
+
+                <!-- VNPAY -->
+                <div
+                  class="payment-option-box p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                  [class.active-payment]="selectedPayment() === 'VNPAY'"
+                  (click)="selectedPayment.set('VNPAY')"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-credit-card-2-front-fill fs-3 text-primary"></i>
+                    <div>
+                      <strong class="text-white d-block">Cổng Quốc Gia VNPAY</strong>
+                      <span class="text-secondary small">Hỗ trợ thẻ ATM nội địa & VNPAY-QR</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MoMo -->
+                <div
+                  class="payment-option-box p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                  [class.active-payment]="selectedPayment() === 'MOMO'"
+                  (click)="selectedPayment.set('MOMO')"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-phone-fill fs-3 text-danger"></i>
+                    <div>
+                      <strong class="text-white d-block">Ví Điện Tử MoMo</strong>
+                      <span class="text-secondary small">Thanh toán bảo mật tức thì qua ứng dụng MoMo</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ZaloPay -->
+                <div
+                  class="payment-option-box p-3 rounded-3 border d-flex align-items-center justify-content-between"
+                  [class.active-payment]="selectedPayment() === 'ZALOPAY'"
+                  (click)="selectedPayment.set('ZALOPAY')"
+                >
+                  <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-chat-dots-fill fs-3 text-info"></i>
+                    <div>
+                      <strong class="text-white d-block">Ví Điện Tử ZaloPay</strong>
+                      <span class="text-secondary small">Thanh toán tức thì ngay trong ứng dụng Zalo</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CỘT PHẢI (COL-LG-5): TÓM TẮT ĐƠN HÀNG, MÃ GIẢM GIÁ & NÚT THANH TOÁN -->
+        <div class="col-lg-5">
+          <div class="card card-showman-glass rounded-4 p-4 sticky-top" style="top: 90px;">
+            <h4 class="text-gold fw-bold mb-3">TỔNG HỢP VÉ ĐẶT</h4>
+
+            <div class="mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <h5 class="text-white fw-bold mb-1">{{ checkoutData()?.musicalTitle }}</h5>
+              <div class="text-gold small mb-2">
+                <i class="bi bi-clock-fill me-1"></i> {{ checkoutData()?.performanceTime }} • {{ checkoutData()?.performanceDate | date:'dd/MM/yyyy' }}
+              </div>
+              <span class="text-secondary small d-block">Khán phòng: {{ checkoutData()?.hall }}</span>
+            </div>
+
+            <!-- Danh sách ghế -->
+            <div class="mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <span class="text-secondary small fw-bold d-block mb-2">Ghế ngồi đã chọn ({{ selectedSeats().length }} ghế):</span>
+              <div class="d-flex flex-column gap-2">
+                @for (s of selectedSeats(); track s.seatCode) {
+                  <div class="d-flex justify-content-between align-items-center small">
+                    <span class="text-white">
+                      Ghế <strong class="text-gold">{{ s.seatCode }}</strong> ({{ s.type }})
+                    </span>
+                    <span class="text-white font-monospace">{{ s.price | number:'1.0-0' }} đ</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Ô NHẬP MÃ GIẢM GIÁ (VOUCHER) - BPMN 2.2.3 Bước 8 & 9 -->
+            <div class="mb-4">
+              <label class="form-label text-gold small fw-bold">
+                <i class="bi bi-ticket-perforated me-1"></i> MÃ KHUYẾN MÃI (VOUCHER)
+              </label>
+
+              @if (!appliedVoucher()) {
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    placeholder="VD: SHOWMAN20, TRIAN10"
+                    [value]="voucherCodeInput()"
+                    (input)="voucherCodeInput.set($any($event.target).value)"
+                  />
+                  <button class="btn btn-showman-gold fw-bold" type="button" (click)="applyVoucher()">
+                    ÁP DỤNG
+                  </button>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                  <span class="x-small text-muted">Gợi ý mã:</span>
+                  <a href="javascript:void(0)" class="x-small text-gold text-decoration-none" (click)="voucherCodeInput.set('SHOWMAN20'); applyVoucher()">SHOWMAN20 (-20%)</a>
+                  <span class="text-muted">•</span>
+                  <a href="javascript:void(0)" class="x-small text-gold text-decoration-none" (click)="voucherCodeInput.set('TRIAN10'); applyVoucher()">TRIAN10 (-10%)</a>
+                </div>
+              } @else {
+                <div class="p-2 px-3 rounded-3 bg-dark border border-success d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="badge badge-status-available me-2">{{ appliedVoucher().code }}</span>
+                    <span class="text-success small">-{{ appliedVoucher().discountAmount | number:'1.0-0' }} đ</span>
+                  </div>
+                  <button class="btn btn-sm btn-outline-danger py-0 px-2 rounded-circle" (click)="removeVoucher()" title="Xóa mã">
+                    ✕
+                  </button>
+                </div>
+              }
+
+              @if (voucherError()) {
+                <span class="text-danger small mt-1 d-block">{{ voucherError() }}</span>
+              }
+            </div>
+
+            <!-- TỔNG KẾT TIỀN -->
+            <div class="p-3 rounded-3 bg-dark-translucent border border-gold-glow mb-4">
+              <div class="d-flex justify-content-between text-secondary small mb-1">
+                <span>Tiền vé:</span>
+                <span class="text-white">{{ subtotal() | number:'1.0-0' }} đ</span>
+              </div>
+              @if (discountAmount() > 0) {
+                <div class="d-flex justify-content-between text-success small mb-1">
+                  <span>Giảm giá (Voucher):</span>
+                  <span>-{{ discountAmount() | number:'1.0-0' }} đ</span>
+                </div>
+              }
+              <hr class="border-secondary opacity-50 my-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-white fw-bold">TỔNG THANH TOÁN:</span>
+                <span class="text-gold-gradient fs-4 fw-bold">
+                  {{ totalPrice() | number:'1.0-0' }} đ
+                </span>
+              </div>
+            </div>
+
+            <!-- NÚT MỞ CỔNG THANH TOÁN -->
+            <button
+              class="btn btn-showman-ruby w-100 py-3 rounded-pill fw-bold shadow-lg"
+              [disabled]="isProcessing() || customerForm.invalid"
+              (click)="onOpenPaymentModal()"
+            >
+              <i class="bi bi-credit-card-fill text-gold me-2"></i> TIẾN HÀNH THANH TOÁN
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================ -->
+    <!-- MODAL HIỂN THỊ MÃ QR CỔNG THANH TOÁN (BPMN 2.2.3 Bước 11) -->
+    <!-- ============================================================ -->
+    @if (showQrModal()) {
+      <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.85); z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content card-showman-glass border-gold-glow text-white p-2 rounded-4 shadow-2xl">
+            <div class="modal-header border-secondary border-opacity-25">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge badge-showman-gold fw-bold">BƯỚC 11</span>
+                <h5 class="modal-title text-gold fw-bold mb-0">CỔNG THANH TOÁN: {{ selectedPayment() }}</h5>
+              </div>
+              <button type="button" class="btn-close btn-close-white" (click)="closePaymentModal()"></button>
+            </div>
+
+            <div class="modal-body text-center py-4">
+              <p class="text-secondary small mb-3">
+                Quét mã QR bằng ứng dụng <strong class="text-gold">{{ selectedPayment() }}</strong> để thanh toán:
+              </p>
+
+              <!-- Khối QR Code động -->
+              <div class="p-3 bg-white rounded-3 shadow-2xl d-inline-block border border-gold-glow mb-3">
+                <svg width="180" height="180" viewBox="0 0 100 100" class="img-fluid">
+                  <rect width="100" height="100" fill="white" />
+                  <rect x="8" y="8" width="28" height="28" fill="#090D16" />
+                  <rect x="14" y="14" width="16" height="16" fill="white" />
+                  <rect x="18" y="18" width="8" height="8" fill="#BE123C" />
+                  <rect x="64" y="8" width="28" height="28" fill="#090D16" />
+                  <rect x="70" y="14" width="16" height="16" fill="white" />
+                  <rect x="74" y="18" width="8" height="8" fill="#BE123C" />
+                  <rect x="8" y="64" width="28" height="28" fill="#090D16" />
+                  <rect x="14" y="70" width="16" height="16" fill="white" />
+                  <rect x="18" y="74" width="8" height="8" fill="#BE123C" />
+                  <rect x="42" y="12" width="14" height="14" fill="#F59E0B" />
+                  <rect x="42" y="42" width="16" height="16" fill="#090D16" />
+                  <rect x="65" y="42" width="10" height="10" fill="#BE123C" />
+                  <rect x="42" y="68" width="12" height="12" fill="#F59E0B" />
+                  <rect x="68" y="68" width="18" height="18" fill="#090D16" />
+                </svg>
+              </div>
+
+              <div class="p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25 text-start small mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-secondary">Đơn vị nhận:</span>
+                  <strong class="text-white">NHÀ HÁT NHẠC KỊCH THÀNH PHỐ</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="text-secondary">Số tiền chuyển khoản:</span>
+                  <strong class="text-gold-gradient fs-6">{{ totalPrice() | number:'1.0-0' }} đ</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="text-secondary">Thời gian giữ chỗ còn lại:</span>
+                  <span class="text-warning fw-bold font-monospace">{{ formatTime(holdSecondsLeft()) }}</span>
+                </div>
+              </div>
+
+              <!-- Hai lựa chọn kiểm thử BPMN: Thành công vs Thất bại -->
+              <div class="d-grid gap-2">
+                <button
+                  type="button"
+                  class="btn btn-showman-gold py-2 fw-bold"
+                  [disabled]="isProcessing()"
+                  (click)="onConfirmSuccessPayment()"
+                >
+                  @if (isProcessing()) {
+                    <span class="spinner-border spinner-border-sm me-2"></span> ĐANG XÁC THỰC GIAO DỊCH...
+                  } @else {
+                    <i class="bi bi-check-circle-fill me-1"></i> XÁC NHẬN ĐÃ THANH TOÁN THÀNH CÔNG
+                  }
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm py-2"
+                  (click)="onTriggerPaymentFailure()"
+                >
+                  <i class="bi bi-x-circle me-1"></i> Mô phỏng: Giao Dịch Thất Bại (BPMN Bước 12-13)
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

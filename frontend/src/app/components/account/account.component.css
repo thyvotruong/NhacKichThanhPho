@@ -1,0 +1,90 @@
+/* ============================================================
+   STYLES CHO ACCOUNT PROFILE & SUB-TABS (THE GREATEST SHOWMAN)
+   ============================================================ */
+
+.account-page {
+  min-height: 85vh;
+  background: radial-gradient(circle at 50% 20%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+}
+
+.profile-ambient-glow {
+  position: absolute;
+  top: -100px;
+  right: -50px;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(190, 18, 60, 0.25) 0%, rgba(212, 175, 55, 0.15) 50%, transparent 80%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.avatar-circle {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(190, 18, 60, 0.4) 0%, rgba(212, 175, 55, 0.3) 100%);
+  border: 2px solid #D4AF37;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+}
+
+.vip-crown-badge {
+  font-size: 1.2rem;
+  background: #070A12;
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+}
+
+.account-nav-tab {
+  background: transparent;
+  color: #94A3B8;
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+}
+
+.account-nav-tab:hover {
+  color: #FDE68A;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.account-nav-tab.active {
+  background: linear-gradient(135deg, #BE123C 0%, #881337 100%);
+  color: #FFFFFF;
+  border-color: #D4AF37;
+  box-shadow: 0 0 15px rgba(190, 18, 60, 0.5), 0 0 5px rgba(212, 175, 55, 0.3);
+}
+
+.highlight-tickets-tab {
+  border: 1px dashed rgba(212, 175, 55, 0.4);
+}
+
+.highlight-tickets-tab.active {
+  background: linear-gradient(135deg, #D4AF37 0%, #B45309 100%);
+  color: #070A12;
+  font-weight: 800;
+  border-color: #FFF;
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.security-lock-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-dark-glass {
+  background: rgba(7, 10, 18, 0.85);
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}

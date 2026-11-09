@@ -1,0 +1,152 @@
+/* ============================================================
+   STYLES CHO TRANG VỀ CHÚNG TÔI (/about)
+   Phong cách: The Greatest Showman (Chuẩn tỷ lệ hiển thị 100%)
+   ============================================================ */
+
+.about-page {
+  min-height: 85vh;
+  background: radial-gradient(circle at 50% 15%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+}
+
+.about-ambient-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 350px;
+  background: radial-gradient(ellipse at 50% 20%, rgba(245, 158, 11, 0.15) 0%, rgba(190, 18, 60, 0.1) 50%, transparent 80%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.max-w-700 {
+  max-width: 700px;
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.drop-shadow-title {
+  text-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+}
+
+.extra-small {
+  font-size: 0.78rem;
+}
+
+.x-small {
+  font-size: 0.72rem;
+}
+
+.bg-dark-glass {
+  background: rgba(7, 10, 18, 0.75);
+}
+
+/* Biểu tượng phân hệ */
+.about-icon-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Thống kê nổi bật */
+.stat-highlight-box {
+  background: rgba(14, 22, 41, 0.65);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease;
+}
+
+.stat-highlight-box:hover {
+  transform: translateY(-3px);
+}
+
+/* Thẻ giá trị cốt lõi */
+.value-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value-card-hover {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.value-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(245, 158, 11, 0.2);
+}
+
+/* ============================================================
+   KHUNG ẢNH ĐẠI DIỆN 4 NHÂN SỰ CHỦ CHỐT (AVATAR CARDS)
+   ============================================================ */
+.leader-card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.leader-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(245, 158, 11, 0.3);
+  border-color: rgba(245, 158, 11, 0.65) !important;
+}
+
+.leader-halo-glow {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(190, 18, 60, 0.15) 50%, transparent 80%);
+  pointer-events: none;
+  filter: blur(20px);
+}
+
+.leader-avatar-wrapper {
+  width: 96px;
+  height: 96px;
+}
+
+.leader-avatar-img {
+  width: 96px;
+  height: 96px;
+  border: 2.5px solid #F59E0B;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.leader-card-hover:hover .leader-avatar-img {
+  transform: scale(1.05);
+}
+
+.leader-badge-pill {
+  width: 22px;
+  height: 22px;
+  background: #070A12;
+  border: 1px solid #F59E0B;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+}
+
+.cta-about-banner {
+  background: radial-gradient(circle at 50% 50%, rgba(190, 18, 60, 0.2) 0%, rgba(37, 99, 235, 0.15) 50%, #070A12 85%),
+              linear-gradient(180deg, #070A12 0%, #05070D 100%);
+}

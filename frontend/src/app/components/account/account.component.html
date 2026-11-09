@@ -1,0 +1,291 @@
+<!-- ============================================================
+     PHÂN HỆ TÀI KHOẢN CÁ NHÂN (CUSTOMER ACCOUNT PORTAL)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     Chỉ truy cập khi ĐÃ ĐĂNG NHẬP (Bảo vệ bởi AuthGuard)
+     Bao gồm: Thông tin, Đổi mật khẩu, và [Mục con] Vé của tôi
+     ============================================================ -->
+
+<div class="account-page position-relative py-5">
+  <!-- Bụi tiên nền -->
+  <div class="stardust-container" aria-hidden="true">
+    <span class="stardust-sparkle" style="top: 15%; left: 10%;">✦</span>
+    <span class="stardust-sparkle" style="top: 28%; left: 85%;">✧</span>
+    <span class="stardust-sparkle" style="top: 60%; left: 12%;">★</span>
+    <span class="stardust-dot" style="top: 25%; left: 45%;"></span>
+    <span class="stardust-dot" style="top: 75%; left: 80%;"></span>
+  </div>
+
+  <div class="container position-relative z-2">
+    <!-- BANNER HỒ SƠ KHÁN GIẢ VIP -->
+    <div class="card card-showman-glass rounded-4 p-4 p-md-5 mb-4 border border-gold-glow shadow-2xl position-relative overflow-hidden">
+      <div class="profile-ambient-glow"></div>
+
+      <div class="row align-items-center g-4">
+        <!-- Avatar & Tên -->
+        <div class="col-md-auto text-center text-md-start">
+          <div class="profile-avatar-box position-relative d-inline-block">
+            <div class="avatar-circle d-flex align-items-center justify-content-center">
+              <span class="fs-1 text-gold-glow">🎭</span>
+            </div>
+            <span class="vip-crown-badge position-absolute top-0 end-0" title="Thành viên Showman VIP">👑</span>
+          </div>
+        </div>
+
+        <div class="col-md text-center text-md-start">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-2">
+            <h2 class="text-gold-gradient fw-bold mb-0">{{ musicalService.currentUser()?.fullName || 'Khách Hàng' }}</h2>
+            <span class="badge badge-showman-gold rounded-pill px-3 py-1 small fw-bold">
+              <i class="bi bi-star-fill text-gold me-1"></i> SHOWMAN GOLD VIP
+            </span>
+          </div>
+          <p class="text-secondary small mb-3">
+            <i class="bi bi-envelope me-1 text-gold"></i> {{ musicalService.currentUser()?.email || 'khachhang@gmail.com' }} • 
+            <i class="bi bi-telephone me-1 text-gold ms-2"></i> {{ musicalService.currentUser()?.phone || '0909123456' }} • 
+            <i class="bi bi-calendar-check me-1 text-gold ms-2"></i> Thành viên từ: <strong>03/2026</strong>
+          </p>
+
+          <!-- Thống kê nhanh -->
+          <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
+            <div class="stat-badge px-3 py-1 rounded-pill bg-dark-glass border border-secondary border-opacity-25 small">
+              <span class="text-secondary">Điểm tích lũy:</span> <strong class="text-gold">1,250 PTS</strong>
+            </div>
+            <div class="stat-badge px-3 py-1 rounded-pill bg-dark-glass border border-secondary border-opacity-25 small">
+              <span class="text-secondary">Ưu đãi hiện có:</span> <strong class="text-ruby-glow">2 Voucher</strong>
+            </div>
+            <div class="stat-badge px-3 py-1 rounded-pill bg-dark-glass border border-secondary border-opacity-25 small">
+              <span class="text-secondary">Trạng thái:</span> <strong class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Đã xác thực</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nút Đăng xuất -->
+        <div class="col-md-auto text-center text-md-end">
+          <button class="btn btn-outline-danger rounded-pill px-3 py-2 btn-sm fw-bold" (click)="onLogout()">
+            <i class="bi bi-box-arrow-right me-1"></i> ĐĂNG XUẤT
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HỆ THỐNG TAB QUẢN TRỊ TÀI KHOẢN -->
+    <div class="account-tabs-wrapper d-flex flex-wrap gap-2 mb-4 p-2 rounded-4 card-showman-glass border border-secondary border-opacity-25">
+      <button
+        type="button"
+        class="btn account-nav-tab flex-fill rounded-pill fw-bold py-2 px-3 d-inline-flex align-items-center justify-content-center gap-2"
+        [class.active]="activeTab() === 'profile'"
+        (click)="setTab('profile')"
+      >
+        <i class="bi bi-person-lines-fill"></i>
+        <span>THÔNG TIN CÁ NHÂN</span>
+      </button>
+
+      <!-- [MỤC CON] VÉ CỦA TÔI (Yêu cầu BA & Phân quyền Authenticated) -->
+      <button
+        type="button"
+        class="btn account-nav-tab flex-fill rounded-pill fw-bold py-2 px-3 d-inline-flex align-items-center justify-content-center gap-2 highlight-tickets-tab"
+        [class.active]="activeTab() === 'tickets'"
+        (click)="setTab('tickets')"
+      >
+        <i class="bi bi-ticket-perforated-fill text-gold"></i>
+        <span>[MỤC CON] VÉ CỦA TÔI</span>
+        <span class="badge bg-danger rounded-pill ms-1">E-Tickets</span>
+      </button>
+
+      <button
+        type="button"
+        class="btn account-nav-tab flex-fill rounded-pill fw-bold py-2 px-3 d-inline-flex align-items-center justify-content-center gap-2"
+        [class.active]="activeTab() === 'security'"
+        (click)="setTab('security')"
+      >
+        <i class="bi bi-shield-lock-fill"></i>
+        <span>ĐỔI MẬT KHẨU</span>
+      </button>
+    </div>
+
+    <!-- NỘI DUNG TỪNG TAB -->
+
+    <!-- ============================================================
+         TAB 1: THÔNG TIN CÁ NHÂN
+         ============================================================ -->
+    @if (activeTab() === 'profile') {
+      <div class="card card-showman-glass rounded-4 p-4 p-md-5 border border-gold-glow shadow-2xl">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+          <div>
+            <h4 class="text-gold-gradient fw-bold mb-1">HỒ SƠ KHÁN GIẢ</h4>
+            <p class="text-secondary small mb-0">Quản lý và cập nhật thông tin cá nhân dùng để nhận vé điện tử và ưu đãi</p>
+          </div>
+          <span class="badge badge-showman-ruby px-3 py-2 rounded-pill small">
+            ID: {{ musicalService.currentUser()?._id || 'KH-8829' }}
+          </span>
+        </div>
+
+        @if (profileMessage()) {
+          <div class="alert alert-success rounded-3 mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div class="small">{{ profileMessage() }}</div>
+          </div>
+        }
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <label class="form-label text-gold small fw-bold">HỌ VÀ TÊN KHÁN GIẢ *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-person"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="fullName"
+                  placeholder="Nhập họ và tên..."
+                />
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-gold small fw-bold">SỐ ĐIỆN THOẠI LIÊN HỆ *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-telephone"></i>
+                </span>
+                <input
+                  type="tel"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="phone"
+                  placeholder="0909123456"
+                />
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">ĐỊA CHỈ EMAIL (KHÔNG THỂ THAY ĐỔI)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-secondary border-secondary border-opacity-25">
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input
+                  type="email"
+                  class="form-control bg-dark text-muted border-secondary border-opacity-25"
+                  formControlName="email"
+                />
+              </div>
+              <small class="text-secondary extra-small mt-1 d-block">Email dùng để nhận mã vé điện tử QR Code.</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-gold small fw-bold">ĐỊA CHỈ LIÊN LẠC</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-geo-alt"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="address"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-showman-gold px-4 py-2 rounded-pill fw-bold shadow">
+              <i class="bi bi-save me-1"></i> LƯU THAY ĐỔI
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 2: [MỤC CON] VÉ CỦA TÔI (MY E-TICKETS)
+         CHỈ HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG
+         ============================================================ -->
+    @if (activeTab() === 'tickets') {
+      <div class="tickets-container-box">
+        <!-- Nhúng toàn bộ phân hệ vé cá nhân (BPMN 2.2.4: Phân loại, QR code, in vé, hủy hoàn tiền tự động) -->
+        <app-my-tickets></app-my-tickets>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 3: ĐỔI MẬT KHẨU BẢO MẬT
+         ============================================================ -->
+    @if (activeTab() === 'security') {
+      <div class="card card-showman-glass rounded-4 p-4 p-md-5 border border-gold-glow shadow-2xl max-w-650 mx-auto">
+        <div class="text-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+          <div class="security-lock-icon mx-auto mb-2">
+            <i class="bi bi-shield-lock text-gold fs-1"></i>
+          </div>
+          <h4 class="text-gold-gradient fw-bold mb-1">ĐỔI MẬT KHẨU TÀI KHOẢN</h4>
+          <p class="text-secondary small mb-0">Nâng cao bảo mật cho tài khoản và thông tin vé nhạc kịch của bạn</p>
+        </div>
+
+        @if (securityError()) {
+          <div class="alert alert-danger rounded-3 mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+            <div class="small">{{ securityError() }}</div>
+          </div>
+        }
+
+        @if (securityMessage()) {
+          <div class="alert alert-success rounded-3 mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill fs-5"></i>
+            <div class="small">{{ securityMessage() }}</div>
+          </div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="mb-3">
+            <label class="form-label text-gold small fw-bold">MẬT KHẨU HIỆN TẠI *</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                <i class="bi bi-key"></i>
+              </span>
+              <input
+                type="password"
+                class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                placeholder="Nhập mật khẩu đang dùng..."
+                formControlName="currentPassword"
+              />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-gold small fw-bold">MẬT KHẨU MỚI *</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                <i class="bi bi-lock"></i>
+              </span>
+              <input
+                type="password"
+                class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                placeholder="Tối thiểu 6 ký tự..."
+                formControlName="newPassword"
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label text-gold small fw-bold">XÁC NHẬN MẬT KHẨU MỚI *</label>
+            <div class="input-group">
+              <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                <i class="bi bi-check2-circle"></i>
+              </span>
+              <input
+                type="password"
+                class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                placeholder="Nhập lại mật khẩu mới..."
+                formControlName="confirmPassword"
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-showman-ruby w-100 py-3 rounded-pill fw-bold shadow">
+            <i class="bi bi-shield-check me-1"></i> XÁC NHẬN CẬP NHẬT MẬT KHẨU
+          </button>
+        </form>
+      </div>
+    }
+  </div>
+</div>

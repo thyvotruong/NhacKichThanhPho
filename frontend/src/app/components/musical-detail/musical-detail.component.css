@@ -1,0 +1,87 @@
+/* ============================================================
+   STYLES CHO TRANG CHI TIẾT VỞ DIỄN & FORM ĐẶT VÉ
+   Phong cách: The Greatest Showman
+   ============================================================ */
+
+.musical-detail-hero-showman {
+  min-height: 340px;
+  background-size: cover;
+  background-position: center;
+  background-color: #090D16;
+}
+
+.showman-spotlight-beam-detail {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 380px;
+  background: radial-gradient(ellipse at 50% 20%, rgba(245, 158, 11, 0.22) 0%, rgba(190, 18, 60, 0.15) 45%, transparent 75%);
+  pointer-events: none;
+  filter: blur(25px);
+}
+
+.drop-shadow-title {
+  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 25px rgba(245, 158, 11, 0.35));
+}
+
+.synopsis-text {
+  line-height: 1.6;
+  font-size: 0.88rem;
+}
+
+.poster-inner-showman img {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(190, 18, 60, 0.3);
+  transition: transform 0.4s ease;
+}
+
+.poster-inner-showman:hover img {
+  transform: scale(1.02);
+}
+
+.table-row-glass {
+  transition: background-color 0.25s ease;
+}
+
+.table-row-glass:hover {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+}
+
+.booking-box-showman {
+  border-top: 3px solid #F59E0B !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.2) !important;
+}
+
+.success-icon-badge-showman {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(9, 13, 22, 0.9) 100%);
+  border: 1.5px solid #F59E0B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+}
+
+.bg-dark-glass {
+  background: rgba(14, 21, 38, 0.9) !important;
+}
+
+.price-summary-box-showman {
+  background-color: rgba(9, 13, 22, 0.85) !important;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.max-w-600 {
+  max-width: 600px;
+}
+
+.x-small {
+  font-size: 0.72rem;
+}
+
+.min-vh-50 {
+  min-height: 50vh;
+}

@@ -1,0 +1,45 @@
+/* ============================================================
+   STYLES CHO CHECKOUT FUNNEL & E-TICKET
+   ============================================================ */
+
+.e-ticket-card {
+  background: radial-gradient(circle at 50% 20%, #151D33 0%, #0A0F1D 80%);
+}
+
+.ticket-glow-circle {
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bg-dark-translucent {
+  background: rgba(7, 10, 18, 0.85);
+}
+
+.payment-option-card {
+  background: rgba(14, 22, 41, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.payment-option-card:hover {
+  background: rgba(22, 34, 62, 0.8);
+  border-color: rgba(245, 158, 11, 0.4);
+  transform: translateX(4px);
+}
+
+.payment-option-card.active {
+  background: rgba(30, 45, 80, 0.9);
+  border-color: #F59E0B;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+}
+
+.x-small {
+  font-size: 0.72rem;
+}

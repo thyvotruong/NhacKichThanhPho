@@ -1,0 +1,77 @@
+/**
+ * ============================================================
+ * NHẠC KỊCH THÀNH PHỐ - AUTH COMPONENT STYLES
+ * Phong cách: The Greatest Showman (100% Montserrat)
+ * ============================================================
+ */
+
+.auth-page {
+  min-height: calc(100vh - 160px);
+  background: radial-gradient(circle at 50% 20%, #151e36 0%, var(--showman-canvas-night) 75%);
+}
+
+.auth-emblem-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: radial-gradient(circle, rgba(190, 18, 60, 0.4) 0%, rgba(7, 10, 18, 0.95) 100%);
+  border: 1.5px solid var(--showman-gold);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+}
+
+.auth-tabs-wrapper {
+  background: rgba(7, 10, 18, 0.7);
+}
+
+.auth-tab-btn {
+  color: #94A3B8;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+  border: none;
+}
+
+.auth-tab-btn.active {
+  background: linear-gradient(135deg, var(--showman-gold) 0%, #D97706 100%);
+  color: #070A12;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+}
+
+.method-pill-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94A3B8;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.method-pill-btn:hover {
+  color: var(--showman-gold);
+  border-color: var(--showman-gold);
+}
+
+.method-pill-btn.active {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--showman-gold);
+  border-color: var(--showman-gold);
+}
+
+.letter-spacing-2 {
+  letter-spacing: 4px;
+}
+
+.hover-gold:hover {
+  color: var(--showman-gold) !important;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}

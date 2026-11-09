@@ -1,0 +1,405 @@
+<!-- ============================================================
+     PHÂN HỆ TÀI KHOẢN KHÁCH HÀNG: ĐĂNG NHẬP, ĐĂNG KÝ & QUÊN MẬT KHẨU (BPMN 2.2.2)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<div class="auth-page position-relative py-5 d-flex align-items-center justify-content-center">
+  <!-- Bụi tiên nền -->
+  <div class="stardust-container" aria-hidden="true">
+    <span class="stardust-sparkle" style="top: 12%; left: 18%;">✦</span>
+    <span class="stardust-sparkle" style="top: 25%; left: 82%;">✧</span>
+    <span class="stardust-sparkle" style="top: 75%; left: 14%;">✦</span>
+    <span class="stardust-dot" style="top: 20%; left: 55%;"></span>
+    <span class="stardust-dot" style="top: 68%; left: 75%;"></span>
+  </div>
+
+  <div class="container position-relative z-2">
+    <div class="row justify-content-center">
+      <div class="col-md-9 col-lg-7 col-xl-6">
+        <!-- Khối Thẻ Xác Thực Khách Hàng -->
+        <div class="card-showman-glass p-4 p-md-5 rounded-4 border border-gold-glow shadow-2xl">
+          <!-- Header Thương hiệu -->
+          <div class="text-center mb-4">
+            <div class="auth-emblem-box mx-auto mb-3 d-flex align-items-center justify-content-center">
+              <span class="fs-2 text-gold-glow">🎭</span>
+            </div>
+            <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold text-uppercase mb-2 shadow">
+              <i class="bi bi-person-circle text-gold me-1"></i> TÀI KHOẢN KHÁN GIẢ
+            </span>
+            <h2 class="text-gold-gradient fw-black mb-1">
+              @if (activeTab() === 'login') {
+                ĐĂNG NHẬP TÀI KHOẢN
+              } @else if (activeTab() === 'register') {
+                ĐĂNG KÝ THÀNH VIÊN
+              } @else {
+                KHÔI PHỤC MẬT KHẨU
+              }
+            </h2>
+            <p class="text-secondary small mb-0">
+              Nhà Hát Thành Phố • Trải nghiệm đặt vé và quản lý lịch diễn đẳng cấp
+            </p>
+            <div class="showman-divider"></div>
+          </div>
+
+          <!-- Thông báo lỗi hoặc thành công -->
+          @if (errorMessage()) {
+            <div class="alert alert-danger rounded-3 mb-4 d-flex align-items-center gap-2 animate-shake">
+              <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+              <div class="small flex-grow-1">{{ errorMessage() }}</div>
+            </div>
+          }
+
+          @if (successMessage()) {
+            <div class="alert alert-success rounded-3 mb-4 d-flex align-items-center gap-2">
+              <i class="bi bi-check-circle-fill fs-5"></i>
+              <div class="small flex-grow-1">{{ successMessage() }}</div>
+            </div>
+          }
+
+          <!-- Chuyển Đổi Tab: Đăng Nhập vs Đăng Ký (BPMN 2.2.2) -->
+          <div class="auth-tabs-wrapper d-flex p-1 rounded-pill mb-4 border border-secondary border-opacity-25">
+            <button
+              type="button"
+              class="btn flex-fill rounded-pill fw-bold py-2 auth-tab-btn"
+              [class.active]="activeTab() === 'login'"
+              (click)="switchTab('login')"
+            >
+              <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
+            </button>
+            <button
+              type="button"
+              class="btn flex-fill rounded-pill fw-bold py-2 auth-tab-btn"
+              [class.active]="activeTab() === 'register'"
+              (click)="switchTab('register')"
+            >
+              <i class="bi bi-person-plus-fill me-1"></i> Đăng Ký
+            </button>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- 1: TAB ĐĂNG NHẬP (BPMN 2.2.2.1) -->
+          <!-- ========================================== -->
+          @if (activeTab() === 'login') {
+            <!-- Chọn phương thức đăng nhập -->
+            <div class="d-flex justify-content-center gap-2 mb-4">
+              <button
+                type="button"
+                class="btn btn-sm method-pill-btn"
+                [class.active]="loginMethod() === 'email'"
+                (click)="setLoginMethod('email')"
+              >
+                <i class="bi bi-envelope-fill me-1"></i> Email
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm method-pill-btn"
+                [class.active]="loginMethod() === 'phone'"
+                (click)="setLoginMethod('phone')"
+              >
+                <i class="bi bi-phone-fill me-1"></i> Số điện thoại & OTP
+              </button>
+            </div>
+
+            <!-- Form Đăng nhập -->
+            <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+              <!-- Nhánh Email -->
+              @if (loginMethod() === 'email') {
+                <div class="mb-3">
+                  <label class="form-label text-secondary small fw-bold">ĐỊA CHỈ EMAIL:</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-envelope"></i>
+                    </span>
+                    <input
+                      type="email"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="VD: khachhang@gmail.com"
+                      formControlName="email"
+                    />
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label text-secondary small fw-bold mb-0">MẬT KHẨU:</label>
+                    <a href="javascript:void(0)" class="text-gold small text-decoration-none" (click)="switchTab('forgot')">
+                      Quên mật khẩu?
+                    </a>
+                  </div>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="Nhập mật khẩu..."
+                      formControlName="password"
+                    />
+                  </div>
+                </div>
+              }
+
+              <!-- Nhánh Số Điện Thoại & OTP -->
+              @if (loginMethod() === 'phone') {
+                <div class="mb-3">
+                  <label class="form-label text-secondary small fw-bold">SỐ ĐIỆN THOẠI:</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-telephone"></i>
+                    </span>
+                    <input
+                      type="tel"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="VD: 0909123456"
+                      formControlName="phone"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-outline-warning border-gold-glow fw-bold text-white small"
+                      (click)="sendOtp()"
+                      [disabled]="otpSent() && otpCountdown() > 0"
+                    >
+                      {{ otpSent() && otpCountdown() > 0 ? ('Gửi lại (' + otpCountdown() + 's)') : 'Gửi mã OTP' }}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label text-secondary small fw-bold">MÃ XÁC THỰC OTP:</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-shield-check"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25 text-center fw-bold letter-spacing-2"
+                      placeholder="Nhập mã 6 chữ số..."
+                      formControlName="otp"
+                    />
+                  </div>
+                  <small class="text-secondary opacity-75 mt-1 d-block">Mã OTP thử nghiệm nhanh: <strong class="text-gold">123456</strong></small>
+                </div>
+              }
+
+              <div class="d-grid mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
+                  [disabled]="isSubmitting()"
+                >
+                  @if (isSubmitting()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    ĐANG XÁC THỰC...
+                  } @else {
+                    <i class="bi bi-box-arrow-in-right me-1"></i> ĐĂNG NHẬP NGAY
+                  }
+                </button>
+              </div>
+            </form>
+
+            <!-- Đăng nhập qua mạng xã hội (Google) -->
+            <div class="position-relative text-center my-4">
+              <hr class="border-secondary opacity-25">
+              <span class="position-absolute top-50 start-50 translate-middle px-3 text-secondary small bg-dark-glass">
+                HOẶC
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-outline-light w-100 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 border-secondary border-opacity-50 hover-glow"
+              (click)="loginWithGoogle()"
+              [disabled]="isSubmitting()"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.5 0 2.8.5 3.9 1.4l2.9-2.9C17 1.8 14.6 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.6 2.8C6.4 7.2 8.9 5 12 5z"/>
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                <path fill="#FBBC05" d="M5.5 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.8s.7 5.1 1.9 7.5l3.6-2.9z"/>
+                <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.6-2.2-6.5-5.1L1.9 16.5C3.7 20.3 7.5 23.5 12 23.5z"/>
+              </svg>
+              <span class="fw-bold small">Đăng nhập nhanh với Google</span>
+            </button>
+          }
+
+          <!-- ========================================== -->
+          <!-- 2: TAB ĐĂNG KÝ (BPMN 2.2.2.2) -->
+          <!-- ========================================== -->
+          @if (activeTab() === 'register') {
+            <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+              <div class="mb-3">
+                <label class="form-label text-secondary small fw-bold">HỌ VÀ TÊN KHÁN GIẢ *</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                    <i class="bi bi-person"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                    placeholder="VD: Nguyễn Văn An"
+                    formControlName="fullName"
+                  />
+                </div>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label text-secondary small fw-bold">ĐỊA CHỈ EMAIL *</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-envelope"></i>
+                    </span>
+                    <input
+                      type="email"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="email@vidu.com"
+                      formControlName="email"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-sm-6">
+                  <label class="form-label text-secondary small fw-bold">SỐ ĐIỆN THOẠI *</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-telephone"></i>
+                    </span>
+                    <input
+                      type="tel"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="0909123456"
+                      formControlName="phone"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-sm-6">
+                  <label class="form-label text-secondary small fw-bold">MẬT KHẨU *</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="Tối thiểu 6 ký tự"
+                      formControlName="password"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-sm-6">
+                  <label class="form-label text-secondary small fw-bold">XÁC NHẬN MẬT KHẨU *</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-check2-circle"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="Nhập lại mật khẩu"
+                      formControlName="confirmPassword"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="agreeTerms" formControlName="agreeTerms">
+                <label class="form-check-label text-secondary small" for="agreeTerms">
+                  Tôi đồng ý với <a routerLink="/support" class="text-gold text-decoration-none">Điều khoản sử dụng</a> và <a routerLink="/support" class="text-gold text-decoration-none">Chính sách bảo mật</a> của Nhà Hát.
+                </label>
+              </div>
+
+              <div class="d-grid mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-showman-ruby py-3 fw-bold fs-6 shadow-2xl"
+                  [disabled]="isSubmitting()"
+                >
+                  @if (isSubmitting()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    ĐANG XỬ LÝ...
+                  } @else {
+                    <i class="bi bi-person-plus-fill me-1"></i> TẠO TÀI KHOẢN MỚI
+                  }
+                </button>
+              </div>
+            </form>
+
+            <div class="position-relative text-center my-4">
+              <hr class="border-secondary opacity-25">
+              <span class="position-absolute top-50 start-50 translate-middle px-3 text-secondary small bg-dark-glass">
+                HOẶC
+              </span>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-outline-light w-100 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 border-secondary border-opacity-50 hover-glow"
+              (click)="registerWithGoogle()"
+              [disabled]="isSubmitting()"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.5 0 2.8.5 3.9 1.4l2.9-2.9C17 1.8 14.6 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.6 2.8C6.4 7.2 8.9 5 12 5z"/>
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                <path fill="#FBBC05" d="M5.5 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12 0 14.8s.7 5.1 1.9 7.5l3.6-2.9z"/>
+                <path fill="#34A853" d="M12 23.5c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.6-2.2-6.5-5.1L1.9 16.5C3.7 20.3 7.5 23.5 12 23.5z"/>
+              </svg>
+              <span class="fw-bold small">Đăng ký nhanh với Google</span>
+            </button>
+          }
+
+          <!-- ========================================== -->
+          <!-- 3: TAB QUÊN MẬT KHẨU -->
+          <!-- ========================================== -->
+          @if (activeTab() === 'forgot') {
+            <form [formGroup]="forgotForm" (ngSubmit)="onForgotSubmit()">
+              <p class="text-secondary small mb-3">
+                Nhập Email hoặc Số điện thoại bạn đã dùng để đăng ký tài khoản. Hệ thống sẽ gửi mã xác thực OTP để tạo mật khẩu mới.
+              </p>
+
+              <div class="mb-4">
+                <label class="form-label text-secondary small fw-bold">EMAIL HOẶC SỐ ĐIỆN THOẠI:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                    <i class="bi bi-shield-lock"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                    placeholder="VD: khachhang@gmail.com hoặc 0909123456"
+                    formControlName="identifier"
+                  />
+                </div>
+              </div>
+
+              <div class="d-grid mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
+                  [disabled]="isSubmitting()"
+                >
+                  @if (isSubmitting()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    ĐANG GỬI...
+                  } @else {
+                    <i class="bi bi-send-fill me-1"></i> GỬI MÃ KHÔI PHỤC
+                  }
+                </button>
+              </div>
+
+              <div class="text-center mt-3">
+                <a href="javascript:void(0)" class="text-gold small text-decoration-none" (click)="switchTab('login')">
+                  <i class="bi bi-arrow-left me-1"></i> Quay lại Đăng nhập
+                </a>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

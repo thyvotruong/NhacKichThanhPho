@@ -1,0 +1,116 @@
+/**
+ * ============================================================
+ * NHẠC KỊCH THÀNH PHỐ - OPS CHECK-IN PORTAL STYLES
+ * Phong cách: The Greatest Showman (100% Montserrat)
+ * ============================================================
+ */
+
+.ops-checkin-page {
+  min-height: calc(100vh - 160px);
+  background: radial-gradient(circle at 50% 10%, #151d33 0%, var(--showman-canvas-night) 70%);
+}
+
+.checker-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--showman-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.live-blink-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  display: inline-block;
+  box-shadow: 0 0 8px #10B981;
+  animation: liveBlink 1.5s infinite ease-in-out;
+}
+
+@keyframes liveBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1.5px;
+}
+
+.sample-ticket-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #E2E8F0;
+  transition: all 0.2s ease;
+}
+
+.sample-ticket-pill:hover {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--showman-gold);
+  border-color: var(--showman-gold);
+}
+
+.pill-confirmed {
+  border-left: 3px solid #10B981;
+}
+
+.pill-checked {
+  border-left: 3px solid #3B82F6;
+  opacity: 0.7;
+}
+
+.pill-cancelled {
+  border-left: 3px solid #EF4444;
+  opacity: 0.7;
+}
+
+.success-icon-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: #10B981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-icon-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: #EF4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkin-success-card {
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+}
+
+.checkin-error-card {
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.recent-checkins-list {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

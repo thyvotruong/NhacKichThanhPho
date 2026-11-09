@@ -1,0 +1,136 @@
+/**
+ * ============================================================
+ * NHẠC KỊCH THÀNH PHỐ - INTERNAL GATEWAY STYLES
+ * Phong cách: The Greatest Showman (100% Montserrat)
+ * ============================================================
+ */
+
+.internal-gateway-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 15%, #18223c 0%, var(--showman-canvas-night) 70%);
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.drop-shadow-title {
+  text-shadow: 0 4px 20px rgba(245, 158, 11, 0.35);
+}
+
+.staff-gateway-emblem {
+  width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  background: radial-gradient(circle, rgba(190, 18, 60, 0.45) 0%, rgba(7, 10, 18, 0.95) 100%);
+  border: 2px solid var(--showman-gold);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.4);
+}
+
+.staff-profile-card {
+  background: rgba(14, 22, 41, 0.7);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.25s ease;
+}
+
+.staff-profile-card:hover {
+  background: rgba(14, 22, 41, 0.95);
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.staff-profile-card.active-card {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--showman-gold) !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+}
+
+.staff-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.icon-gold {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--showman-gold);
+  border: 1px solid var(--showman-gold);
+}
+
+.icon-ruby {
+  background: rgba(190, 18, 60, 0.2);
+  color: #FB7185;
+  border: 1px solid #BE123C;
+}
+
+.icon-emerald {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border: 1px solid #10B981;
+}
+
+.icon-sapphire {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
+  border: 1px solid #2563EB;
+}
+
+.badge-role {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.badge-gold {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--showman-gold);
+  border: 1px solid var(--showman-gold);
+}
+
+.badge-ruby {
+  background: rgba(190, 18, 60, 0.2);
+  color: #FB7185;
+  border: 1px solid #BE123C;
+}
+
+.badge-emerald {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border: 1px solid #10B981;
+}
+
+.badge-sapphire {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
+  border: 1px solid #2563EB;
+}
+
+.module-select-card {
+  background: rgba(14, 22, 41, 0.7);
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transition: all 0.25s ease;
+}
+
+.module-select-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--showman-gold) !important;
+}
+
+.module-select-card.module-active {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: var(--showman-gold) !important;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+}
+
+.letter-spacing-2 {
+  letter-spacing: 4px;
+}
+
+.hover-gold:hover {
+  color: var(--showman-gold) !important;
+}

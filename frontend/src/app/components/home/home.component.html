@@ -1,0 +1,405 @@
+<!-- ============================================================
+     PHÂN HỆ TRANG CHỦ: HERO BANNER SÂN KHẤU MÀN NHUNG ĐỎ VÉN QUA
+     Phong cách: "The Greatest Showman"
+     - Màn che đỏ (Velvet Theater Curtain) vén sang hai bên
+     - Các vở nhạc kịch tỏa sáng rực rỡ ở trung tâm sân khấu
+     - Mật độ bụi tiên dày đặc (Dense Stardust Bokeh & Sparkles)
+     - Ánh đèn rọi Spotlight quét chuyển động sống động
+     ============================================================ -->
+<section class="hero-theatrical-stage position-relative overflow-hidden">
+
+<!-- ==================== HỆ THỐNG MÀN NHUNG ĐỎ SÂN KHẤU (THEATRICAL CURTAIN) ==================== -->
+  <div class="stage-curtains-wrapper">
+    <!-- 1. Màn nhung vòm đỉnh (Top Valance Drapes) với hiệu ứng xếp lớp & tua rua vàng -->
+    <div class="curtain-top-valance">
+      <div class="valance-folds"></div>
+      <div class="curtain-gold-fringe"></div>
+    </div>
+
+    <!-- 2. Màn nhung đỏ bên trái vén sang một bên (Left Draped Curtain with 3D folds) -->
+    <div class="curtain-drape curtain-drape-left">
+      <div class="curtain-fold-shadow"></div>
+      <div class="curtain-rope-tie curtain-rope-left">
+        <span class="tassel-gold"></span>
+      </div>
+    </div>
+
+    <!-- 3. Màn nhung đỏ bên phải vén sang một bên (Right Draped Curtain with 3D folds) -->
+    <div class="curtain-drape curtain-drape-right">
+      <div class="curtain-fold-shadow"></div>
+      <div class="curtain-rope-tie curtain-rope-right">
+        <span class="tassel-gold"></span>
+      </div>
+    </div>
+
+    <!-- 4. Sàn sân khấu phản chiếu ánh sáng (Stage Floor Glow) -->
+    <div class="stage-floor-reflection"></div>
+  </div>
+  
+  <!-- ==================== ÁNH ĐÈN RỌI SPOTLIGHT QUÉT CHUYỂN ĐỘNG ==================== -->
+  <div class="stage-spotlight-left"></div>
+  <div class="stage-spotlight-right"></div>
+  <div class="stage-center-radial-flare"></div>
+
+  <!-- ==================== MẬT ĐỘ BỤI TIÊN DÀY ĐẶC & PARTICLES CHUYỂN ĐỘNG ==================== -->
+  <div class="stardust-dense-container">
+    <!-- Ngôi sao lấp lánh 4 cánh (Cross Sparkles) -->
+    <span class="sparkle-cross cross-1">✦</span>
+    <span class="sparkle-cross cross-2">★</span>
+    <span class="sparkle-cross cross-3">✦</span>
+    <span class="sparkle-cross cross-4">★</span>
+    <span class="sparkle-cross cross-5">✦</span>
+    <span class="sparkle-cross cross-6">✦</span>
+    <span class="sparkle-cross cross-7">★</span>
+    <span class="sparkle-cross cross-8">✦</span>
+    <span class="sparkle-cross cross-9">✦</span>
+    <span class="sparkle-cross cross-10">★</span>
+    <span class="sparkle-cross cross-11">✦</span>
+    <span class="sparkle-cross cross-12">★</span>
+
+    <!-- Hạt bụi tiên vàng phát sáng (Golden Stardust Dots) -->
+    <span class="sparkle-dot dot-1"></span>
+    <span class="sparkle-dot dot-2"></span>
+    <span class="sparkle-dot dot-3"></span>
+    <span class="sparkle-dot dot-4"></span>
+    <span class="sparkle-dot dot-5"></span>
+    <span class="sparkle-dot dot-6"></span>
+    <span class="sparkle-dot dot-7"></span>
+    <span class="sparkle-dot dot-8"></span>
+    <span class="sparkle-dot dot-9"></span>
+    <span class="sparkle-dot dot-10"></span>
+    <span class="sparkle-dot dot-11"></span>
+    <span class="sparkle-dot dot-12"></span>
+    <span class="sparkle-dot dot-13"></span>
+    <span class="sparkle-dot dot-14"></span>
+
+    <!-- Quầng mờ Bokeh ánh sáng (Bokeh Orbs) -->
+    <div class="bokeh-orb bokeh-1"></div>
+    <div class="bokeh-orb bokeh-2"></div>
+    <div class="bokeh-orb bokeh-3"></div>
+    <div class="bokeh-orb bokeh-4"></div>
+    <div class="bokeh-orb bokeh-5"></div>
+  </div>
+
+  <!-- ==================== NỘI DUNG CÁC VỞ NHẠC KỊCH TRÊN SÂN KHẤU ==================== -->
+  @for (slide of heroSlides; track slide.slug; let idx = $index) {
+    <div
+      class="hero-slide-item position-absolute top-0 start-0 w-100 h-100"
+      [class.active]="activeSlideIndex() === idx"
+    >
+      <div class="container h-100 d-flex align-items-center position-relative z-10 pt-4">
+        <div class="row align-items-center w-100 g-5">
+          <!-- Cột thông tin vở diễn -->
+          <div class="col-lg-7 text-white py-4">
+            <!-- Huy hiệu vở diễn phong cách hoàng gia -->
+            <div class="d-inline-flex flex-wrap align-items-center gap-2 mb-3">
+              <span class="badge badge-showman-ruby px-3 py-2 rounded-pill text-uppercase shadow">
+                <i class="bi bi-stars text-gold me-1"></i> {{ slide.badge }}
+              </span>
+              <span class="badge badge-showman-gold px-3 py-2 rounded-pill text-uppercase shadow">
+                <i class="bi bi-fire me-1"></i> Broadway Grand Season 2026
+              </span>
+            </div>
+
+            <!-- Tên vở kịch chính nổi bật trên nền màn nhung với Montserrat 900 dát vàng -->
+            <h1 class="display-3 fw-bold text-gold-gradient mb-3 line-height-tight drop-shadow-theatrical">
+              {{ slide.title }}
+            </h1>
+
+            <!-- Phụ đề & Giới thiệu ngắn gọn -->
+            <p class="lead text-secondary mb-4 fs-5 fw-normal max-w-550 leading-relaxed">
+              {{ slide.subtitle }}
+            </p>
+
+            <!-- Thông tin đạo diễn & Thời lượng -->
+            <div class="d-flex flex-wrap align-items-center gap-3 text-secondary small mb-4 py-2 border-top border-bottom border-glass-glow">
+              <span class="d-inline-flex align-items-center text-white fw-bold">
+                <i class="bi bi-person-badge-fill text-ruby-glow me-2 fs-6"></i> {{ slide.director }}
+              </span>
+              <span class="text-gold">•</span>
+              <span class="d-inline-flex align-items-center text-white fw-bold">
+                <i class="bi bi-clock-history text-gold-glow me-2 fs-6"></i> {{ slide.time }}
+              </span>
+            </div>
+
+            <!-- Cặp nút hành động: Đặt vé ngay & Xem lịch diễn -->
+            <div class="d-flex flex-wrap gap-2 pt-2">
+              <a
+                [routerLink]="['/musical', slide.slug]"
+                class="btn btn-showman-ruby px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2"
+              >
+                <i class="bi bi-ticket-perforated-fill text-gold fs-5"></i>
+                <span>ĐẶT VÉ NGAY</span>
+              </a>
+              <button
+                (click)="scrollToSection('schedules-section')"
+                class="btn btn-showman-outline px-3 py-2 rounded-pill d-inline-flex align-items-center gap-2"
+              >
+                <i class="bi bi-calendar3 text-gold"></i>
+                <span>XEM LỊCH DIỄN</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cột Poster hình ảnh ấn tượng trên bục sân khấu -->
+          <div class="col-lg-5 d-none d-lg-block text-center position-relative">
+            <div class="stage-poster-pedestal mx-auto position-relative">
+              <div class="poster-ambient-backlight"></div>
+              <img
+                [src]="slide.bgImage"
+                [alt]="slide.title"
+                class="img-fluid rounded-4 object-fit-cover w-100 h-100 position-relative z-2 border border-gold-glow"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Nút điều hướng Slider Prev / Next -->
+  <button class="stage-ctrl stage-prev d-none d-md-flex" (click)="prevSlide()" aria-label="Vở kịch trước">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  <button class="stage-ctrl stage-next d-none d-md-flex" (click)="nextSlide()" aria-label="Vở kịch tiếp theo">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+</section>
+<!-- ============================================================
+     PHÂN HỆ CÁC VỞ NHẠC KỊCH TIÊU BIỂU (MUSICAL CARDS)
+     ============================================================ -->
+<section id="musicals-section" class="py-5 position-relative">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="text-gold-gradient display-5 fw-bold mt-2 mb-2">CÁC VỞ NHẠC KỊCH TIÊU BIỂU</h2>
+      <div class="showman-divider"></div>
+      <p class="text-secondary max-w-600 mx-auto">
+        Những tác phẩm được dàn dựng kỳ công với âm thanh giao hưởng trực tiếp, vũ đạo bùng nổ và ánh sáng sân khấu huyền ảo.
+      </p>
+    </div>
+
+    <!-- Danh sách thẻ vở diễn Glassmorphism -->
+    <div class="row g-4">
+      @for (musical of musicals(); track musical.slug) {
+        <div class="col-lg-6">
+          <div class="card card-showman-glass h-100 rounded-4 overflow-hidden">
+            <div class="row g-0 h-100">
+              <div class="col-md-5 position-relative overflow-hidden">
+                <img
+                  [src]="musical.posterUrl"
+                  [alt]="musical.title"
+                  class="img-fluid h-100 w-100 object-fit-cover card-poster-img"
+                  loading="lazy"
+                />
+                <span class="position-absolute top-0 start-0 m-3 badge badge-showman-ruby shadow">
+                  <i class="bi bi-clock me-1 text-gold"></i> {{ musical.duration }} PHÚT
+                </span>
+              </div>
+              <div class="col-md-7 d-flex flex-column justify-content-between p-4">
+                <div>
+                  <h3 class="fw-bold text-white fs-4 mb-1">
+                    {{ musical.title }}
+                  </h3>
+                  <p class="text-ruby-glow small fw-semibold mb-2 fst-italic">
+                    {{ musical.subtitle }}
+                  </p>
+                  <p class="text-secondary small mb-3 line-clamp-3 leading-relaxed">
+                    {{ musical.synopsis }}
+                  </p>
+
+                  <div class="d-flex flex-column gap-1 mb-3 pt-2 border-top border-secondary border-opacity-25 text-secondary small">
+                    <div>
+                      <i class="bi bi-person-fill text-gold me-1"></i> <strong>Đạo diễn:</strong>
+                      <span class="text-white ms-1">{{ musical.director }}</span>
+                    </div>
+                    <div>
+                      <i class="bi bi-tag-fill text-ruby-glow me-1"></i> <strong>Giá vé từ:</strong>
+                      <span class="text-gold-gradient fw-bold ms-1 fs-6">
+                        {{ (musical.ticketPrices[0]?.price || 450000) | number:'1.0-0' }} VNĐ
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Nút điều hướng Slug Routing -->
+                <div class="pt-2">
+                  <a
+                    [routerLink]="['/musical', musical.slug]"
+                    class="btn btn-showman-ruby w-100 rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <span>XEM CHI TIẾT & ĐẶT VÉ</span>
+                    <i class="bi bi-arrow-right text-gold"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PHÂN HỆ LỊCH DIỄN NỔI BẬT (UPCOMING SCHEDULES)
+     ============================================================ -->
+<!-- ============================================================
+      PHÂN HỆ LỊCH DIỄN NỔI BẬT (UPCOMING SCHEDULES)
+      ============================================================ -->
+<section id="schedules-section" class="py-5 position-relative schedules-bg-ambient border-top border-bottom border-gold-glow">
+  <div class="container py-4">
+    <!-- Tiêu đề và mô tả căn giữa -->
+    <div class="text-center mb-5">
+      <h2 class="text-gold-gradient display-5 fw-bold mb-3 pt-2 lh-base">LỊCH DIỄN SẮP TỚI</h2>
+      <div class="showman-divider mx-auto my-2"></div>
+      <p class="text-secondary mx-auto max-w-500 small leading-relaxed mt-2">
+        Khán phòng Nhà Hát Thành Phố với hệ thống âm thanh vòm Dolby Atmos và ghế nhung hoàng gia êm ái.
+      </p>
+    </div>
+
+    <!-- Lưới lịch chiếu Card Theatrical -->
+    <div class="row g-4 justify-content-center">
+      @for (schedule of schedules(); track schedule._id) {
+        <div class="col-lg-6 col-xl-3 col-md-6">
+          <!-- Thay card-showman-glass bằng style nền sáng hơn, sang trọng hơn -->
+          <div class="card rounded-4 h-100 border border-gold-glow shadow-lg" style="background: linear-gradient(135deg, rgba(40, 30, 45, 0.95) 0%, rgba(20, 15, 25, 0.98) 100%);">
+            <div class="card-body d-flex flex-column justify-content-between p-4">
+              <div>
+                <!-- Header Ngày & Trạng Thái Vé (@if) -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div class="date-badge-showman text-center p-2 rounded-3 border border-gold-glow bg-dark bg-opacity-50">
+                    <span class="d-block text-gold fw-bold fs-4 line-height-1">
+                      {{ schedule.performanceDate | date:'dd' }}
+                    </span>
+                    <span class="d-block text-uppercase text-light x-small fw-semibold opacity-75">
+                      THÁNG {{ schedule.performanceDate | date:'MM' }}
+                    </span>
+                  </div>
+
+                  <!-- DIRECTIVE @if: CẬP NHẬT TRẠNG THÁI VÉ CÒN VÉ / CHÁY VÉ -->
+                  @if (schedule.status === 'available') {
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-2 rounded-pill small fw-semibold">
+                      <i class="bi bi-check-circle-fill me-1"></i> Còn vé
+                    </span>
+                  }
+                  @if (schedule.status === 'sold_out') {
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 px-3 py-2 rounded-pill small fw-semibold">
+                      <i class="bi bi-fire me-1"></i> Cháy vé
+                    </span>
+                  }
+                </div>
+
+                <!-- Tên vở diễn & Thông tin suất -->
+                <h4 class="text-white fs-5 fw-bold mb-3">
+                  {{ schedule.musicalTitle }}
+                </h4>
+                <div class="schedule-meta small d-flex flex-column gap-2 mb-3">
+                  <span class="d-flex align-items-center text-light">
+                    <i class="bi bi-clock-fill text-gold me-2 flex-shrink-0"></i> 
+                    <span>Giờ diễn: <strong class="text-white ms-1">{{ schedule.time }}</strong></span>
+                  </span>
+                  <span class="d-flex align-items-center text-light">
+                    <i class="bi bi-door-open-fill text-ruby-glow me-2 flex-shrink-0"></i> 
+                    <span class="text-truncate">{{ schedule.hall }}</span>
+                  </span>
+                  <span class="d-flex align-items-center text-light opacity-75">
+                    <i class="bi bi-geo-alt-fill text-gold me-2 flex-shrink-0"></i> 
+                    <span>{{ schedule.venue }}</span>
+                  </span>
+                </div>
+              </div>
+
+              <!-- Nút hành động tương ứng trạng thái vé -->
+              <div class="pt-3 border-top border-secondary border-opacity-25 mt-2">
+                @if (schedule.status === 'available') {
+                  <a
+                    [routerLink]="['/musical', schedule.musicalSlug]"
+                    class="btn btn-warning w-100 rounded-pill btn-sm py-2 fw-bold text-dark shadow-sm"
+                    style="background: linear-gradient(45deg, #f39c12, #f1c40f); border: none;"
+                  >
+                    <i class="bi bi-ticket-perforated me-1"></i> ĐẶT SUẤT NÀY
+                  </a>
+                }
+                @if (schedule.status === 'sold_out') {
+                  <!-- Đã sửa màu chữ thành sáng rõ, không bị ẩn chìm nữa -->
+                  <button class="btn btn-dark w-100 rounded-pill btn-sm py-2 text-light border border-secondary opacity-75" disabled>
+                    <i class="bi bi-bell-slash me-1"></i> ĐÃ HẾT CHỖ
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-12 text-center py-5">
+          <p class="text-secondary fs-5">Hiện chưa có lịch diễn mới được công bố. Vui lòng quay lại sau!</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PHÂN HỆ GƯƠNG MẶT NGHỆ SĨ (ARTISTS & LEADERSHIP)
+     ============================================================ -->
+<section id="artists-section" class="py-5 position-relative">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 class="text-gold-gradient display-5 fw-bold mt-2 mb-2">GƯƠNG MẶT NGHỆ SĨ TIÊU BIỂU</h2>
+      <div class="showman-divider"></div>
+      <p class="text-secondary max-w-600 mx-auto">
+        Đội ngũ Ban giám đốc nghệ thuật, đạo diễn hàng đầu cùng những ngôi sao nhạc kịch thắp sáng từng đêm diễn.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      @for (artist of artists(); track artist.name) {
+        <div class="col-lg-3 col-md-6">
+          <div class="card card-showman-glass text-center p-4 rounded-4 h-100">
+            <div class="artist-avatar-wrapper mx-auto mb-3 position-relative">
+              <div class="avatar-glow-ring"></div>
+              <img
+                [src]="artist.avatar"
+                [alt]="artist.name"
+                class="rounded-circle object-fit-cover artist-avatar shadow-lg position-relative z-2"
+                loading="lazy"
+              />
+            </div>
+            <h4 class="text-white fs-5 fw-bold mb-1">{{ artist.name }}</h4>
+            <div class="text-ruby-glow fw-semibold small mb-2">{{ artist.role }}</div>
+            <p class="text-muted x-small mb-3 fst-italic">{{ artist.title }}</p>
+            <p class="text-secondary small leading-relaxed">{{ artist.bio }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BANNER ĐĂNG KÝ (NEWSLETTER / EARLY BIRD)
+     ============================================================ -->
+<section class="py-5 cta-banner-showman text-center position-relative border-top border-gold-glow">
+  <div class="container py-4 position-relative z-2">
+
+    <h2 class="display-6 fw-bold mb-2 text-gold-gradient">NHẬN THÔNG TIN SUẤT CHIẾU & ƯU ĐÃI VIP</h2>
+    <p class="text-secondary max-w-600 mx-auto mb-4">
+      Đăng ký email để nhận thông báo sớm nhất về các đêm diễn mở bán vé và ưu đãi vé hạng VIP lên tới 20%.
+    </p>
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-5">
+        <div class="input-group shadow-xl">
+          <input
+            type="email"
+            class="form-control form-control-lg text-white"
+            placeholder="Nhập địa chỉ email của bạn..."
+            aria-label="Email"
+          />
+          <button class="btn btn-showman-gold px-4 fw-bold" type="button">
+            ĐĂNG KÝ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

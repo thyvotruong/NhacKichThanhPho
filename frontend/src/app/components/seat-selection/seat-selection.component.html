@@ -1,0 +1,191 @@
+<!-- ============================================================
+     PHÂN HỆ SƠ ĐỒ GHẾ NGỒI TƯƠNG TÁC & GIỮ GHẾ 8 PHÚT
+     Phong cách: The Greatest Showman
+     Font: 100% Montserrat
+     ============================================================ -->
+<div class="py-5 position-relative">
+  <div class="container">
+    <!-- Header thông tin suất diễn -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom border-gold-glow">
+      <div>
+        <nav aria-label="breadcrumb" class="mb-1">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a routerLink="/" class="text-gold text-decoration-none fw-bold">TRANG CHỦ</a></li>
+            <li class="breadcrumb-item text-secondary active">SƠ ĐỒ CHỌN GHẾ</li>
+          </ol>
+        </nav>
+        <h2 class="display-6 fw-bold text-gold-gradient mb-1">
+          {{ scheduleInfo()?.musicalTitle || 'Vở Nhạc Kịch Sân Khấu' }}
+        </h2>
+        <div class="d-flex flex-wrap gap-3 text-secondary small">
+          <span><i class="bi bi-calendar3 text-gold me-1"></i> {{ scheduleInfo()?.performanceDate | date:'dd/MM/yyyy' }}</span>
+          <span><i class="bi bi-clock-fill text-gold me-1"></i> {{ scheduleInfo()?.time }}</span>
+          <span><i class="bi bi-geo-alt-fill text-ruby-glow me-1"></i> {{ scheduleInfo()?.hall }}</span>
+        </div>
+      </div>
+
+      <!-- THANH ĐẾM NGƯỢC GIỮ GHẾ TẠM THỜI (COUNTDOWN 10 PHÚT THEO BPMN 2.2.3) -->
+      @if (isHoldingActive()) {
+        <div class="hold-countdown-badge p-3 rounded-4 border border-gold-glow mt-3 mt-md-0 shadow-lg text-center">
+          <div class="d-flex align-items-center gap-2 text-gold-glow fw-bold mb-1">
+            <i class="bi bi-hourglass-split fs-4 animate-spin"></i>
+            <span class="fs-4">{{ formatTime(holdSecondsLeft()) }}</span>
+          </div>
+          <span class="x-small text-white opacity-90 d-block">Giữ ghế 10 phút chống trùng lặp</span>
+        </div>
+      }
+    </div>
+
+    <!-- Cảnh báo tính khả dụng của ghế (BPMN 2.2.3 Bước 6) -->
+    @if (seatWarning(); as warning) {
+      <div class="alert alert-warning border-gold-glow rounded-3 mb-4 d-flex align-items-center justify-content-between p-3 animate-fade-in">
+        <div class="d-flex align-items-center gap-2 text-dark fw-bold small">
+          <i class="bi bi-exclamation-triangle-fill fs-5 text-dark"></i>
+          <span>{{ warning }}</span>
+        </div>
+        <button type="button" class="btn-close" (click)="seatWarning.set(null)"></button>
+      </div>
+    }
+
+    <!-- KHU VỰC SƠ ĐỒ SÂN KHẤU & GHẾ -->
+    <div class="card card-showman-glass rounded-4 p-4 mb-4">
+      <!-- MÔ PHỎNG VỊ TRÍ SÂN KHẤU TRUNG TÂM -->
+      <div class="stage-screen-box text-center mx-auto mb-5 position-relative">
+        <div class="stage-screen-curve"></div>
+        <span class="font-cinzel text-gold-glow tracking-wider fw-bold text-uppercase d-block mt-2">
+          🎭 SÂN KHẤU CHÍNH (THE GRAND BROADWAY STAGE)
+        </span>
+        <span class="x-small text-secondary">Âm thanh vòm Dolby Atmos • Ánh sáng đa chiều</span>
+      </div>
+
+      <!-- BỘ CHUYỂN TẦNG: TẦNG TRỆT & TẦNG LẦU -->
+      <div class="d-flex justify-content-center gap-2 mb-4">
+        <button
+          class="btn btn-sm rounded-pill px-4 py-2 fw-bold"
+          [class.btn-showman-gold]="activeFloor() === 'Tầng Trệt'"
+          [class.btn-showman-outline]="activeFloor() !== 'Tầng Trệt'"
+          (click)="activeFloor.set('Tầng Trệt')"
+        >
+          TẦNG TRỆT (STALLS)
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-4 py-2 fw-bold"
+          [class.btn-showman-gold]="activeFloor() === 'Tầng Lầu'"
+          [class.btn-showman-outline]="activeFloor() !== 'Tầng Lầu'"
+          (click)="activeFloor.set('Tầng Lầu')"
+        >
+          TẦNG LẦU (BALCONY)
+        </button>
+      </div>
+
+      <!-- CHÚ THÍCH PHÂN LOẠI GHẾ & TRẠNG THÁI -->
+      <div class="seat-legend-bar d-flex flex-wrap justify-content-center gap-3 gap-md-4 py-3 px-4 rounded-3 mb-5">
+        <div class="d-flex align-items-center gap-2">
+          <div class="seat-sample seat-vip"></div>
+          <span class="small text-white">VIP (800k - 950k)</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="seat-sample seat-standard"></div>
+          <span class="small text-white">Thường (450k - 500k)</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="seat-sample seat-couple"></div>
+          <span class="small text-white">Ghế Đôi Sweetbox (1.200k)</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="seat-sample seat-selected"></div>
+          <span class="small text-gold-glow fw-bold">Đang Chọn</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="seat-sample seat-booked"></div>
+          <span class="small text-muted">Đã Bán</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="seat-sample seat-locked"></div>
+          <span class="small text-ruby-glow">Khóa Nội Bộ</span>
+        </div>
+      </div>
+
+      <!-- MA TRẬN GHẾ NGỒI THEO HÀNG (SEAT GRID) -->
+      <div class="seat-map-viewport overflow-auto text-center py-2">
+        <div class="d-inline-flex flex-column gap-3 min-w-seatmap">
+          @for (rowName of uniqueRows(); track rowName) {
+            <div class="d-flex align-items-center justify-content-center gap-2">
+              <!-- Nhãn hàng bên trái -->
+              <span class="row-label fw-bold text-gold me-2">{{ rowName }}</span>
+
+              <!-- Danh sách ghế trong hàng -->
+              <div class="d-flex gap-2">
+                @for (seat of getSeatsInRow(rowName); track seat.seatCode) {
+                  <button
+                    class="seat-btn"
+                    [class.seat-btn-vip]="seat.type === 'VIP'"
+                    [class.seat-btn-standard]="seat.type === 'Standard'"
+                    [class.seat-btn-couple]="seat.type === 'Couple'"
+                    [class.seat-btn-selected]="isSelected(seat.seatCode)"
+                    [class.seat-btn-booked]="seat.status === 'booked'"
+                    [class.seat-btn-locked]="seat.status === 'locked'"
+                    [disabled]="seat.status === 'booked' || seat.status === 'locked'"
+                    (click)="toggleSeat(seat)"
+                    [title]="seat.seatCode + ' - ' + seat.type + ' (' + (seat.price | number:'1.0-0') + ' đ)' + (seat.lockedReason ? ' [' + seat.lockedReason + ']' : '')"
+                  >
+                    @if (seat.status === 'locked') {
+                      <i class="bi bi-lock-fill"></i>
+                    } @else if (seat.status === 'booked') {
+                      ✕
+                    } @else {
+                      {{ seat.number }}
+                    }
+                  </button>
+                }
+              </div>
+
+              <!-- Nhãn hàng bên phải -->
+              <span class="row-label fw-bold text-gold ms-2">{{ rowName }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- THANH TỔNG HỢP VÉ NỔI DƯỚI ĐÁY (STICKY FLOATING SUMMARY BAR) -->
+    <div class="card card-showman-glass rounded-4 p-3 shadow-2xl border-gold-glow">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-6">
+          <div class="d-flex flex-column">
+            <span class="x-small text-gold fw-bold text-uppercase mb-1">
+              <i class="bi bi-check-circle-fill me-1"></i> Ghế Đã Chọn ({{ selectedSeats().length }}/5):
+            </span>
+            <div class="d-flex flex-wrap gap-2">
+              @for (s of selectedSeats(); track s.seatCode) {
+                <span class="badge badge-showman-gold px-2 py-1 small">
+                  {{ s.seatCode }} ({{ s.type }})
+                </span>
+              } @empty {
+                <span class="text-secondary small fst-italic">Chưa có ghế nào được chọn. Vui lòng bấm vào ghế trên sơ đồ.</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 text-lg-end">
+          <span class="text-secondary small d-block">Tạm tính:</span>
+          <span class="text-gold-gradient fs-4 fw-bold">
+            {{ totalSeatPrice() | number:'1.0-0' }} đ
+          </span>
+        </div>
+
+        <div class="col-lg-3">
+          <button
+            class="btn btn-showman-ruby w-100 py-3 rounded-pill fw-bold shadow-lg"
+            [disabled]="selectedSeats().length === 0"
+            (click)="proceedToCheckout()"
+          >
+            <i class="bi bi-credit-card-2-front-fill me-2 text-gold"></i>
+            TIẾP TỤC ĐẶT VÉ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

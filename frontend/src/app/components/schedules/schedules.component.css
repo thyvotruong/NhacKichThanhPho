@@ -1,0 +1,70 @@
+/* ============================================================
+   STYLES CHO LỊCH DIỄN (/schedules)
+   ============================================================ */
+
+.schedules-page {
+  min-height: 85vh;
+  background: radial-gradient(circle at 50% 10%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.bg-dark-glass {
+  background: rgba(7, 10, 18, 0.85);
+}
+
+.schedule-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.schedule-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.25);
+  border-color: rgba(212, 175, 55, 0.6) !important;
+}
+
+/* Time slot multi-select chips */
+.time-slot-chip {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #CBD5E1;
+  font-size: 0.775rem;
+  font-weight: 500;
+  padding: 0.26rem 0.75rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.time-slot-chip:hover {
+  background-color: rgba(212, 175, 55, 0.12);
+  border-color: rgba(212, 175, 55, 0.4);
+  color: #F8FAFC;
+}
+
+.time-slot-chip.active {
+  background: linear-gradient(135deg, #BE123C 0%, #881337 100%);
+  border-color: #D4AF37;
+  color: #FFFFFF;
+  box-shadow: 0 0 12px rgba(190, 18, 60, 0.45);
+}
+
+.time-slot-chip.active i {
+  color: #F59E0B;
+}
+
+/* Custom dark date picker */
+.date-input-dark {
+  color-scheme: dark;
+}
+
+.date-input-dark::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) sepia(1) saturate(5) hue-rotate(5deg);
+  cursor: pointer;
+}
+
+.text-gold-glow {
+  color: #D4AF37;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}

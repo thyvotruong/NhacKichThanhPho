@@ -1,0 +1,159 @@
+/* ============================================================
+   STYLES CHO TRANG CHÍNH SÁCH & ĐIỀU KHOẢN (/policy)
+   Phong cách: The Greatest Showman (Chuẩn tỷ lệ hiển thị 100%)
+   Định dạng: Text & Bullet points trang nhã, không dùng hình ảnh
+   ============================================================ */
+
+.policy-page {
+  min-height: 85vh;
+  background: radial-gradient(circle at 50% 15%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+}
+
+.policy-ambient-glow {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 350px;
+  background: radial-gradient(ellipse at 50% 20%, rgba(37, 99, 235, 0.14) 0%, rgba(190, 18, 60, 0.1) 50%, transparent 80%);
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+.max-w-700 {
+  max-width: 700px;
+}
+
+.drop-shadow-title {
+  text-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+}
+
+.extra-small {
+  font-size: 0.78rem;
+}
+
+.x-small {
+  font-size: 0.72rem;
+}
+
+.bg-dark-glass {
+  background: rgba(7, 10, 18, 0.85);
+}
+
+/* Sidebar Menu 5 Mục Chính Sách */
+.policy-sidebar {
+  top: 90px;
+  z-index: 10;
+}
+
+.policy-nav-btn {
+  background: rgba(14, 22, 41, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94A3B8;
+  width: 100%;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.policy-nav-btn:hover {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #F8FAFC;
+  transform: translateX(3px);
+}
+
+.policy-nav-btn.active {
+  background: linear-gradient(135deg, rgba(190, 18, 60, 0.85) 0%, rgba(136, 19, 55, 0.95) 100%);
+  border-color: #D4AF37;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 18px rgba(190, 18, 60, 0.45);
+}
+
+.policy-nav-btn.active .policy-nav-title {
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+.badge-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #F59E0B;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.badge-num-active {
+  background: #F59E0B;
+  border-color: #FEF08A;
+  color: #070A12;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+}
+
+.policy-nav-btn:hover .arrow-indicator,
+.policy-nav-btn.active .arrow-indicator {
+  transform: translateX(3px);
+  color: #FDE68A !important;
+}
+
+/* Icon đầu trang chính sách */
+.policy-icon-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Danh sách Bullet Points trang nhã */
+.policy-bullet-list {
+  list-style: none;
+  padding-left: 0 !important;
+}
+
+.policy-bullet-list > li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.policy-bullet-list > li::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #F59E0B;
+  font-size: 0.85rem;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+
+.policy-bullet-list > li strong {
+  color: #FFFFFF;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

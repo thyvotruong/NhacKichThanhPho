@@ -1,0 +1,335 @@
+<!-- ============================================================
+     PHÂN HỆ: CHÍNH SÁCH & ĐIỀU KHOẢN (/policy)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     Định dạng: Text & Bullet points trang nhã, không hình ảnh
+     Tỷ lệ: Hiển thị chuẩn xác, vừa mắt ở tỷ lệ 100%
+     ============================================================ -->
+
+<div class="policy-page position-relative py-5">
+  <!-- Quầng sáng ambient nhẹ nhàng phía trên -->
+  <div class="policy-ambient-glow" aria-hidden="true"></div>
+
+  <div class="container position-relative z-2">
+    <!-- Breadcrumb & Header -->
+    <div class="text-center mb-4">
+      <nav aria-label="breadcrumb" class="d-inline-block mb-2">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item">
+            <a routerLink="/" class="text-gold text-decoration-none fw-bold">
+              <i class="bi bi-stars me-1"></i> TRANG CHỦ
+            </a>
+          </li>
+          <li class="breadcrumb-item text-secondary active" aria-current="page">CHÍNH SÁCH & ĐIỀU KHOẢN</li>
+        </ol>
+      </nav>
+
+      <span class="badge badge-showman-ruby px-3 py-1 rounded-pill text-uppercase mb-2 shadow d-inline-block">
+        <i class="bi bi-shield-check text-gold me-1"></i> MINH BẠCH & AN TOÀN
+      </span>
+      <h1 class="display-5 fw-black text-gold-gradient mb-2 drop-shadow-title">
+        ĐIỀU KHOẢN & CHÍNH SÁCH DỊCH VỤ
+      </h1>
+      <p class="lead text-secondary max-w-700 mx-auto small mb-0">
+        Toàn bộ quy định, điều khoản sử dụng và chính sách quyền lợi bảo vệ khán giả khi tham gia đặt vé và thưởng thức nhạc kịch tại Nhà hát Thành phố.
+      </p>
+      <div class="showman-divider"></div>
+    </div>
+
+    <!-- BỐ CỤC 2 CỘT: CỘT TRÁI MENU 5 CHÍNH SÁCH, CỘT PHẢI NỘI DUNG CHI TIẾT -->
+    <div class="row g-4">
+      <!-- CỘT TRÁI (COL-LG-4): MENU 5 MỤC ĐIỀU HƯỚNG THEO THỨ TỰ -->
+      <div class="col-lg-4">
+        <div class="card card-showman-glass rounded-4 p-3 border border-secondary border-opacity-25 sticky-top policy-sidebar">
+          <span class="text-gold extra-small fw-bold text-uppercase mb-2 d-block px-2">
+            <i class="bi bi-list-check me-1"></i> DANH MỤC ĐIỀU KHOẢN & CHÍNH SÁCH
+          </span>
+
+          <div class="d-flex flex-column gap-2">
+            @for (item of policyNavItems; track item.id) {
+              <button
+                type="button"
+                class="policy-nav-btn text-start p-2.5 rounded-3 d-flex align-items-center justify-content-between"
+                [class.active]="activeSection() === item.id"
+                (click)="setSection(item.id)"
+              >
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge-num" [class.badge-num-active]="activeSection() === item.id">
+                    {{ item.number }}
+                  </span>
+                  <span class="policy-nav-title small fw-semibold">
+                    {{ item.title }}
+                  </span>
+                </div>
+                <i class="bi bi-chevron-right extra-small text-gold arrow-indicator"></i>
+              </button>
+            }
+          </div>
+
+          <!-- Khung Hotline hỗ trợ nhanh -->
+          <div class="mt-4 p-3 rounded-3 bg-dark-glass border border-secondary border-opacity-25">
+            <span class="text-gold extra-small fw-bold d-block mb-1">
+              <i class="bi bi-headset me-1"></i> TRỢ GIÚP PHÒNG VÉ:
+            </span>
+            <p class="text-secondary extra-small mb-1">
+              Hotline hỗ trợ trực tiếp 08:30 - 21:30 hàng ngày:
+            </p>
+            <span class="text-white fw-bold small d-block">
+              <i class="bi bi-telephone-fill text-ruby-glow me-1"></i> 1900 8888 • (028) 3829 9999
+            </span>
+            <span class="text-muted x-small d-block mt-1">
+              <i class="bi bi-envelope-fill text-gold me-1"></i> hotro&#64;nhackichthanhpho.vn
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CỘT PHẢI (COL-LG-8): NỘI DUNG CHI TIẾT DẠNG TEXT & BULLET POINTS -->
+      <div class="col-lg-8">
+        <!-- ==========================================
+             MỤC 1: CHÍNH SÁCH BẢO MẬT (PRIVACY POLICY)
+             ========================================== -->
+        @if (activeSection() === 'privacy') {
+          <div class="card card-showman-glass rounded-4 p-4 p-lg-5 border border-gold-glow animate-fade-in">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <div class="policy-icon-badge">
+                <i class="bi bi-shield-lock-fill text-gold fs-3"></i>
+              </div>
+              <div>
+                <span class="badge badge-showman-sapphire extra-small fw-bold mb-1">MỤC 01</span>
+                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">CHÍNH SÁCH BẢO MẬT THÔNG TIN</h2>
+              </div>
+            </div>
+
+            <p class="text-secondary small leading-relaxed mb-3">
+              Nhà Hát Nhạc Kịch Thành Phố cam kết bảo mật tuyệt đối thông tin riêng tư của khách hàng phù hợp với các quy định pháp luật hiện hành của Việt Nam và các tiêu chuẩn an ninh thanh toán quốc tế.
+            </p>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">1. Thu Thập Dữ Liệu Khách Hàng</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li><strong>Thông tin cơ bản:</strong> Chúng tôi chỉ thu thập các trường thông tin cần thiết gồm: Họ và tên, Số điện thoại và Địa chỉ Email khi quý khách đặt vé trực tuyến hoặc đăng ký thành viên.</li>
+              <li><strong>Mục đích thu thập:</strong> Dữ liệu được sử dụng để xuất vé điện tử (E-Ticket), gửi mã QR định danh check-in tại cửa rạp và gửi thông báo khẩn cấp trong trường hợp có sự thay đổi về lịch diễn hoặc thời tiết.</li>
+              <li><strong>Dữ liệu tự động:</strong> Hệ thống có thể ghi nhận địa chỉ IP và lịch sử truy cập ẩn danh nhằm mục đích tối ưu hóa hiệu suất website và phát hiện gian lận đặt giữ chỗ.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">2. Tiêu Chuẩn Bảo Mật Giao Dịch & Thanh Toán</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li><strong>Mã hóa SSL/TLS 256-bit:</strong> Toàn bộ dữ liệu truyền tải giữa trình duyệt của quý khách và máy chủ đều được mã hóa theo giao thức HTTPS chuẩn bảo mật cao cấp.</li>
+              <li><strong>Không lưu trữ thông tin thẻ:</strong> Hệ thống website không trực tiếp lưu trữ số thẻ tín dụng, mã CVV/CVC hay mật khẩu Internet Banking của khách hàng. Tất cả giao dịch đều được xử lý qua cổng thanh toán đối tác đạt chứng chỉ bảo mật quốc tế PCI-DSS Level 1 (VietQR, VNPAY, MoMo, ZaloPay).</li>
+              <li><strong>Tường lửa chống tấn công:</strong> Hệ thống áp dụng cơ chế xác thực đa lớp (WAF) để ngăn chặn truy cập trái phép và bảo vệ an toàn cho dữ liệu đặt vé.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">3. Cam Kết Không Chia Sẻ Dữ Liệu</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Nhà hát cam kết tuyệt đối <strong>không bán, trao đổi hoặc chia sẻ</strong> thông tin cá nhân của khách hàng cho bất kỳ bên thứ ba nào vì mục đích quảng cáo thương mại.</li>
+              <li>Dữ liệu chỉ được cung cấp cho cơ quan chức năng có thẩm quyền khi có văn bản yêu cầu chính thức theo đúng quy định của pháp luật Việt Nam.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">4. Quyền Hạn Của Khách Hàng Đối Với Dữ Liệu</h3>
+            <ul class="text-secondary small leading-relaxed mb-0 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Khách hàng có quyền đăng nhập vào mục <strong>Tài Khoản Cá Nhân</strong> để kiểm tra, chỉnh sửa thông tin liên hệ hoặc xem lịch sử đặt vé.</li>
+              <li>Quý khách có quyền yêu cầu xóa vĩnh viễn tài khoản hoặc hủy đăng ký nhận bản tin email bất kỳ lúc nào bằng cách liên hệ bộ phận hỗ trợ kỹ thuật.</li>
+            </ul>
+          </div>
+        }
+
+        <!-- ==========================================
+             MỤC 2: CHÍNH SÁCH GIÁ DỊCH VỤ (PRICING POLICY)
+             ========================================== -->
+        @if (activeSection() === 'pricing') {
+          <div class="card card-showman-glass rounded-4 p-4 p-lg-5 border border-gold-glow animate-fade-in">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <div class="policy-icon-badge">
+                <i class="bi bi-tag-fill text-gold fs-3"></i>
+              </div>
+              <div>
+                <span class="badge badge-showman-gold extra-small fw-bold mb-1">MỤC 02</span>
+                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">CHÍNH SÁCH GIÁ DỊCH VỤ & VÉ XEM KỊCH</h2>
+              </div>
+            </div>
+
+            <p class="text-secondary small leading-relaxed mb-3">
+              Chính sách giá vé tại Nhà Hát Thành Phố được xây dựng minh bạch, tương xứng với chất lượng nghệ thuật biểu diễn đỉnh cao và trải nghiệm khán phòng hoàng gia.
+            </p>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">1. Nguyên Tắc Định Giá Vé Theo Hạng Ghế</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li><strong>Hạng vé VIP (Grand Stalls Center):</strong> Dao động từ 800.000 đ – 950.000 đ/vé. Vị trí trung tâm khán phòng, tầm nhìn trực diện và cự ly âm thanh hoàn hảo nhất từ dàn nhạc giao hưởng. Kèm dịch vụ tiếp đón tại sảnh VIP.</li>
+              <li><strong>Hạng vé Tiêu Chuẩn (Standard):</strong> Dao động từ 450.000 đ – 500.000 đ/vé. Bố trí tại các khu vực cánh tầng trệt và tầng lầu (Balcony), đảm bảo góc nhìn thông thoáng và chất lượng âm thanh vòm tiêu chuẩn.</li>
+              <li><strong>Hạng ghế Đôi (Couple / Sweetbox):</strong> Giá 1.200.000 đ/cặp ghế. Ghế sofa bọc nhung liền khối dành riêng cho cặp đôi tại khu vực riêng tư phía sau tầng trệt.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">2. Tính Trọn Gói Của Giá Vé Niêm Yết</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Giá vé hiển thị trên website là <strong>giá trọn gói</strong>, đã bao gồm 10% thuế Giá trị gia tăng (VAT) và bảo hiểm sự kiện cho mỗi khán giả.</li>
+              <li>Khách hàng không phải chi trả thêm bất kỳ phụ phí in ấn vé hay phí xử lý cổng thanh toán trực tuyến nào khác.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">3. Chính Sách Ưu Đãi & Khách Hàng Thân Thiết</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li><strong>Học sinh, Sinh viên:</strong> Giảm giá 15% khi xuất trình thẻ học sinh/sinh viên còn hiệu lực tại phòng vé hoặc nhập mã ưu đãi học đường.</li>
+              <li><strong>Người cao tuổi (trên 60 tuổi) & Người có công:</strong> Áp dụng mức giảm 20% trên giá vé tiêu chuẩn cho các suất diễn cuối tuần.</li>
+              <li><strong>Khách đoàn & Doanh nghiệp:</strong> Chiết khấu từ 10% – 25% cho các đơn vị đặt mua từ 15 vé trở lên hoặc bao trọn khán phòng theo hợp đồng tài trợ.</li>
+              <li><strong>Hội viên VIP Member:</strong> Khán giả tích lũy điểm thưởng qua mỗi lần mua vé để nhận mã voucher giảm giá và quyền ưu tiên chọn ghế trước ngày mở bán đại trà.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">4. Cam Kết Chống Phe Vé & Bán Sai Giá</h3>
+            <ul class="text-secondary small leading-relaxed mb-0 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Nhà hát chỉ bảo đảm giá trị vé được đặt mua trực tiếp tại website chính thức hoặc quầy vé tại sảnh rạp.</li>
+              <li>Nghiêm cấm các hành vi đầu cơ mua gom vé để bán lại với giá chênh lệch (vé chợ đen). Vé bị phát hiện mua bán lại trái quy định sẽ bị vô hiệu hóa mã QR mà không bồi hoàn chi phí.</li>
+            </ul>
+          </div>
+        }
+
+        <!-- ==========================================
+             MỤC 3: CHÍNH SÁCH THANH TOÁN (PAYMENT POLICY)
+             ========================================== -->
+        @if (activeSection() === 'payment') {
+          <div class="card card-showman-glass rounded-4 p-4 p-lg-5 border border-gold-glow animate-fade-in">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <div class="policy-icon-badge">
+                <i class="bi bi-credit-card-2-front-fill text-gold fs-3"></i>
+              </div>
+              <div>
+                <span class="badge badge-showman-ruby extra-small fw-bold mb-1">MỤC 03</span>
+                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">CHÍNH SÁCH THANH TOÁN TRỰC TUYẾN</h2>
+              </div>
+            </div>
+
+            <p class="text-secondary small leading-relaxed mb-3">
+              Quy trình thanh toán được thiết kế hiện đại, tự động hóa thời gian thực giúp khán giả đặt giữ chỗ an tâm và nhận vé tức thì trong vài thao tác đơn giản.
+            </p>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">1. Các Phương Thức Thanh Toán Hỗ Trợ</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li><strong>Chuyển khoản VietQR tự động:</strong> Quét mã QR qua ứng dụng ngân hàng số bất kỳ (Vietcombank, Techcombank, MB Bank, BIDV...). Hệ thống xác nhận giao dịch thành công trong 3 - 5 giây.</li>
+              <li><strong>Cổng thanh toán VNPAY-QR:</strong> Hỗ trợ tất cả các ngân hàng nội địa và thẻ ATM ghi nợ nội địa Napas.</li>
+              <li><strong>Thẻ Quốc Tế (Visa / Mastercard / JCB):</strong> Hỗ trợ thanh toán nhanh bằng thẻ tín dụng quốc tế có bảo mật 3D-Secure OTP.</li>
+              <li><strong>Ví Điện Tử:</strong> Thanh toán tiện lợi không tiền mặt qua ứng dụng MoMo và ZaloPay.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">2. Thời Gian Đếm Ngược Giữ Chỗ Tạm Thời</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Sau khi bấm "Tiếp tục đặt vé", hệ thống sẽ khóa ghế và kích hoạt đồng hồ đếm ngược <strong>10 phút (Hold Session)</strong> để đảm bảo ghế không bị trùng lặp với khách hàng khác.</li>
+              <li>Khách hàng cần hoàn tất quét mã và thanh toán trước khi thời gian 10 phút kết thúc. Nếu quá 10 phút chưa nhận được thanh toán, ghế sẽ tự động giải phóng về trạng thái Còn vé trên sơ đồ.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">3. Quy Trình Phát Hành Vé Điện Tử (E-Ticket)</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Ngay sau khi giao dịch được ngân hàng xác nhận thành công, màn hình sẽ hiển thị <strong>Vé điện tử kèm Mã QR định danh duy nhất</strong>.</li>
+              <li>Đồng thời, hệ thống tự động gửi 01 bản sao vé điện tử PDF có mã QR về địa chỉ email của quý khách. Khách hàng có thể lưu về điện thoại hoặc in ra giấy để xuất trình tại cửa rạp.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">4. Xử Lý Sự Cố Giao Dịch</h3>
+            <ul class="text-secondary small leading-relaxed mb-0 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Trong trường hợp tài khoản của quý khách đã bị trừ tiền nhưng do nghẽn mạng hệ thống chưa kịp ghi nhận đơn hàng, xin vui lòng chụp lại biên lai chuyển khoản và liên hệ Hotline <strong>1900 8888</strong>.</li>
+              <li>Đội ngũ vận hành sẽ đối soát mã giao dịch với ngân hàng và xuất vé bù ngay cho quý khách trong vòng 15 - 30 phút.</li>
+            </ul>
+          </div>
+        }
+
+        <!-- ==========================================
+             MỤC 4: ĐIỀU KHOẢN & QUY ĐỊNH SỬ DỤNG (TERMS OF USE)
+             ========================================== -->
+        @if (activeSection() === 'terms') {
+          <div class="card card-showman-glass rounded-4 p-4 p-lg-5 border border-gold-glow animate-fade-in">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <div class="policy-icon-badge">
+                <i class="bi bi-file-earmark-ruled-fill text-gold fs-3"></i>
+              </div>
+              <div>
+                <span class="badge badge-showman-gold extra-small fw-bold mb-1">MỤC 04</span>
+                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">ĐIỀU KHOẢN & NỘI QUY KHÁN PHÒNG</h2>
+              </div>
+            </div>
+
+            <p class="text-secondary small leading-relaxed mb-3">
+              Để bảo đảm không gian nghệ thuật trang trọng, văn minh và thưởng thức trọn vẹn từng khoảnh khắc sân khấu, quý khán giả vui lòng tuân thủ các quy định sau:
+            </p>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">1. Thời Gian Có Mặt & Đóng Cửa Khán Phòng</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Khán giả vui lòng có mặt tại nhà hát trước giờ diễn tối thiểu <strong>30 phút</strong> để làm thủ tục quét mã QR check-in và nhận hướng dẫn ổn định chỗ ngồi.</li>
+              <li>Cửa khán phòng sẽ <strong>đóng đúng giờ ghi trên vé</strong>. Khán giả đến trễ sẽ phải đợi tại sảnh chờ và chỉ được nhân viên dẫn vào khán phòng trong phân cảnh nghỉ giải lao (Intermission) để không gây ảnh hưởng đến nghệ sĩ và khán giả đang theo dõi.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">2. Quy Định Trang Phục Lịch Lãm</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Khán phòng nhà hát yêu cầu trang phục lịch sự, trang nhã (Smart Casual, Semi-Formal hoặc Formal).</li>
+              <li>Ban quản lý nhà hát có quyền từ chối phục vụ đối với khán giả mặc trang phục không phù hợp (áo ba lỗ, quần cộc, đồ ngủ, dép lê). Vé sẽ không được hoàn lại trong trường hợp này.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">3. Thiết Bị Điện Tử & Bản Quyền Sân Khấu</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Vui lòng chuyển điện thoại di động và các thiết bị phát âm thanh sang chế độ <strong>Im lặng hoặc Tắt nguồn</strong> trước khi buổi diễn bắt đầu.</li>
+              <li>Nghiêm cấm tuyệt đối mọi hành vi quay phim, chụp ảnh có bật đèn flash, ghi âm hoặc phát sóng trực tiếp (Livestream) toàn bộ hoặc một phần buổi diễn nhằm bảo vệ bản quyền nghệ thuật sân khấu. Nhân viên rạp có quyền yêu cầu xóa nội dung vi phạm hoặc mời khán giả rời rạp nếu tái phạm.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">4. Quy Định Về Độ Tuổi & Đồ Ăn Thức Uống</h3>
+            <ul class="text-secondary small leading-relaxed mb-0 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li><strong>Độ tuổi:</strong> Trừ các vở kịch thiếu nhi được công bố dành riêng cho trẻ nhỏ, các vở nhạc kịch chính kịch chỉ dành cho khán giả từ <strong>12 tuổi trở lên</strong>. Khán giả vui lòng mang theo giấy tờ tùy thân nếu cần đối soát độ tuổi.</li>
+              <li><strong>Ẩm thực:</strong> Không mang đồ ăn, bánh kẹo có mùi, kẹo cao su hoặc các loại nước uống có ga vào khán phòng. Nhà hát có phục vụ nước khoáng đóng chai tiêu chuẩn tại các quầy tiếp đón.</li>
+              <li><strong>Hút thuốc & Chất cấm:</strong> Nghiêm cấm hút thuốc (kể cả thuốc lá điện tử), mang theo vũ khí, chất dễ cháy nổ hay thú nuôi vào khuôn viên nhà hát.</li>
+            </ul>
+          </div>
+        }
+
+        <!-- ==========================================
+             MỤC 5: CHÍNH SÁCH ĐỔI/HỦY VÉ & HOÀN TIỀN (REFUND POLICY)
+             ========================================== -->
+        @if (activeSection() === 'refund') {
+          <div class="card card-showman-glass rounded-4 p-4 p-lg-5 border border-gold-glow animate-fade-in">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+              <div class="policy-icon-badge">
+                <i class="bi bi-arrow-counterclockwise text-gold fs-3"></i>
+              </div>
+              <div>
+                <span class="badge badge-showman-ruby extra-small fw-bold mb-1">MỤC 05</span>
+                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">CHÍNH SÁCH ĐỔI, HỦY VÉ & HOÀN TIỀN</h2>
+              </div>
+            </div>
+
+            <p class="text-secondary small leading-relaxed mb-3">
+              Nhà hát áp dụng chính sách đổi và hoàn hủy vé linh hoạt, minh bạch dựa trên thời điểm tiếp nhận yêu cầu so với giờ bắt đầu của suất diễn ghi trên vé:
+            </p>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">1. Các Mốc Thời Gian & Tỷ Lệ Hoàn Tiền Vé</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-2 policy-bullet-list">
+              <li>
+                <strong>Hủy trước thời điểm diễn trên > 24 Giờ:</strong><br />
+                Khách hàng được <span class="text-success fw-bold">hoàn trả 90%</span> tổng giá trị vé đã thanh toán. Nhà hát thu khoản phí xử lý hủy giữ chỗ là 10%.
+              </li>
+              <li>
+                <strong>Hủy trong khoảng từ 12 Giờ đến 24 Giờ:</strong><br />
+                Khách hàng được <span class="text-warning fw-bold">hoàn trả 70%</span> tổng giá trị vé đã thanh toán. Khoản phí hủy vé là 30% nhằm bù đắp chi phí phát sinh khi mở bán lại ghế sát giờ diễn.
+              </li>
+              <li>
+                <strong>Hủy dưới &lt; 12 Giờ so với giờ biểu diễn:</strong><br />
+                <span class="text-danger fw-bold">Không áp dụng hoàn hủy vé (0%)</span>. Vào thời điểm này, danh sách khán phòng và công tác tiếp đón đã được chốt hoàn toàn để chuẩn bị lên đèn sân khấu.
+              </li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">2. Điều Kiện & Quy Định Đổi Suất Diễn</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Khách hàng được hỗ trợ đổi vé sang một suất diễn khác của cùng vở kịch nếu gửi yêu cầu <strong>trước giờ diễn tối thiểu 24 giờ</strong> (tùy thuộc vào tình trạng ghế trống của suất diễn mới).</li>
+              <li>Nếu chọn vị trí ghế có giá cao hơn, khách hàng thanh toán thêm phần chênh lệch. Nếu chọn ghế có giá thấp hơn, nhà hát không hoàn trả phần chênh lệch giá vé.</li>
+              <li>Mỗi vé xem kịch chỉ được hỗ trợ chuyển đổi suất diễn tối đa 01 lần duy nhất.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">3. Trường Hợp Bất Khả Kháng (Hủy Do Nhà Hát)</h3>
+            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Trong các trường hợp bất khả kháng (thiên tai, dịch bệnh, sự cố kỹ thuật sân khấu hoặc diễn viên chính gặp lý do sức khỏe đột xuất), nhà hát sẽ thông báo dời lịch hoặc hủy suất diễn qua Email và Tin nhắn SMS.</li>
+              <li>Khách hàng sẽ được lựa chọn: Đổi sang suất biểu diễn thay thế hoặc nhận <span class="text-gold fw-bold">hoàn lại 100% tiền vé</span> trong vòng 48 giờ mà không phải chịu bất kỳ khoản phí nào.</li>
+            </ul>
+
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">4. Hình Thức & Thời Gian Hoàn Tiền Thực Tế</h3>
+            <ul class="text-secondary small leading-relaxed mb-0 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
+              <li>Thao tác hủy vé được thực hiện trực tiếp tại mục <strong>Vé Của Tôi</strong> bằng Mã đặt vé (Booking Code) và Số điện thoại đặt vé.</li>
+              <li>Số tiền hoàn sẽ được hệ thống chuyển khoản tự động về đúng tài khoản ngân hàng hoặc ví điện tử (VietQR, VNPAY, MoMo, ZaloPay) mà quý khách đã dùng để thanh toán ban đầu.</li>
+              <li>Thời gian nhận tiền hoàn từ <strong>3 - 5 ngày làm việc</strong> tùy thuộc vào ngân hàng thụ hưởng của quý khách.</li>
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

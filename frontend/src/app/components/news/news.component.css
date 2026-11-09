@@ -1,0 +1,56 @@
+/* ============================================================
+   STYLES CHO TIN TỨC (/news)
+   ============================================================ */
+
+.news-page {
+  min-height: 85vh;
+  background: radial-gradient(circle at 50% 15%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.news-img-box {
+  height: 180px;
+  overflow: hidden;
+}
+
+.news-cover-img {
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.news-card-hover:hover .news-cover-img {
+  transform: scale(1.06);
+}
+
+.news-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.news-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.25);
+  border-color: rgba(212, 175, 55, 0.65) !important;
+}
+
+.news-title {
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}
+
+.hover-arrow {
+  transition: all 0.2s ease;
+}
+
+.hover-arrow:hover {
+  color: #FFF !important;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+  transform: translateX(4px);
+}

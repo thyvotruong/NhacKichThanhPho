@@ -1,0 +1,443 @@
+/* ============================================================
+   STYLES CHO HOMEPAGE - SÂN KHẤU MÀN NHUNG ĐỎ VÉN QUA
+   Phong cách: The Greatest Showman (Tỉ lệ chuẩn 100% cân đối)
+   - Màn che đỏ (Velvet Theater Curtain) vén sang hai bên
+   - Mật độ bụi tiên dày đặc (Dense Sparkles & Stardust Bokeh)
+   - Ánh đèn rọi Spotlight quét chuyển động sống động
+   ============================================================ */
+
+.hero-theatrical-stage {
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  max-height: none;
+  background: radial-gradient(circle at 50% 45%, #111A30 0%, #080D18 60%, #05070D 100%);
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+/* ============================================================
+   1. HỆ THỐNG MÀN NHUNG ĐỎ SÂN KHẤU (THEATRICAL RED CURTAIN)
+   ============================================================ */
+.stage-curtains-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Màn nhung vòm đỉnh (Top Valance Drapes) - Thu gọn tinh tế */
+/* Màn nhung vòm đỉnh (Top Valance Drapes) */
+.curtain-top-valance {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 85px; /* Tăng nhẹ chiều cao một chút để có không gian cho tua rua */
+  background: radial-gradient(ellipse at 50% -20%, #E11D48 0%, #9F1239 40%, #500724 80%, #2B0514 100%);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.95), inset 0 -10px 18px rgba(0, 0, 0, 0.7);
+  clip-path: path('M 0,0 L 1920,0 L 1920,65 Q 1700,95 1500,65 Q 1300,35 1100,75 Q 960,95 820,75 Q 620,35 420,65 Q 220,95 0,65 Z');
+  /* Xóa overflow: hidden đi để không bị cắt cụt phần viền dưới */
+  z-index: 5;
+}
+
+.curtain-top-valance::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    rgba(0, 0, 0, 0.45) 28px,
+    rgba(255, 255, 255, 0.08) 56px,
+    rgba(0, 0, 0, 0.5) 84px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.85;
+}
+
+/* Tua rua viền vàng chạy đều uốn lượn theo mép rèm */
+.curtain-gold-fringe {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 12px; /* Tăng chiều cao để tạo độ rủ mềm mại */
+  background: linear-gradient(90deg, #FDE68A, #F59E0B, #FEF3C7, #F59E0B, #FDE68A);
+  /* Áp dụng chuẩn xác cùng đường cắt path uốn lượn với rèm vòm phía trên để nó bám đều */
+  clip-path: path('M 0,55 Q 220,85 420,55 Q 620,25 820,65 Q 960,85 1100,65 Q 1300,25 1500,55 Q 1700,85 1920,55 L 1920,85 L 0,85 Z');
+  box-shadow: 0 3px 8px rgba(245, 158, 11, 0.9);
+}
+
+/* Màn nhung đỏ vén sang hai bên - Tỉ lệ 125px vừa vặn không che khuất chữ */
+.curtain-drape {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 125px;
+  z-index: 4;
+}
+
+/* Rèm vén bên trái */
+.curtain-drape-left {
+  left: 0;
+  background: linear-gradient(90deg, #1A0108 0%, #4C0519 25%, #881337 55%, #E11D48 85%, transparent 100%);
+  clip-path: path('M 0,0 L 125,0 Q 85,380 105,650 Q 115,780 70,900 L 0,900 Z');
+  box-shadow: 14px 0 35px rgba(0, 0, 0, 0.95);
+}
+
+/* Rèm vén bên phải */
+.curtain-drape-right {
+  right: 0;
+  background: linear-gradient(270deg, #1A0108 0%, #4C0519 25%, #881337 55%, #E11D48 85%, transparent 100%);
+  clip-path: path('M 125,0 L 0,0 Q 40,380 20,650 Q 10,780 55,900 L 125,900 Z');
+  box-shadow: -14px 0 35px rgba(0, 0, 0, 0.95);
+}
+
+.curtain-drape::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0px,
+    rgba(0, 0, 0, 0.5) 20px,
+    rgba(255, 255, 255, 0.08) 40px,
+    rgba(0, 0, 0, 0.55) 60px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.9;
+}
+
+/* Dây đai vàng thắt rèm (Curtain Rope & Gold Tassel) - Tỉ lệ 34px gọn gàng */
+.curtain-rope-tie {
+  position: absolute;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #FEF3C7 0%, #F59E0B 60%, #B45309 100%);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.85), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.curtain-rope-left {
+  right: 18px;
+}
+
+.curtain-rope-right {
+  left: 18px;
+}
+
+.tassel-gold {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 22px;
+  background: linear-gradient(180deg, #FEF3C7 0%, #F59E0B 50%, #78350F 100%);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Sàn sân khấu phản chiếu ánh sáng (Stage Floor Glow) */
+.stage-floor-reflection {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 95px;
+  background: linear-gradient(180deg, transparent 0%, rgba(14, 22, 41, 0.6) 40%, rgba(7, 10, 18, 0.98) 100%),
+              radial-gradient(ellipse at 50% 100%, rgba(245, 158, 11, 0.22) 0%, rgba(225, 29, 72, 0.18) 45%, transparent 75%);
+  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  z-index: 3;
+}
+
+/* ============================================================
+   2. ÁNH ĐÈN RỌI SPOTLIGHT QUÉT CHUYỂN ĐỘNG SỐNG ĐỘNG
+   ============================================================ */
+.stage-spotlight-left {
+  position: absolute;
+  top: -60px;
+  left: 15%;
+  width: 260px;
+  height: 750px;
+  background: linear-gradient(170deg, rgba(245, 158, 11, 0.32) 0%, rgba(190, 18, 60, 0.14) 45%, transparent 75%);
+  clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);
+  filter: blur(14px);
+  pointer-events: none;
+  animation: stageBeamSweepLeft 9s infinite ease-in-out;
+  z-index: 2;
+}
+
+.stage-spotlight-right {
+  position: absolute;
+  top: -60px;
+  right: 15%;
+  width: 260px;
+  height: 750px;
+  background: linear-gradient(190deg, rgba(37, 99, 235, 0.28) 0%, rgba(245, 158, 11, 0.16) 45%, transparent 75%);
+  clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%);
+  filter: blur(14px);
+  pointer-events: none;
+  animation: stageBeamSweepRight 9s infinite ease-in-out;
+  z-index: 2;
+}
+
+.stage-center-radial-flare {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 420px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(245, 158, 11, 0.18) 0%, rgba(190, 18, 60, 0.1) 50%, transparent 75%);
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ============================================================
+   3. PARTICLES & BỤI TIÊN (VỊ TRÍ TỶ LỆ CÂN XỨNG)
+   ============================================================ */
+.cross-1  { top: 18%; left: 22%; animation-duration: 3.5s; font-size: 1.1rem; }
+.cross-2  { top: 28%; left: 38%; animation-duration: 4.8s; animation-delay: 1s; font-size: 0.8rem; }
+.cross-3  { top: 15%; left: 62%; animation-duration: 3.2s; animation-delay: 0.5s; font-size: 1.0rem; }
+.cross-4  { top: 32%; left: 78%; animation-duration: 4.2s; animation-delay: 1.8s; font-size: 1.15rem; color: #FCD34D; }
+.cross-5  { top: 65%; left: 16%; animation-duration: 5.0s; animation-delay: 2.2s; font-size: 0.9rem; }
+.cross-6  { top: 72%; left: 45%; animation-duration: 3.8s; animation-delay: 0.7s; font-size: 1.2rem; color: #FFFFFF; }
+.cross-7  { top: 58%; left: 82%; animation-duration: 4.5s; animation-delay: 1.2s; font-size: 0.95rem; }
+.cross-8  { top: 82%; left: 30%; animation-duration: 3.6s; animation-delay: 2.5s; font-size: 1.0rem; }
+.cross-9  { top: 48%; left: 52%; animation-duration: 4.0s; animation-delay: 1.5s; font-size: 1.1rem; color: #FDE68A; }
+.cross-10 { top: 22%; left: 86%; animation-duration: 5.2s; animation-delay: 0.3s; font-size: 0.8rem; }
+.cross-11 { top: 78%; left: 68%; animation-duration: 3.9s; animation-delay: 2.0s; font-size: 0.95rem; }
+.cross-12 { top: 12%; left: 48%; animation-duration: 4.4s; animation-delay: 1.1s; font-size: 0.85rem; }
+
+.dot-1  { top: 20%; left: 18%; width: 4px; height: 4px; animation: floatStardustSlow 7s infinite ease-in-out; }
+.dot-2  { top: 35%; left: 25%; width: 6px; height: 6px; animation: floatStardustFast 5s infinite ease-in-out; animation-delay: 0.8s; }
+.dot-3  { top: 60%; left: 12%; width: 3px; height: 3px; animation: floatStardustSlow 8s infinite ease-in-out; animation-delay: 1.5s; }
+.dot-4  { top: 25%; left: 42%; width: 5px; height: 5px; animation: floatStardustFast 6s infinite ease-in-out; animation-delay: 2.1s; }
+.dot-5  { top: 75%; left: 35%; width: 6px; height: 6px; animation: floatStardustSlow 9s infinite ease-in-out; animation-delay: 0.5s; }
+.dot-6  { top: 18%; left: 70%; width: 4px; height: 4px; animation: floatStardustFast 5.5s infinite ease-in-out; animation-delay: 1.2s; }
+.dot-7  { top: 42%; left: 65%; width: 6px; height: 6px; animation: floatStardustSlow 7.5s infinite ease-in-out; animation-delay: 2.8s; }
+.dot-8  { top: 80%; left: 58%; width: 3px; height: 3px; animation: floatStardustFast 6.5s infinite ease-in-out; animation-delay: 0.3s; }
+.dot-9  { top: 30%; left: 88%; width: 5px; height: 5px; animation: floatStardustSlow 8.5s infinite ease-in-out; animation-delay: 1.9s; }
+.dot-10 { top: 68%; left: 84%; width: 6px; height: 6px; animation: floatStardustFast 5.8s infinite ease-in-out; animation-delay: 2.4s; }
+.dot-11 { top: 50%; left: 30%; width: 4px; height: 4px; animation: floatStardustSlow 6.8s infinite ease-in-out; animation-delay: 1.0s; }
+.dot-12 { top: 85%; left: 76%; width: 5px; height: 5px; animation: floatStardustFast 7.2s infinite ease-in-out; animation-delay: 1.6s; }
+.dot-13 { top: 14%; left: 34%; width: 3px; height: 3px; animation: floatStardustSlow 8.2s infinite ease-in-out; animation-delay: 0.7s; }
+.dot-14 { top: 55%; left: 74%; width: 6px; height: 6px; animation: floatStardustFast 6.0s infinite ease-in-out; animation-delay: 2.7s; }
+
+.bokeh-1 { top: 15%; left: 20%; width: 110px; height: 110px; background: rgba(245, 158, 11, 0.1); }
+.bokeh-2 { top: 45%; left: 75%; width: 140px; height: 140px; background: rgba(190, 18, 60, 0.12); }
+.bokeh-3 { top: 65%; left: 25%; width: 95px; height: 95px; background: rgba(37, 99, 235, 0.1); }
+.bokeh-4 { top: 25%; left: 55%; width: 120px; height: 120px; background: rgba(245, 158, 11, 0.08); }
+.bokeh-5 { top: 70%; left: 65%; width: 105px; height: 105px; background: rgba(190, 18, 60, 0.1); }
+
+/* ============================================================
+   4. SLIDER ITEM & VỞ KỊCH TRÊN SÂN KHẤU (COMPACT SCALING)
+   ============================================================ */
+.hero-slide-item {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s;
+  z-index: 5;
+}
+
+.hero-slide-item.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 6;
+}
+
+.drop-shadow-theatrical {
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.35));
+}
+
+.line-height-tight {
+  line-height: 1.15;
+}
+
+.max-w-550 {
+  max-width: 500px;
+}
+
+.border-glass-glow {
+  border-color: rgba(245, 158, 11, 0.28) !important;
+}
+
+/* Khung Poster đặt trên bục sân khấu - Scale vừa vặn 270px x 380px */
+.stage-poster-pedestal {
+  width: 270px;
+  height: 380px;
+  border-radius: 18px;
+  padding: 8px;
+  background: rgba(14, 22, 41, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(245, 158, 11, 0.5);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95), 0 0 30px rgba(190, 18, 60, 0.35);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.stage-poster-pedestal:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.98), 0 0 40px rgba(245, 158, 11, 0.5);
+}
+
+.poster-ambient-backlight {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  width: 90%;
+  height: 90%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(190, 18, 60, 0.25) 50%, transparent 80%);
+  filter: blur(24px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.stage-gold-seal {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #BE123C 0%, #7F1D1D 65%, #070A12 100%);
+  border: 1.5px solid #FDE68A;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.7);
+}
+
+/* Nút điều hướng Slider sân khấu - Scale gọn gàng 40px x 40px */
+.stage-ctrl {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 12;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(14, 22, 41, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(245, 158, 11, 0.5);
+  color: #FDE68A;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+  transition: all 0.25s ease;
+}
+
+.stage-ctrl:hover {
+  background: linear-gradient(135deg, #BE123C 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  border-color: #FEF08A;
+  box-shadow: 0 0 22px rgba(245, 158, 11, 0.75);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.stage-prev {
+  left: 16px;
+}
+
+.stage-next {
+  right: 16px;
+}
+
+/* Thẻ Vở Diễn */
+.card-poster-img {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-showman-glass:hover .card-poster-img {
+  transform: scale(1.05);
+}
+
+/* Nền Lịch Diễn Ambient Sapphire */
+.schedules-bg-ambient {
+  background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
+              radial-gradient(circle at 80% 50%, rgba(190, 18, 60, 0.12) 0%, transparent 60%),
+              #0A0F1D;
+}
+
+.date-badge-showman {
+  min-width: 52px;
+  background: rgba(7, 10, 18, 0.9);
+}
+
+/* Nghệ Sĩ Vòng Sáng Hào Quang - Tỉ lệ 95px gọn gàng */
+.artist-avatar-wrapper {
+  width: 95px;
+  height: 95px;
+}
+
+.avatar-glow-ring {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #BE123C, #F59E0B, #2563EB, #BE123C);
+  filter: blur(4px);
+  opacity: 0.6;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.card-showman-glass:hover .avatar-glow-ring {
+  opacity: 1;
+  filter: blur(5px);
+}
+
+.artist-avatar {
+  width: 95px;
+  height: 95px;
+  border: 2px solid #FDE68A;
+}
+
+.artist-badge-star {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #BE123C 0%, #881337 100%);
+  border: 1.5px solid #FDE68A;
+  font-size: 0.72rem;
+}
+
+/* Banner Grand Finale CTA */
+.cta-banner-showman {
+  background: radial-gradient(circle at 50% 50%, rgba(190, 18, 60, 0.22) 0%, rgba(37, 99, 235, 0.15) 50%, #070A12 85%),
+              linear-gradient(180deg, #070A12 0%, #05070D 100%);
+}
+
+.max-w-600 {
+  max-width: 550px;
+}
+
+.max-w-400 {
+  max-width: 380px;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.x-small {
+  font-size: 0.72rem;
+}

@@ -1,0 +1,435 @@
+<!-- ============================================================
+     PHÂN HỆ QUẢN LÝ VÉ CÁ NHÂN & HỦY VÉ HOÀN TIỀN (BPMN 2.2.4)
+     ============================================================ -->
+<div class="py-5 position-relative">
+  <div class="container">
+    <!-- TIÊU ĐỀ & TÌM KIẾM -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 pb-3 border-bottom border-gold-glow gap-3">
+      <div>
+        <h2 class="display-6 fw-bold text-gold-gradient mb-1">VÉ CỦA TÔI (MY E-TICKETS)</h2>
+        <p class="text-secondary small mb-0">Quản lý lịch sử vé, xem chi tiết E-ticket, in vé hoặc yêu cầu hủy vé hoàn tiền tự động</p>
+      </div>
+
+      <div class="d-flex flex-column flex-sm-row gap-2">
+        <!-- Ô tìm kiếm mã vé -->
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-dark border-secondary border-opacity-50 text-gold">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50"
+            placeholder="Tìm mã vé, tên vở kịch..."
+            [value]="searchCode()"
+            (input)="searchCode.set($any($event.target).value)"
+          />
+        </div>
+
+        <!-- Tab phân loại -->
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-bold text-nowrap"
+            [class.btn-showman-ruby]="activeTab() === 'UPCOMING'"
+            [class.btn-showman-outline]="activeTab() !== 'UPCOMING'"
+            (click)="activeTab.set('UPCOMING')"
+          >
+            CHƯA SỬ DỤNG
+          </button>
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-bold text-nowrap"
+            [class.btn-showman-gold]="activeTab() === 'USED'"
+            [class.btn-showman-outline]="activeTab() !== 'USED'"
+            (click)="activeTab.set('USED')"
+          >
+            ĐÃ CHECK-IN
+          </button>
+          <button
+            class="btn btn-sm rounded-pill px-3 py-2 fw-bold text-nowrap"
+            [class.btn-showman-ruby]="activeTab() === 'CANCELLED'"
+            [class.btn-showman-outline]="activeTab() !== 'CANCELLED'"
+            (click)="activeTab.set('CANCELLED')"
+          >
+            ĐÃ HỦY
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANH SÁCH VÉ (BPMN 2.2.4 Bước 2) -->
+    <div class="row g-4">
+      @for (order of filteredBookings(); track order.bookingCode) {
+        <div class="col-lg-6">
+          <div class="card card-showman-glass rounded-4 p-4 h-100 position-relative overflow-hidden ticket-card-hover">
+            <!-- Dải viền trang trí kiểu vé kịch -->
+            <div class="ticket-stub-border"></div>
+
+            <!-- Huy hiệu trạng thái -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="font-monospace text-gold fw-bold fs-6">
+                <i class="bi bi-upc me-1"></i> {{ order.bookingCode }}
+              </span>
+
+              @if (order.bookingStatus === 'CONFIRMED') {
+                <span class="badge badge-status-available">
+                  <i class="bi bi-ticket-perforated-fill me-1"></i> Chưa Sử Dụng
+                </span>
+              } @else if (order.bookingStatus === 'CHECKED_IN') {
+                <span class="badge badge-showman-gold">
+                  <i class="bi bi-check2-circle me-1"></i> Đã Check-in
+                </span>
+              } @else if (order.bookingStatus === 'CANCELLED') {
+                <span class="badge badge-status-soldout">
+                  <i class="bi bi-x-circle-fill me-1"></i> Đã Hủy / Hoàn Tiền
+                </span>
+              }
+            </div>
+
+            <!-- Tên vở kịch & suất diễn -->
+            <h4 class="text-white fw-bold mb-1 title-truncate">{{ order.musicalTitle }}</h4>
+            <div class="text-gold small mb-3">
+              <i class="bi bi-calendar3 me-1"></i> {{ order.performanceDate | date:'dd/MM/yyyy' }} • 
+              <i class="bi bi-clock me-1 ms-2"></i> {{ order.performanceTime }}
+            </div>
+
+            <!-- Khán phòng & ghế -->
+            <div class="d-flex flex-column gap-2 text-secondary small mb-4 p-3 rounded-3 bg-dark-translucent border border-secondary border-opacity-25">
+              <div class="d-flex justify-content-between">
+                <span><strong class="text-white">Khán phòng:</strong> {{ order.hall }}</span>
+                <span><strong class="text-white">Số lượng:</strong> {{ order.quantity }} vé</span>
+              </div>
+              <div>
+                <strong class="text-white">Ghế ngồi:</strong>
+                @for (s of order.seats; track s.seatCode) {
+                  <span class="badge badge-showman-gold ms-1">{{ s.seatCode }} ({{ s.type }})</span>
+                }
+              </div>
+              <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+                <div>
+                  <span class="text-secondary">Tổng thanh toán: </span>
+                  <span class="text-gold-gradient fw-bold fs-6">{{ order.totalPrice | number:'1.0-0' }} đ</span>
+                </div>
+                <span class="badge bg-dark border border-secondary border-opacity-50 text-secondary">
+                  {{ order.paymentMethod }} ({{ order.paymentStatus }})
+                </span>
+              </div>
+
+              @if (order.checkInInfo?.checkedInAt) {
+                <div class="text-info pt-2 border-top border-secondary border-opacity-25 small">
+                  <i class="bi bi-check-all me-1"></i> Đã check-in lúc: {{ order.checkInInfo?.checkedInAt | date:'HH:mm dd/MM/yyyy' }} 
+                  ({{ order.checkInInfo?.checkedInBy || 'Cổng soát vé' }})
+                </div>
+              }
+
+              @if (order.refundInfo?.refundAmount) {
+                <div class="text-warning pt-2 border-top border-secondary border-opacity-25 small">
+                  <i class="bi bi-arrow-return-left me-1"></i> Đã hoàn tiền: {{ order.refundInfo?.refundAmount | number:'1.0-0' }} đ 
+                  (Phí: {{ (order.refundInfo?.refundFee || 0) | number:'1.0-0' }} đ)
+                </div>
+              }
+            </div>
+
+            <!-- Nút hành động trên từng vé -->
+            <div class="d-flex flex-wrap gap-2 mt-auto">
+              <button class="btn btn-showman-gold rounded-pill fw-bold btn-sm py-2 px-3 flex-grow-1" (click)="openDetailModal(order)">
+                <i class="bi bi-file-earmark-text me-1"></i> XEM CHI TIẾT VÉ
+              </button>
+
+              <button class="btn btn-showman-outline rounded-pill fw-bold btn-sm py-2 px-3" (click)="openQrModal(order)" title="Xem nhanh mã QR">
+                <i class="bi bi-qr-code"></i>
+              </button>
+
+              <button class="btn btn-outline-light rounded-pill btn-sm py-2 px-3" (click)="printTicket(order)" title="In vé / Lưu PDF">
+                <i class="bi bi-printer"></i>
+              </button>
+
+              @if (order.bookingStatus === 'CONFIRMED') {
+                <button class="btn btn-outline-danger rounded-pill fw-bold btn-sm py-2 px-3" (click)="openCancelModal(order)">
+                  <i class="bi bi-x-circle me-1"></i> HỦY VÉ
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-12 text-center py-5">
+          <div class="card card-showman-glass rounded-4 p-5 max-w-500 mx-auto">
+            <i class="bi bi-ticket-perforated text-gold display-4 mb-3 d-block"></i>
+            <h4 class="text-white fw-bold mb-2">Chưa có vé nào trong mục này</h4>
+            <p class="text-secondary small mb-4">Khám phá các vở nhạc kịch đỉnh cao đang diễn ra tại Nhà hát Thành phố và đặt chỗ ngay.</p>
+            <a routerLink="/musicals" class="btn btn-showman-ruby rounded-pill px-4 py-2 fw-bold">
+              KHÁM PHÁ VỞ NHẠC KỊCH
+            </a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 1: CHI TIẾT VÉ ĐIỆN TỬ (E-TICKET) - BPMN 2.2.4 Bước 2 & 3
+       ============================================================ -->
+  @if (selectedDetailOrder(); as detail) {
+    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
+      <div class="card card-showman-glass rounded-4 p-4 max-w-650 w-100 border-gold-glow shadow-2xl modal-scrollable">
+        <!-- Header Modal -->
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-gold-glow">
+          <div class="d-flex align-items-center gap-2">
+            <div class="theatre-emblem">🎭</div>
+            <div>
+              <h5 class="text-gold-gradient fw-bold mb-0">VÉ ĐIỆN TỬ (E-TICKET)</h5>
+              <span class="text-secondary extra-small">NHÀ HÁT THÀNH PHỐ • HỆ THỐNG PHÁT HÀNH CHÍNH THỨC</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary rounded-circle" (click)="closeDetailModal()">✕</button>
+        </div>
+
+        <!-- KHUNG VÉ ĐIỆN TỬ IN ẤN ĐƯỢC (PRINTABLE TICKET) -->
+        <div id="printable-ticket-content" class="printable-ticket p-4 rounded-4 mb-4">
+          <!-- Huy hiệu trạng thái vé -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="font-monospace text-gold fw-bold fs-5">MÃ VÉ: {{ detail.bookingCode }}</span>
+            @if (detail.bookingStatus === 'CONFIRMED') {
+              <span class="badge badge-status-available fs-6 px-3 py-2">
+                <i class="bi bi-check-circle-fill me-1"></i> HỢP LỆ (CHƯA DÙNG)
+              </span>
+            } @else if (detail.bookingStatus === 'CHECKED_IN') {
+              <span class="badge badge-showman-gold fs-6 px-3 py-2">
+                <i class="bi bi-check2-circle me-1"></i> ĐÃ CHECK-IN
+              </span>
+            } @else if (detail.bookingStatus === 'CANCELLED') {
+              <span class="badge badge-status-soldout fs-6 px-3 py-2">
+                <i class="bi bi-x-circle-fill me-1"></i> ĐÃ HỦY VÉ
+              </span>
+            }
+          </div>
+
+          <!-- Thông tin vở kịch -->
+          <div class="text-center my-3 pb-3 border-bottom border-gold-glow">
+            <h3 class="text-white fw-bold mb-2">{{ detail.musicalTitle }}</h3>
+            <p class="text-gold mb-1 fs-5">
+              <i class="bi bi-calendar-event me-2"></i>{{ detail.performanceDate | date:'EEEE, dd/MM/yyyy' }} • {{ detail.performanceTime }}
+            </p>
+            <p class="text-secondary small mb-0">
+              <i class="bi bi-geo-alt-fill text-ruby me-1"></i> {{ detail.hall }} - {{ detail.venue || 'Nhà hát Lớn Thành phố' }}
+            </p>
+          </div>
+
+          <!-- Sơ đồ mã QR & Thông tin ghế ngồi -->
+          <div class="row align-items-center g-3 my-2">
+            <div class="col-sm-5 text-center">
+              <div class="qr-box p-3 bg-white rounded-3 shadow-lg d-inline-block">
+                <svg width="150" height="150" viewBox="0 0 100 100">
+                  <rect width="100" height="100" fill="white" />
+                  <rect x="10" y="10" width="25" height="25" fill="#090D16" />
+                  <rect x="15" y="15" width="15" height="15" fill="white" />
+                  <rect x="18" y="18" width="9" height="9" fill="#BE123C" />
+                  <rect x="65" y="10" width="25" height="25" fill="#090D16" />
+                  <rect x="70" y="15" width="15" height="15" fill="white" />
+                  <rect x="73" y="18" width="9" height="9" fill="#BE123C" />
+                  <rect x="10" y="65" width="25" height="25" fill="#090D16" />
+                  <rect x="15" y="70" width="15" height="15" fill="white" />
+                  <rect x="18" y="73" width="9" height="9" fill="#BE123C" />
+                  <rect x="42" y="15" width="8" height="8" fill="#F59E0B" />
+                  <rect x="45" y="35" width="12" height="12" fill="#090D16" />
+                  <rect x="65" y="65" width="10" height="10" fill="#090D16" />
+                  <rect x="78" y="75" width="12" height="12" fill="#F59E0B" />
+                  <rect x="40" y="70" width="10" height="10" fill="#090D16" />
+                </svg>
+              </div>
+              <span class="d-block text-secondary extra-small mt-2">Quét mã QR tại cổng kiểm soát</span>
+            </div>
+
+            <div class="col-sm-7">
+              <div class="bg-dark-translucent p-3 rounded-3 border border-secondary border-opacity-25 small">
+                <div class="mb-2">
+                  <span class="text-secondary">Khách hàng: </span>
+                  <strong class="text-white">{{ detail.customerName }}</strong>
+                </div>
+                <div class="mb-2">
+                  <span class="text-secondary">Điện thoại / Email: </span>
+                  <span class="text-white">{{ detail.customerPhone }} • {{ detail.customerEmail }}</span>
+                </div>
+                <div class="mb-2">
+                  <span class="text-secondary">Ghế ngồi đã đặt:</span>
+                  <div class="d-flex flex-wrap gap-1 mt-1">
+                    @for (s of detail.seats; track s.seatCode) {
+                      <span class="badge badge-showman-gold">{{ s.seatCode }} ({{ s.type }} - {{ s.price | number:'1.0-0' }}đ)</span>
+                    }
+                  </div>
+                </div>
+                <div class="pt-2 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                  <span class="text-secondary">Tổng tiền:</span>
+                  <span class="text-gold-gradient fw-bold fs-6">{{ detail.totalPrice | number:'1.0-0' }} đ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lưu ý quy định vào rạp -->
+          <div class="p-2 rounded-2 bg-dark border border-secondary border-opacity-25 extra-small text-secondary mt-3">
+            <i class="bi bi-info-circle-fill text-gold me-1"></i>
+            <strong>Quy định:</strong> Vui lòng có mặt trước giờ diễn 15-30 phút. Trang phục lịch sự. Trẻ em dưới độ tuổi quy định sẽ không được vào khán phòng.
+          </div>
+        </div>
+
+        <!-- NÚT THAO TÁC RẼ NHÁNH THEO BPMN 2.2.4 Bước 3 -->
+        <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
+          <!-- Nhánh A: In / Tải vé PDF -->
+          <button class="btn btn-showman-gold rounded-pill py-2 px-4 fw-bold flex-grow-1" (click)="printTicket(detail)">
+            <i class="bi bi-printer-fill me-1"></i> TẢI VÉ / IN VÉ ĐIỆN TỬ (PDF/PRINT)
+          </button>
+
+          <!-- Nhánh B: Yêu cầu hủy vé (nếu vé chưa dùng) -->
+          @if (detail.bookingStatus === 'CONFIRMED') {
+            <button class="btn btn-outline-danger rounded-pill py-2 px-3 fw-bold" (click)="openCancelModal(detail)">
+              <i class="bi bi-x-circle me-1"></i> HỦY VÉ & HOÀN TIỀN
+            </button>
+          }
+
+          <button class="btn btn-showman-outline rounded-pill py-2 px-3" (click)="closeDetailModal()">
+            ĐÓNG
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================
+       MODAL 2: THÔNG BÁO LỖI KHÔNG ĐỦ ĐIỀU KIỆN HỦY VÉ (< 12 GIỜ)
+       BPMN 2.2.4 Bước 3 - Cổng quyết định "Suất diễn diễn ra trong vòng < 12h"
+       ============================================================ -->
+  @if (cancelErrorAlert(); as errMsg) {
+    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
+      <div class="card card-showman-glass rounded-4 p-4 max-w-500 w-100 border-ruby-glow shadow-2xl text-center">
+        <div class="mb-3">
+          <i class="bi bi-exclamation-octagon-fill text-danger display-4"></i>
+        </div>
+        <h4 class="text-ruby-glow fw-bold mb-2">KHÔNG ĐỦ ĐIỀU KIỆN HỦY VÉ</h4>
+        <p class="text-white fs-6 mb-3 px-2">{{ errMsg }}</p>
+
+        <div class="alert alert-dark border-secondary border-opacity-25 p-3 rounded-3 small text-secondary text-start mb-4">
+          <h6 class="text-warning fw-bold mb-1"><i class="bi bi-shield-lock me-1"></i> Chính sách vé Nhà Hát:</h6>
+          <ul class="mb-0 ps-3">
+            <li>Vé kịch được khóa sơ đồ biểu diễn trước 12 giờ để chuẩn bị khâu tiếp đón và kỹ thuật sân khấu.</li>
+            <li>Trong vòng 12h trước giờ diễn, hệ thống không thể xử lý hoàn hủy để đảm bảo quyền lợi tổ chức nghệ thuật.</li>
+          </ul>
+        </div>
+
+        <button class="btn btn-showman-gold w-100 rounded-pill py-2 fw-bold" (click)="cancelErrorAlert.set(null)">
+          QUAY LẠI MÀN HÌNH VÉ
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================
+       MODAL 3: XÁC NHẬN HỦY VÉ & HOÀN TIỀN TỰ ĐỘNG (>= 12 GIỜ)
+       BPMN 2.2.4 Bước 3 Nhánh B: Đủ điều kiện hủy -> Tính hoàn tiền -> Xác nhận
+       ============================================================ -->
+  @if (cancellingOrder(); as cancelTarget) {
+    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
+      <div class="card card-showman-glass rounded-4 p-4 max-w-500 w-100 border-gold-glow shadow-2xl">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="text-ruby-glow fw-bold mb-0">HỦY VÉ & HOÀN TIỀN</h4>
+          <button class="btn btn-sm btn-outline-secondary rounded-circle" (click)="closeCancelModal()">✕</button>
+        </div>
+
+        @if (!cancelSuccessMessage()) {
+          <div class="mb-3 text-secondary small">
+            <div>Mã vé: <strong class="text-gold">{{ cancelTarget.bookingCode }}</strong></div>
+            <div>Vở kịch: <strong class="text-white">{{ cancelTarget.musicalTitle }}</strong></div>
+            <div>Tổng giá trị vé: <strong class="text-white">{{ cancelTarget.totalPrice | number:'1.0-0' }} đ</strong></div>
+          </div>
+
+          <!-- BẢNG TÍNH TOÁN TIỀN HOÀN DỰA TRÊN THỜI GIAN -->
+          @if (refundEstimate(); as est) {
+            <div class="alert alert-dark border-warning p-3 rounded-3 small mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-secondary">Thời gian tới giờ diễn:</span>
+                <span class="text-warning fw-bold">{{ est.hoursRemaining }} giờ</span>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-secondary">Tỷ lệ hoàn tiền:</span>
+                <span class="text-success fw-bold">{{ est.rate }}% giá trị vé</span>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-secondary">Phí hủy quy định:</span>
+                <span class="text-danger">{{ est.fee | number:'1.0-0' }} đ</span>
+              </div>
+              <div class="d-flex justify-content-between pt-2 border-top border-secondary border-opacity-50">
+                <strong class="text-white">Số tiền hoàn thực tế:</strong>
+                <strong class="text-gold-gradient fs-6">{{ est.refundAmount | number:'1.0-0' }} đ</strong>
+              </div>
+            </div>
+          }
+
+          <div class="mb-3">
+            <label class="form-label text-gold small fw-bold">Lý do hủy vé *</label>
+            <select class="form-select bg-dark text-white border-secondary" [value]="cancelReason()" (change)="cancelReason.set($any($event.target).value)">
+              <option value="Bận lịch cá nhân đột xuất">Bận lịch cá nhân đột xuất</option>
+              <option value="Thay đổi ngày xem / muốn đổi suất khác">Muốn đổi sang suất chiếu khác</option>
+              <option value="Đặt nhầm số lượng hoặc vị trí ghế">Đặt nhầm số lượng hoặc vị trí ghế</option>
+              <option value="Lý do sức khỏe hoặc công tác">Lý do sức khỏe hoặc công tác</option>
+            </select>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-showman-outline w-100 rounded-pill py-2" (click)="closeCancelModal()">HỦY BỎ</button>
+            <button class="btn btn-showman-ruby w-100 rounded-pill py-2 fw-bold" [disabled]="isSubmittingCancel()" (click)="confirmCancelBooking()">
+              @if (isSubmittingCancel()) {
+                <span class="spinner-border spinner-border-sm me-1"></span> Đang xử lý...
+              } @else {
+                XÁC NHẬN HỦY VÉ & HOÀN TIỀN
+              }
+            </button>
+          </div>
+        } @else {
+          <!-- MÀN HÌNH HOÀN TẤT HỦY VÉ -->
+          <div class="alert alert-success p-4 rounded-3 text-white bg-dark border-success text-center mb-3">
+            <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+            <h5 class="fw-bold text-success mb-2">HỦY VÉ THÀNH CÔNG</h5>
+            <p class="small mb-0 text-white">{{ cancelSuccessMessage() }}</p>
+          </div>
+          <button class="btn btn-showman-gold w-100 rounded-pill py-2 fw-bold" (click)="closeCancelModal()">ĐÃ HIỂU & ĐÓNG</button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================
+       MODAL 4: XEM MÃ QR CHECK-IN PHÓNG TO
+       ============================================================ -->
+  @if (viewingQrOrder(); as qrTarget) {
+    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
+      <div class="card card-showman-glass rounded-4 p-4 max-w-450 w-100 border-gold-glow text-center shadow-2xl">
+        <h4 class="text-gold-gradient fw-bold mb-1">{{ qrTarget.musicalTitle }}</h4>
+        <p class="text-secondary small mb-3">{{ qrTarget.performanceTime }} • {{ qrTarget.performanceDate | date:'dd/MM/yyyy' }} • {{ qrTarget.hall }}</p>
+
+        <div class="qr-box p-3 bg-white rounded-3 shadow-lg d-inline-block mb-3 mx-auto">
+          <svg width="180" height="180" viewBox="0 0 100 100">
+            <rect width="100" height="100" fill="white" />
+            <rect x="10" y="10" width="25" height="25" fill="#090D16" />
+            <rect x="15" y="15" width="15" height="15" fill="white" />
+            <rect x="18" y="18" width="9" height="9" fill="#BE123C" />
+            <rect x="65" y="10" width="25" height="25" fill="#090D16" />
+            <rect x="70" y="15" width="15" height="15" fill="white" />
+            <rect x="73" y="18" width="9" height="9" fill="#BE123C" />
+            <rect x="10" y="65" width="25" height="25" fill="#090D16" />
+            <rect x="15" y="70" width="15" height="15" fill="white" />
+            <rect x="18" y="73" width="9" height="9" fill="#BE123C" />
+            <rect x="42" y="15" width="8" height="8" fill="#F59E0B" />
+            <rect x="45" y="35" width="12" height="12" fill="#090D16" />
+            <rect x="65" y="65" width="10" height="10" fill="#090D16" />
+            <rect x="78" y="75" width="12" height="12" fill="#F59E0B" />
+            <rect x="40" y="70" width="10" height="10" fill="#090D16" />
+          </svg>
+        </div>
+
+        <span class="d-block text-gold fw-bold fs-5 font-monospace mb-1">{{ qrTarget.bookingCode }}</span>
+        <span class="d-block text-white small mb-3">Ghế: {{ qrTarget.seats[0]?.seatCode }} {{ qrTarget.seats.length > 1 ? '(và ' + (qrTarget.seats.length - 1) + ' ghế khác)' : '' }}</span>
+
+        <button class="btn btn-showman-ruby w-100 rounded-pill py-2 fw-bold" (click)="closeQrModal()">ĐÓNG</button>
+      </div>
+    </div>
+  }
+</div>

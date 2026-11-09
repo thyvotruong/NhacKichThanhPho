@@ -1,0 +1,911 @@
+<!-- ============================================================
+     CỔNG QUẢN TRỊ HỆ THỐNG - ADMIN PORTAL (RBAC)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<app-staff-header></app-staff-header>
+
+<div class="admin-portal-page position-relative py-4">
+  <!-- Bụi tiên nền -->
+  <div class="stardust-container" aria-hidden="true">
+    <span class="stardust-sparkle" style="top: 8%; left: 12%;">✦</span>
+    <span class="stardust-sparkle" style="top: 25%; left: 88%;">✧</span>
+    <span class="stardust-dot" style="top: 15%; left: 50%;"></span>
+  </div>
+
+  <div class="container-fluid px-lg-5 position-relative z-2">
+    <!-- Top Bar: Header & RBAC Quick Role Switcher -->
+    <div class="card-showman-glass p-3 p-md-4 rounded-4 border border-gold-glow mb-4">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold">
+              <i class="bi bi-shield-lock-fill text-gold me-1"></i> ADMIN PORTAL (RBAC)
+            </span>
+            <span class="badge badge-showman-gold small fw-bold">HỆ THỐNG QUẢN TRỊ ĐIỀU HÀNH</span>
+          </div>
+          <h2 class="text-gold-gradient fw-black mb-0 fs-3">
+            TRUNG TÂM QUẢN TRỊ NHÀ HÁT THÀNH PHỐ
+          </h2>
+        </div>
+
+        <!-- Role Simulator & Profile -->
+        <div class="d-flex flex-wrap align-items-center gap-3 bg-dark-glass p-2 px-3 rounded-3 border border-secondary border-opacity-25">
+          <div class="d-flex align-items-center gap-2">
+            <div class="user-avatar-circle">
+              <i class="bi bi-person-badge-fill text-gold fs-5"></i>
+            </div>
+            <div>
+              <div class="text-white fw-bold small">{{ currentUser().fullName }}</div>
+              <div class="text-secondary" style="font-size: 0.75rem;">
+                Vai trò: <span class="text-gold fw-bold text-uppercase">{{ currentUser().role }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Role Switcher for Testing RBAC -->
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-warning dropdown-toggle fw-bold py-1 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-arrow-repeat me-1"></i> Đổi Vai Trò Giả Lập
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end border-gold-glow shadow-2xl">
+              <li><h6 class="dropdown-header text-gold">CHỌN PHÂN QUYỀN THỬ NGHIỆM</h6></li>
+              <li><button class="dropdown-item" (click)="switchRole('admin')"><i class="bi bi-shield-fill-check text-gold me-2"></i> Giám Đốc Điều Hành (Admin)</button></li>
+              <li><button class="dropdown-item" (click)="switchRole('editor')"><i class="bi bi-pencil-square text-info me-2"></i> Ban Biên Tập (Editor)</button></li>
+              <li><button class="dropdown-item" (click)="switchRole('accountant')"><i class="bi bi-cash-coin text-success me-2"></i> Kế Toán Trưởng (Accountant)</button></li>
+              <li><button class="dropdown-item" (click)="switchRole('ticket_checker')"><i class="bi bi-upc-scan text-warning me-2"></i> Tổ Trưởng Soát Vé (Checker)</button></li>
+              <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
+              <li><button class="dropdown-item" (click)="switchRole('customer')"><i class="bi bi-person text-secondary me-2"></i> Khách Hàng (Customer)</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="d-flex flex-wrap gap-2 mb-4 border-bottom border-secondary border-opacity-25 pb-3">
+      <button
+        class="btn admin-tab-btn"
+        [class.active]="activeTab() === 'dashboard'"
+        (click)="setTab('dashboard')"
+      >
+        <i class="bi bi-speedometer2 me-1"></i> Dashboard Tổng Quan
+      </button>
+
+      <button
+        class="btn admin-tab-btn"
+        [class.active]="activeTab() === 'seat-lock'"
+        (click)="setTab('seat-lock')"
+      >
+        <i class="bi bi-lock-fill text-ruby-glow me-1"></i> Khóa Ghế Nội Bộ
+      </button>
+
+      <button
+        class="btn admin-tab-btn"
+        [class.active]="activeTab() === 'orders'"
+        (click)="setTab('orders')"
+      >
+        <i class="bi bi-receipt me-1"></i> Quản Lý Đơn Vé & Hoàn Tiền
+      </button>
+
+      <button
+        class="btn admin-tab-btn"
+        [class.active]="activeTab() === 'vouchers'"
+        (click)="setTab('vouchers')"
+      >
+        <i class="bi bi-ticket-perforated-fill me-1"></i> Quản Lý Voucher
+      </button>
+
+      <button
+        class="btn admin-tab-btn"
+        [class.active]="activeTab() === 'reconciliation'"
+        (click)="setTab('reconciliation')"
+      >
+        <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Đối Soát Giao Dịch
+      </button>
+
+      <button
+        class="btn admin-tab-btn"
+        [class.active]="activeTab() === 'staff'"
+        (click)="setTab('staff')"
+      >
+        <i class="bi bi-people-fill me-1"></i> Nhân Sự & Phân Quyền
+      </button>
+    </div>
+
+    <!-- TAB 1: EXECUTIVE DASHBOARD -->
+    @if (activeTab() === 'dashboard') {
+      <div class="dashboard-section animate-fade-in">
+        @if (isLoadingStats()) {
+          <div class="text-center py-5">
+            <div class="spinner-border text-gold" role="status"></div>
+            <p class="text-gold mt-2 fw-bold">ĐANG TẢI DỮ LIỆU THỐNG KÊ...</p>
+          </div>
+        } @else if (stats(); as s) {
+          <!-- 4 Thẻ KPI Chỉ Số Chính -->
+          <div class="row g-4 mb-4">
+            <!-- Doanh thu -->
+            <div class="col-sm-6 col-xl-3">
+              <div class="kpi-card p-4 rounded-4 border border-gold-glow">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="text-secondary small fw-bold text-uppercase">TỔNG DOANH THU THỰC</span>
+                  <div class="kpi-icon-badge bg-gold-subtle">
+                    <i class="bi bi-currency-dollar text-gold fs-4"></i>
+                  </div>
+                </div>
+                <h3 class="display-6 fw-black text-gold-gradient mb-1">
+                  {{ s.totalRevenue | number:'1.0-0' }} đ
+                </h3>
+                <span class="badge bg-success-subtle text-success small">
+                  <i class="bi bi-arrow-up-right me-1"></i> +18.4% so với tuần trước
+                </span>
+              </div>
+            </div>
+
+            <!-- Vé đã bán -->
+            <div class="col-sm-6 col-xl-3">
+              <div class="kpi-card p-4 rounded-4 border border-secondary border-opacity-25">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="text-secondary small fw-bold text-uppercase">TỔNG VÉ ĐÃ PHÁT HÀNH</span>
+                  <div class="kpi-icon-badge bg-ruby-subtle">
+                    <i class="bi bi-ticket-perforated-fill text-ruby-glow fs-4"></i>
+                  </div>
+                </div>
+                <h3 class="display-6 fw-black text-white mb-1">
+                  {{ s.totalTicketsSold }} <span class="fs-6 text-secondary fw-normal">vé</span>
+                </h3>
+                <span class="badge bg-success-subtle text-success small">
+                  <i class="bi bi-arrow-up-right me-1"></i> Tăng 42 vé hôm nay
+                </span>
+              </div>
+            </div>
+
+            <!-- Tỷ lệ lấp đầy -->
+            <div class="col-sm-6 col-xl-3">
+              <div class="kpi-card p-4 rounded-4 border border-secondary border-opacity-25">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="text-secondary small fw-bold text-uppercase">TỶ LỆ LẤP ĐẦY KHÁN PHÒNG</span>
+                  <div class="kpi-icon-badge bg-sapphire-subtle">
+                    <i class="bi bi-pie-chart-fill text-info fs-4"></i>
+                  </div>
+                </div>
+                <h3 class="display-6 fw-black text-white mb-2">
+                  {{ s.occupancyRate }}%
+                </h3>
+                <div class="progress progress-occupancy" style="height: 6px;">
+                  <div class="progress-bar bg-gold" [style.width.%]="s.occupancyRate"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Đơn đặt vé -->
+            <div class="col-sm-6 col-xl-3">
+              <div class="kpi-card p-4 rounded-4 border border-secondary border-opacity-25">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <span class="text-secondary small fw-bold text-uppercase">TỔNG ĐƠN ĐẶT HÀNG</span>
+                  <div class="kpi-icon-badge bg-success-subtle">
+                    <i class="bi bi-bag-check-fill text-success fs-4"></i>
+                  </div>
+                </div>
+                <h3 class="display-6 fw-black text-white mb-1">
+                  {{ s.totalOrders }} <span class="fs-6 text-secondary fw-normal">đơn</span>
+                </h3>
+                <span class="badge bg-success-subtle text-success small">
+                  <i class="bi bi-check2 me-1"></i> 100% thanh toán trực tuyến
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phân bổ Doanh thu Cổng thanh toán & Tỷ lệ lấp đầy -->
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
+                <h4 class="text-gold fw-bold mb-3">
+                  <i class="bi bi-wallet2 me-2"></i> PHÂN BỔ PHƯƠNG THỨC THANH TOÁN
+                </h4>
+                <p class="text-secondary small mb-4">
+                  Dữ liệu ghi nhận từ các cổng thanh toán kết nối trực tiếp (VietQR, VNPAY, MoMo, ZaloPay, Thẻ).
+                </p>
+
+                <div class="d-flex flex-column gap-3">
+                  <div>
+                    <div class="d-flex justify-content-between text-secondary small mb-1">
+                      <span class="text-white fw-bold"><i class="bi bi-qr-code-scan text-gold me-1"></i> VietQR (Chuyển khoản 247)</span>
+                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.VIETQR | number:'1.0-0' }} đ (43.6%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-warning" style="width: 43.6%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="d-flex justify-content-between text-secondary small mb-1">
+                      <span class="text-white fw-bold"><i class="bi bi-credit-card text-info me-1"></i> VNPAY Cổng Quốc Gia</span>
+                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.VNPAY | number:'1.0-0' }} đ (30.9%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-info" style="width: 30.9%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="d-flex justify-content-between text-secondary small mb-1">
+                      <span class="text-white fw-bold"><i class="bi bi-phone-fill text-danger me-1"></i> Ví Điện Tử MoMo</span>
+                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.MOMO | number:'1.0-0' }} đ (16.4%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-danger" style="width: 16.4%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="d-flex justify-content-between text-secondary small mb-1">
+                      <span class="text-white fw-bold"><i class="bi bi-chat-square-dots text-primary me-1"></i> ZaloPay</span>
+                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.ZALOPAY | number:'1.0-0' }} đ (5.5%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-primary" style="width: 5.5%"></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="d-flex justify-content-between text-secondary small mb-1">
+                      <span class="text-white fw-bold"><i class="bi bi-credit-card-2-front text-secondary me-1"></i> Thẻ Quốc Tế Visa/Mastercard</span>
+                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.BANK_CARD | number:'1.0-0' }} đ (3.6%)</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-secondary" style="width: 3.6%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
+                <h4 class="text-gold fw-bold mb-3">
+                  <i class="bi bi-lightning-charge me-2"></i> LỐI TẮT THAO TÁC NHANH
+                </h4>
+                <div class="d-flex flex-column gap-3">
+                  <button class="btn btn-showman-ruby py-3 text-start fw-bold" (click)="setTab('seat-lock')">
+                    <i class="bi bi-lock-fill fs-5 me-2 text-gold"></i>
+                    KHÓA GHẾ NỘI BỘ (BÁO CHÍ / VIP)
+                  </button>
+
+                  <button class="btn btn-showman-gold py-3 text-start fw-bold" (click)="setTab('orders')">
+                    <i class="bi bi-receipt fs-5 me-2"></i>
+                    TRA CỨU & XỬ LÝ HOÀN TIỀN
+                  </button>
+
+                  <button class="btn btn-outline-warning py-3 text-start fw-bold text-white border-gold-glow" (click)="setTab('reconciliation')">
+                    <i class="bi bi-file-earmark-check fs-5 me-2 text-gold"></i>
+                    ĐỐI SOÁT TÀI CHÍNH CỔNG TT
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- TAB 2: KHÓA GHẾ NỘI BỘ (CRUCIAL FLOW THEO BA) -->
+    @if (activeTab() === 'seat-lock') {
+      <div class="seat-lock-section animate-fade-in">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+              <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold mb-2">
+                NGHIỆP VỤ ĐẶC THÙ NHÀ HÁT
+              </span>
+              <h3 class="text-gold-gradient fw-bold mb-1">
+                QUẢN LÝ KHÓA GHẾ NỘI BỘ (SEAT LOCK)
+              </h3>
+              <p class="text-secondary small mb-0">
+                Khóa các vị trí ghế dành riêng cho Cơ quan Báo chí, Khách mời Ngoại giao, Nhà tài trợ hoặc Khu vực Kỹ thuật. Đồng bộ tức thời sang Khách hàng!
+              </p>
+            </div>
+
+            <!-- Chọn Suất Diễn -->
+            <div class="d-flex align-items-center gap-2">
+              <label class="text-gold fw-bold small text-nowrap"><i class="bi bi-calendar3 me-1"></i> Suất diễn:</label>
+              <select
+                class="form-select bg-dark-glass text-white border-gold-glow py-2"
+                [ngModel]="selectedScheduleId()"
+                (ngModelChange)="selectSchedule($event)"
+              >
+                @for (sch of schedules(); track sch._id) {
+                  <option [value]="sch._id">
+                    {{ sch.musicalTitle }} - {{ sch.performanceDate | date:'dd/MM' }} ({{ sch.time }})
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thông báo kết quả thao tác -->
+        @if (seatActionMessage(); as msg) {
+          <div class="alert rounded-3 mb-4" [class.alert-success]="msg.type === 'success'" [class.alert-danger]="msg.type === 'error'">
+            <i class="bi me-2" [class.bi-check-circle-fill]="msg.type === 'success'" [class.bi-exclamation-triangle-fill]="msg.type === 'error'"></i>
+            {{ msg.text }}
+          </div>
+        }
+
+        <!-- Khu vực Thao Tác Khóa & Sơ Đồ Ghế -->
+        <div class="row g-4">
+          <!-- Cột Trái: Bảng Điều Khiển Khóa Ghế -->
+          <div class="col-lg-4">
+            <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
+              <h4 class="text-white fw-bold mb-3">
+                <i class="bi bi-sliders text-gold me-2"></i> THIẾT LẬP LỆNH KHÓA
+              </h4>
+
+              <div class="mb-3">
+                <label class="form-label text-secondary small fw-bold">GHẾ ĐANG CHỌN THAO TÁC:</label>
+                @if (selectedSeatsForLock().length === 0) {
+                  <div class="p-3 rounded-3 text-center border border-dashed border-secondary border-opacity-50 text-secondary small">
+                    <i class="bi bi-cursor me-1"></i> Nhấp vào các ghế trên sơ đồ bên phải để chọn
+                  </div>
+                } @else {
+                  <div class="d-flex flex-wrap gap-2 p-2 bg-dark-glass rounded-3 border border-gold-glow">
+                    @for (code of selectedSeatsForLock(); track code) {
+                      <span class="badge badge-showman-gold fw-bold px-2 py-1">
+                        {{ code }}
+                      </span>
+                    }
+                  </div>
+                  <small class="text-gold mt-1 d-block">Đã chọn: {{ selectedSeatsForLock().length }} ghế</small>
+                }
+              </div>
+
+              <!-- Lý do khóa -->
+              <div class="mb-3">
+                <label class="form-label text-secondary small fw-bold">LÝ DO KHÓA GHẾ NỘI BỘ:</label>
+                <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25 mb-2" [ngModel]="lockReason()" (ngModelChange)="lockReason.set($event)">
+                  <option value="Báo chí / Truyền thông">📰 Cơ quan Báo chí / Truyền thông</option>
+                  <option value="Khách mời danh dự (VIP Sponsor)">👑 Khách mời danh dự (VIP Sponsor)</option>
+                  <option value="Kỹ thuật / Âm thanh ánh sáng">🎛️ Bàn Kỹ thuật / Âm thanh ánh sáng</option>
+                  <option value="Bảo trì ghế ngồi">🔧 Bảo trì / Ghế dự phòng</option>
+                  <option value="Khác">✏️ Lý do khác (Nhập thủ công)</option>
+                </select>
+
+                @if (lockReason() === 'Khác') {
+                  <input
+                    type="text"
+                    class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                    placeholder="Nhập lý do khóa cụ thể..."
+                    [ngModel]="customLockReason()"
+                    (ngModelChange)="customLockReason.set($event)"
+                  />
+                }
+              </div>
+
+              <!-- Hành động -->
+              <div class="d-grid gap-2 pt-3 border-top border-secondary border-opacity-25">
+                <button
+                  class="btn btn-showman-ruby py-2 fw-bold"
+                  [disabled]="selectedSeatsForLock().length === 0 || isLockingSeats()"
+                  (click)="onExecuteLockSeats()"
+                >
+                  <i class="bi bi-lock-fill me-1 text-gold"></i>
+                  KHÓA GHẾ NỘI BỘ
+                </button>
+
+                <button
+                  class="btn btn-outline-warning py-2 fw-bold text-white border-gold-glow"
+                  [disabled]="selectedSeatsForLock().length === 0 || isLockingSeats()"
+                  (click)="onExecuteUnlockSeats()"
+                >
+                  <i class="bi bi-unlock-fill me-1 text-gold"></i>
+                  MỞ KHÓA GHẾ (BÁN LẠI)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cột Phải: Sơ đồ ghế tương tác trực quan -->
+          <div class="col-lg-8">
+            <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+              <!-- Chú thích màu sắc -->
+              <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 p-2 bg-dark-glass rounded-3 border border-secondary border-opacity-25 small">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="seat-dot seat-available"></span>
+                  <span class="text-secondary">Trống (Có thể bán)</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="seat-dot seat-locked"></span>
+                  <span class="text-secondary fw-bold text-danger">Khóa nội bộ (Locked)</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="seat-dot seat-booked"></span>
+                  <span class="text-secondary">Đã bán</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="seat-dot seat-admin-selected"></span>
+                  <span class="text-gold fw-bold">Đang chọn</span>
+                </div>
+              </div>
+
+              <!-- Sân khấu -->
+              <div class="stage-bar mx-auto mb-4 text-center py-2 text-gold fw-bold text-uppercase rounded-3">
+                <i class="bi bi-stars me-1"></i> SÂN KHẤU NHÀ HÁT (STAGE) <i class="bi bi-stars ms-1"></i>
+              </div>
+
+              <!-- Ghế Tầng Trệt -->
+              @if (currentSchedule(); as sch) {
+                <div class="text-center mb-4">
+                  <h6 class="text-gold fw-bold mb-3"><i class="bi bi-layers me-1"></i> KHU VỰC TẦNG TRỆT (ORCHESTRA)</h6>
+                  <div class="seat-grid-container d-inline-block">
+                    @for (seat of sch.seats; track seat.seatCode) {
+                      @if (seat.floor === 'Tầng Trệt') {
+                        <button
+                          type="button"
+                          class="seat-btn"
+                          [class.seat-btn-available]="seat.status === 'available'"
+                          [class.seat-btn-booked]="seat.status === 'booked'"
+                          [class.seat-btn-locked]="seat.status === 'locked'"
+                          [class.seat-btn-selected]="isSeatSelected(seat.seatCode)"
+                          [disabled]="seat.status === 'booked'"
+                          (click)="toggleSeatSelection(seat)"
+                          [title]="seat.seatCode + ' (' + seat.status + ')'"
+                        >
+                          {{ seat.number }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <!-- Ghế Tầng Lầu -->
+                <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+                  <h6 class="text-gold fw-bold mb-3"><i class="bi bi-building me-1"></i> KHU VỰC TẦNG LẦU (BALCONY)</h6>
+                  <div class="seat-grid-container d-inline-block">
+                    @for (seat of sch.seats; track seat.seatCode) {
+                      @if (seat.floor === 'Tầng Lầu') {
+                        <button
+                          type="button"
+                          class="seat-btn"
+                          [class.seat-btn-available]="seat.status === 'available'"
+                          [class.seat-btn-booked]="seat.status === 'booked'"
+                          [class.seat-btn-locked]="seat.status === 'locked'"
+                          [class.seat-btn-selected]="isSeatSelected(seat.seatCode)"
+                          [disabled]="seat.status === 'booked'"
+                          (click)="toggleSeatSelection(seat)"
+                          [title]="seat.seatCode + ' (' + seat.status + ')'"
+                        >
+                          {{ seat.number }}
+                        </button>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 3: QUẢN LÝ ĐƠN HÀNG & HOÀN TIỀN -->
+    @if (activeTab() === 'orders') {
+      <div class="orders-section animate-fade-in">
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  placeholder="Tra cứu theo mã vé, SĐT, Tên KH..."
+                  [ngModel]="orderSearchKeyword()"
+                  (ngModelChange)="orderSearchKeyword.set($event); loadOrders()"
+                />
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <select
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [ngModel]="orderStatusFilter()"
+                (ngModelChange)="orderStatusFilter.set($event); loadOrders()"
+              >
+                <option value="ALL">Tất cả trạng thái</option>
+                <option value="CONFIRMED">ĐÃ XÁC NHẬN (CONFIRMED)</option>
+                <option value="CHECKED_IN">ĐÃ CHECK-IN (CHECKED_IN)</option>
+                <option value="CANCELLED">ĐÃ HỦY / HOÀN TIỀN (CANCELLED)</option>
+              </select>
+            </div>
+
+            <div class="col-md-3 text-end">
+              <button class="btn btn-showman-gold px-3 py-2 fw-bold w-100" (click)="loadOrders()">
+                <i class="bi bi-arrow-clockwise me-1"></i> Làm Mới Dữ Liệu
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảng danh sách đơn hàng -->
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
+              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+                <tr>
+                  <th>MÃ ĐƠN</th>
+                  <th>KHÁCH HÀNG</th>
+                  <th>VỞ DIỄN & SUẤT</th>
+                  <th>VỊ TRÍ GHẾ</th>
+                  <th>TỔNG TIỀN</th>
+                  <th>CỔNG TT</th>
+                  <th>TRẠNG THÁI</th>
+                  <th class="text-end">THAO TÁC</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (o of orders(); track o.bookingCode) {
+                  <tr>
+                    <td>
+                      <span class="fw-bold text-gold">{{ o.bookingCode }}</span>
+                    </td>
+                    <td>
+                      <div class="text-white fw-bold">{{ o.customerName }}</div>
+                      <div class="text-secondary small">{{ o.customerPhone }}</div>
+                    </td>
+                    <td>
+                      <div class="text-white small fw-bold">{{ o.musicalTitle }}</div>
+                      <div class="text-secondary small">{{ o.performanceDate | date:'dd/MM/yyyy' }} ({{ o.performanceTime }})</div>
+                    </td>
+                    <td>
+                      <div class="d-flex flex-wrap gap-1">
+                        @for (st of o.seats; track st.seatCode) {
+                          <span class="badge badge-showman-ruby small">{{ st.seatCode }}</span>
+                        }
+                      </div>
+                    </td>
+                    <td class="text-gold-gradient fw-bold">
+                      {{ o.totalPrice | number:'1.0-0' }} đ
+                    </td>
+                    <td>
+                      <span class="badge bg-secondary-subtle text-light small">{{ o.paymentMethod }}</span>
+                    </td>
+                    <td>
+                      @if (o.bookingStatus === 'CONFIRMED') {
+                        <span class="badge bg-success-subtle text-success fw-bold">XÁC NHẬN</span>
+                      } @else if (o.bookingStatus === 'CHECKED_IN') {
+                        <span class="badge bg-primary-subtle text-info fw-bold">ĐÃ CHECK-IN</span>
+                      } @else if (o.bookingStatus === 'CANCELLED') {
+                        <span class="badge bg-danger-subtle text-danger fw-bold">ĐÃ HỦY</span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      @if (o.bookingStatus === 'CONFIRMED') {
+                        <button
+                          class="btn btn-sm btn-outline-danger fw-bold py-1 px-2"
+                          (click)="openRefundModal(o)"
+                        >
+                          <i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn Tiền
+                        </button>
+                      } @else {
+                        <span class="text-secondary small">Không khả dụng</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 4: QUẢN LÝ VOUCHER -->
+    @if (activeTab() === 'vouchers') {
+      <div class="vouchers-section animate-fade-in">
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h3 class="text-gold-gradient fw-bold mb-1">MÃ KHUYẾN MÃI & TRI ÂN KHÁCH HÀNG</h3>
+              <p class="text-secondary small mb-0">Quản lý các mã giảm giá áp dụng khi khách hàng thanh toán vé trực tuyến.</p>
+            </div>
+            <button class="btn btn-showman-gold fw-bold px-4 py-2" (click)="showCreateVoucherModal.set(true)">
+              <i class="bi bi-plus-lg me-1"></i> TẠO VOUCHER MỚI
+            </button>
+          </div>
+        </div>
+
+        <!-- Bảng danh sách voucher -->
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
+              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+                <tr>
+                  <th>MÃ VOUCHER</th>
+                  <th>MÔ TẢ</th>
+                  <th>MỨC GIẢM</th>
+                  <th>ĐƠN TỐI THIỂU</th>
+                  <th>HẠN DÙNG</th>
+                  <th>LƯỢT ĐÃ DÙNG</th>
+                  <th>TRẠNG THÁI</th>
+                  <th class="text-end">BẬT / TẮT</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (v of vouchers(); track v.code) {
+                  <tr>
+                    <td>
+                      <span class="badge badge-showman-gold px-3 py-2 fs-6 fw-bold">{{ v.code }}</span>
+                    </td>
+                    <td class="text-secondary small">{{ v.description }}</td>
+                    <td class="text-gold fw-bold">
+                      @if (v.discountType === 'PERCENT') {
+                        {{ v.discountValue }}% (Tối đa {{ (v.maxDiscountAmount || 0) | number:'1.0-0' }} đ)
+                      } @else {
+                        {{ v.discountValue | number:'1.0-0' }} đ
+                      }
+                    </td>
+                    <td class="text-secondary small">{{ v.minOrderValue | number:'1.0-0' }} đ</td>
+                    <td class="text-secondary small">{{ v.validUntil | date:'dd/MM/yyyy' }}</td>
+                    <td class="text-white fw-bold">{{ v.usedCount || 0 }} lượt</td>
+                    <td>
+                      @if (v.isActive) {
+                        <span class="badge bg-success-subtle text-success fw-bold">ĐANG KÍCH HOẠT</span>
+                      } @else {
+                        <span class="badge bg-secondary-subtle text-secondary fw-bold">ĐÃ KHÓA</span>
+                      }
+                    </td>
+                    <td class="text-end">
+                      <button
+                        class="btn btn-sm py-1 px-3 fw-bold"
+                        [class.btn-outline-danger]="v.isActive"
+                        [class.btn-outline-success]="!v.isActive"
+                        (click)="onToggleVoucher(v)"
+                      >
+                        {{ v.isActive ? 'Khóa mã' : 'Kích hoạt' }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 5: ĐỐI SOÁT GIAO DỊCH TÀI CHÍNH (RECONCILIATION) -->
+    @if (activeTab() === 'reconciliation') {
+      <div class="reconciliation-section animate-fade-in">
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+              <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold mb-1">KIỂM TOÁN TÀI CHÍNH</span>
+              <h3 class="text-gold-gradient fw-bold mb-1">ĐỐI SOÁT DOANH THU & CHÊNH LỆCH CỔNG TT</h3>
+              <p class="text-secondary small mb-0">Đối chiếu tự động giữa số tiền ghi nhận trên Hệ Thống và Cổng Thanh Toán đối tác.</p>
+            </div>
+            <button class="btn btn-showman-gold fw-bold px-4 py-2" (click)="triggerExportReport()">
+              <i class="bi bi-file-earmark-excel-fill me-1"></i> XUẤT BÁO CÁO ĐỐI SOÁT (EXCEL)
+            </button>
+          </div>
+        </div>
+
+        @if (showExportSuccess()) {
+          <div class="alert alert-success rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill me-2"></i> Đã xuất báo cáo đối soát doanh thu thành công dưới dạng file Excel chuẩn kế toán!
+          </div>
+        }
+
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
+              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+                <tr>
+                  <th>MÃ GIAO DỊCH</th>
+                  <th>MÃ ĐƠN VÉ</th>
+                  <th>CỔNG THANH TOÁN</th>
+                  <th>TIỀN HỆ THỐNG</th>
+                  <th>TIỀN CỔNG TT</th>
+                  <th>PHÍ CỔNG</th>
+                  <th>THỰC NHẬN</th>
+                  <th>TRẠNG THÁI</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rec of reconciliations(); track rec.transactionId) {
+                  <tr>
+                    <td class="text-white fw-bold">{{ rec.transactionId }}</td>
+                    <td class="text-gold">{{ rec.bookingCode }}</td>
+                    <td><span class="badge bg-secondary-subtle text-light">{{ rec.gateway }}</span></td>
+                    <td class="text-white">{{ rec.systemAmount | number:'1.0-0' }} đ</td>
+                    <td class="text-white">{{ rec.gatewayAmount | number:'1.0-0' }} đ</td>
+                    <td class="text-secondary small">{{ rec.fee | number:'1.0-0' }} đ</td>
+                    <td class="text-gold-gradient fw-bold">{{ rec.netAmount | number:'1.0-0' }} đ</td>
+                    <td>
+                      @if (rec.status === 'MATCHED') {
+                        <span class="badge bg-success-subtle text-success fw-bold">
+                          <i class="bi bi-check2-all me-1"></i> KHỚP 100%
+                        </span>
+                      } @else {
+                        <span class="badge bg-danger-subtle text-danger fw-bold">
+                          <i class="bi bi-exclamation-triangle-fill me-1"></i> LỆCH TIỀN
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 6: NHÂN SỰ & PHÂN QUYỀN RBAC -->
+    @if (activeTab() === 'staff') {
+      <div class="staff-section animate-fade-in">
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
+          <h3 class="text-gold-gradient fw-bold mb-1">DANH SÁCH NHÂN SỰ & MA TRẬN PHÂN QUYỀN</h3>
+          <p class="text-secondary small mb-0">Hệ thống phân quyền theo vai trò (Role-Based Access Control) đảm bảo an toàn vận hành.</p>
+        </div>
+
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
+              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+                <tr>
+                  <th>HỌ VÀ TÊN</th>
+                  <th>EMAIL</th>
+                  <th>SỐ ĐIỆN THOẠI</th>
+                  <th>CHỨC VỤ / VAI TRÒ</th>
+                  <th>QUYỀN HẠN TRUY CẬP</th>
+                  <th>TRẠNG THÁI</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (u of staffUsers(); track u.email) {
+                  <tr>
+                    <td class="text-white fw-bold">
+                      <i class="bi bi-person-circle text-gold me-2"></i>{{ u.fullName }}
+                    </td>
+                    <td class="text-secondary small">{{ u.email }}</td>
+                    <td class="text-secondary small">{{ u.phone }}</td>
+                    <td>
+                      @if (u.role === 'admin') {
+                        <span class="badge badge-showman-ruby fw-bold">GIÁM ĐỐC (ADMIN)</span>
+                      } @else if (u.role === 'editor') {
+                        <span class="badge badge-showman-sapphire fw-bold">BAN BIÊN TẬP (EDITOR)</span>
+                      } @else if (u.role === 'accountant') {
+                        <span class="badge badge-showman-gold fw-bold">KẾ TOÁN TRƯỞNG (ACCOUNTANT)</span>
+                      } @else if (u.role === 'ticket_checker') {
+                        <span class="badge bg-warning-subtle text-dark fw-bold">SOÁT VÉ (CHECKER)</span>
+                      }
+                    </td>
+                    <td class="text-secondary small">
+                      @if (u.role === 'admin') {
+                        Toàn quyền Dashboard, Khóa ghế, Hoàn tiền, Nhân sự
+                      } @else if (u.role === 'editor') {
+                        Cập nhật nội dung vở kịch, nghệ sĩ, lịch diễn
+                      } @else if (u.role === 'accountant') {
+                        Xem báo cáo doanh thu, đối soát tài chính
+                      } @else if (u.role === 'ticket_checker') {
+                        Chỉ truy cập Cổng Soát Vé / Check-in QR
+                      }
+                    </td>
+                    <td>
+                      <span class="badge bg-success-subtle text-success fw-bold">ĐANG HOẠT ĐỘNG</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- MODAL HOÀN TIỀN / HỦY VÉ -->
+@if (selectedOrderForRefund(); as o) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.75);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content card-showman-glass border-gold-glow text-white p-2 rounded-4">
+        <div class="modal-header border-secondary border-opacity-25">
+          <h5 class="modal-title text-gold fw-bold">
+            <i class="bi bi-arrow-counterclockwise me-2"></i> XÁC NHẬN HOÀN TIỀN ĐƠN VÉ
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeRefundModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25 mb-3">
+            <div>Mã đơn: <strong class="text-gold">{{ o.bookingCode }}</strong></div>
+            <div>Khách hàng: <strong class="text-white">{{ o.customerName }}</strong> ({{ o.customerPhone }})</div>
+            <div>Số tiền hoàn: <strong class="text-gold-gradient fs-5">{{ o.totalPrice | number:'1.0-0' }} đ</strong></div>
+          </div>
+
+          <label class="form-label text-secondary small fw-bold">LÝ DO HOÀN TIỀN:</label>
+          <textarea
+            class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+            rows="3"
+            [ngModel]="refundReasonInput()"
+            (ngModelChange)="refundReasonInput.set($event)"
+          ></textarea>
+        </div>
+        <div class="modal-footer border-secondary border-opacity-25">
+          <button type="button" class="btn btn-outline-secondary" (click)="closeRefundModal()">Đóng</button>
+          <button type="button" class="btn btn-showman-ruby fw-bold" (click)="executeRefund()">
+            XÁC NHẬN HOÀN TIỀN
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- MODAL TẠO VOUCHER MỚI -->
+@if (showCreateVoucherModal()) {
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.75);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content card-showman-glass border-gold-glow text-white p-2 rounded-4">
+        <div class="modal-header border-secondary border-opacity-25">
+          <h5 class="modal-title text-gold fw-bold">
+            <i class="bi bi-ticket-perforated-fill me-2"></i> TẠO MÃ GIẢM GIÁ (VOUCHER) MỚI
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="showCreateVoucherModal.set(false)"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="voucherForm">
+            <div class="mb-3">
+              <label class="form-label small text-secondary fw-bold">MÃ VOUCHER (VIẾT HOA):</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25 text-uppercase" placeholder="VD: SHOWMAN2026" formControlName="code" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-secondary fw-bold">MÔ TẢ VOUCHER:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" placeholder="VD: Giảm 20% tri ân mùa diễn mới" formControlName="description" />
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small text-secondary fw-bold">LOẠI GIẢM GIÁ:</label>
+                <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="discountType">
+                  <option value="PERCENT">Theo Phần Trăm (%)</option>
+                  <option value="FIXED">Số Tiền Cố Định (VNĐ)</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label small text-secondary fw-bold">GIÁ TRỊ GIẢM:</label>
+                <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="discountValue" />
+              </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label class="form-label small text-secondary fw-bold">ĐƠN TỐI THIỂU (VNĐ):</label>
+                <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="minOrderValue" />
+              </div>
+              <div class="col-6">
+                <label class="form-label small text-secondary fw-bold">GIẢM TỐI ĐA (VNĐ):</label>
+                <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="maxDiscountAmount" />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-secondary fw-bold">HẠN SỬ DỤNG:</label>
+              <input type="date" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="validUntil" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-secondary border-opacity-25">
+          <button type="button" class="btn btn-outline-secondary" (click)="showCreateVoucherModal.set(false)">Hủy bỏ</button>
+          <button type="button" class="btn btn-showman-gold fw-bold" (click)="onSubmitNewVoucher()">
+            LƯU VÀ KÍCH HOẠT
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

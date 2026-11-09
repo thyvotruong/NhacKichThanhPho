@@ -1,0 +1,190 @@
+<!-- ============================================================
+     PHÂN HỆ DANH MỤC VỞ NHẠC KỊCH (CATALOG)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<div class="musical-catalog-page position-relative py-5">
+
+
+  <div class="container position-relative z-2">
+    <!-- Header Tiêu Đề Danh Mục -->
+    <div class="text-center mb-5">
+      <h1 class="display-4 fw-black text-gold-gradient mb-3 pt-2 lh-base drop-shadow-title">
+        KHÁM PHÁ DANH MỤC VỞ DIỄN
+      </h1>
+      <div class="showman-divider mx-auto my-3"></div>
+      <p class="lead text-secondary max-w-700 mx-auto mt-2">
+        Khám phá các vở đại nhạc kịch lộng lẫy, cảm xúc thăng hoa cùng dàn diễn viên và dàn nhạc giao hưởng hàng đầu.
+      </p>
+    </div>
+    <!-- Thanh Tìm Kiếm & Bộ Lọc Nâng Cao -->
+    <div class="filter-panel-showman p-4 rounded-4 mb-5 border border-gold-glow">
+      <div class="row g-3 align-items-center mb-4">
+        <!-- Ô tìm kiếm -->
+        <div class="col-lg-5">
+          <div class="input-group">
+            <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control bg-dark-glass text-white border-secondary border-opacity-25 py-2"
+              placeholder="Tìm theo tên vở diễn, diễn viên, đạo diễn..."
+              [ngModel]="searchKeyword()"
+              (ngModelChange)="searchKeyword.set($event); onSearch()"
+            />
+            @if (searchKeyword()) {
+              <button class="btn btn-outline-secondary border-opacity-25 text-gold" (click)="searchKeyword.set(''); onSearch()">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Lọc theo Trạng thái -->
+        <div class="col-md-4 col-lg-3">
+          <select
+            class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
+            [ngModel]="selectedStatus()"
+            (ngModelChange)="setStatus($event)"
+          >
+            <option value="all">🎭 Tất Cả Trạng Thái</option>
+            <option value="now_showing">🔥 Đang Công Diễn</option>
+            <option value="coming_soon">✨ Sắp Công Diễn</option>
+          </select>
+        </div>
+
+        <!-- Sắp xếp -->
+        <div class="col-md-4 col-lg-4">
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-secondary small text-nowrap"><i class="bi bi-arrow-down-up text-gold me-1"></i> Sắp xếp:</span>
+            <select
+              class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
+              [ngModel]="selectedSort()"
+              (ngModelChange)="setSort($event)"
+            >
+              <option value="newest">Mới nhất</option>
+              <option value="price_asc">Giá vé tăng dần</option>
+              <option value="price_desc">Giá vé giảm dần</option>
+              <option value="duration">Thời lượng dài nhất</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lọc Thể Loại (Pill buttons) -->
+      <div class="d-flex align-items-center flex-wrap gap-2 pt-3 border-top border-secondary border-opacity-25">
+        <span class="text-gold fw-bold small me-2 text-uppercase">
+          <i class="bi bi-tag-fill me-1"></i> Thể Loại:
+        </span>
+        @for (genre of genres; track genre) {
+          <button
+            type="button"
+            class="btn btn-sm genre-filter-btn"
+            [class.active]="(selectedGenre() === 'all' && genre === 'Tất cả') || selectedGenre() === genre"
+            (click)="setGenre(genre)"
+          >
+            {{ genre }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Danh Sách Vở Nhạc Kịch -->
+    @if (isLoading()) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-gold" role="status" style="width: 3.5rem; height: 3.5rem;">
+          <span class="visually-hidden">Đang tải...</span>
+        </div>
+        <p class="text-gold mt-3 fw-bold tracking-wider">ĐANG TẢI KIỆT TÁC SÂN KHẤU...</p>
+      </div>
+    } @else if (musicals().length === 0) {
+      <div class="text-center py-5 card-showman-glass p-5 rounded-4 border border-secondary border-opacity-25">
+        <i class="bi bi-emoji-neutral fs-1 text-gold mb-3 d-block"></i>
+        <h3 class="text-white fw-bold">Không tìm thấy vở nhạc kịch phù hợp</h3>
+        <p class="text-secondary mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc bỏ chọn các bộ lọc thể loại.</p>
+        <button class="btn btn-showman-gold px-4 py-2" (click)="searchKeyword.set(''); selectedGenre.set('all'); selectedStatus.set('all'); fetchMusicals()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Đặt lại bộ lọc
+        </button>
+      </div>
+    } @else {
+      <!-- Lưới Card Vở Diễn -->
+      <div class="row g-4">
+        @for (m of musicals(); track m.slug) {
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 card-showman-glass musical-catalog-card border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-column">
+              <!-- Poster & Status Badge -->
+              <div class="position-relative overflow-hidden poster-wrapper">
+                <img
+                  [src]="m.posterUrl"
+                  [alt]="m.title"
+                  class="card-img-top catalog-card-img"
+                />
+                <div class="poster-overlay"></div>
+
+                <!-- Tag Trạng Thái -->
+                <div class="position-absolute top-0 start-0 m-3 z-3">
+                  @if (m.status === 'now_showing') {
+                    <span class="badge badge-showman-ruby px-3 py-2 rounded-pill fw-bold shadow">
+                      <i class="bi bi-broadcast text-gold me-1"></i> ĐANG DIỄN
+                    </span>
+                  } @else {
+                    <span class="badge badge-showman-sapphire px-3 py-2 rounded-pill fw-bold shadow">
+                      <i class="bi bi-calendar-event me-1"></i> SẮP DIỄN
+                    </span>
+                  }
+                </div>
+
+                <!-- Thể loại -->
+                <div class="position-absolute bottom-0 start-0 m-3 z-3">
+                  <span class="badge badge-showman-gold px-3 py-1 rounded-pill small fw-bold">
+                    {{ m.genre }}
+                  </span>
+                </div>
+
+                <!-- Thời lượng -->
+                <div class="position-absolute bottom-0 end-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+                  <i class="bi bi-clock-history text-gold me-1"></i> {{ m.duration }}p
+                </div>
+              </div>
+
+              <!-- Nội dung thẻ -->
+              <div class="card-body p-4 d-flex flex-column flex-grow-1 justify-content-between">
+                <div>
+                  <h3 class="card-title fs-4 fw-bold text-gold-gradient mb-2 line-clamp-1">
+                    {{ m.title }}
+                  </h3>
+                  <p class="text-secondary small mb-3 line-clamp-2">
+                    {{ m.subtitle || m.synopsis }}
+                  </p>
+
+                  <div class="small text-secondary mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+                    <div class="mb-1"><i class="bi bi-person-fill text-gold me-1"></i> Đạo diễn: <strong class="text-white">{{ m.director }}</strong></div>
+                    <div class="text-truncate"><i class="bi bi-people text-ruby-glow me-1"></i> Diễn viên: <span class="text-light">{{ m.cast.join(', ') }}</span></div>
+                  </div>
+                </div>
+
+                <div>
+                  <!-- Giá vé khởi điểm -->
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-secondary small">Giá vé từ:</span>
+                    <span class="fs-5 fw-bold text-gold-gradient">
+                      {{ (m.ticketPrices && m.ticketPrices.length > 0 ? m.ticketPrices[m.ticketPrices.length - 1].price : 250000) | number:'1.0-0' }} đ
+                    </span>
+                  </div>
+
+                  <!-- Nút hành động -->
+                  <div class="d-grid gap-2">
+                    <a [routerLink]="['/musical', m.slug]" class="btn btn-showman-gold py-2 fw-bold">
+                      <i class="bi bi-ticket-perforated me-1"></i> ĐẶT VÉ & XEM CHI TIẾT
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

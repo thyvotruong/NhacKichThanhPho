@@ -1,0 +1,155 @@
+<!-- ============================================================
+     CỔNG TRUY CẬP HỆ THỐNG NỘI BỘ (STAFF INTRANET GATEWAY)
+     Tách biệt hoàn toàn khỏi website khách hàng
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<div class="internal-gateway-page position-relative d-flex align-items-center justify-content-center py-5">
+  <!-- Bụi tiên nền -->
+  <div class="stardust-container" aria-hidden="true">
+    <span class="stardust-sparkle" style="top: 10%; left: 15%;">✦</span>
+    <span class="stardust-sparkle" style="top: 30%; left: 85%;">✧</span>
+    <span class="stardust-sparkle" style="top: 75%; left: 20%;">✦</span>
+    <span class="stardust-dot" style="top: 20%; left: 50%;"></span>
+    <span class="stardust-dot" style="top: 65%; left: 80%;"></span>
+  </div>
+
+  <div class="container position-relative z-2">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-9">
+        <!-- Khối Đăng Nhập & Truy Cập Nội Bộ -->
+        <div class="card-showman-glass p-4 p-md-5 rounded-4 border border-gold-glow shadow-2xl">
+          <!-- Header -->
+          <div class="text-center mb-5">
+            <div class="staff-gateway-emblem mx-auto mb-3 d-flex align-items-center justify-content-center">
+              <i class="bi bi-shield-lock-fill text-gold fs-1"></i>
+            </div>
+            <span class="badge badge-showman-ruby px-3 py-2 rounded-pill small fw-bold text-uppercase mb-2 shadow">
+              <i class="bi bi-lock-fill text-gold me-1"></i> KHU VỰC GIỚI HẠN BẢO MẬT
+            </span>
+            <h1 class="display-5 fw-black text-gold-gradient mb-2 drop-shadow-title">
+              CỔNG ĐIỀU HÀNH & VẬN HÀNH NỘI BỘ
+            </h1>
+            <p class="text-secondary max-w-650 mx-auto small mb-0">
+              Hệ thống quản trị tập trung dành riêng cho Ban Giám Đốc, Đội ngũ Soát vé tại cửa rạp và Kế toán Nhà Hát Thành Phố.
+            </p>
+            <div class="showman-divider"></div>
+          </div>
+
+          <!-- Thông báo lỗi nếu có -->
+          @if (errorMessage()) {
+            <div class="alert alert-danger rounded-3 mb-4 text-center">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+            </div>
+          }
+
+          <!-- Bước 1: Chọn Tài Khoản & Vai Trò Nội Bộ -->
+          <div class="mb-4">
+            <label class="form-label text-gold small fw-bold text-uppercase mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-person-badge-fill fs-5"></i>
+              <span>1. CHỌN NHÂN SỰ & VAI TRÒ ĐĂNG NHẬP (RBAC):</span>
+            </label>
+
+            <div class="row g-3">
+              @for (staff of staffProfiles; track staff.role) {
+                <div class="col-md-6">
+                  <div
+                    class="staff-profile-card p-3 rounded-4 border h-100 cursor-pointer transition-all"
+                    [class.active-card]="selectedRole() === staff.role"
+                    (click)="selectStaff(staff)"
+                  >
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                      <div class="staff-card-icon" [ngClass]="'icon-' + staff.color">
+                        <i class="bi" [ngClass]="staff.icon"></i>
+                      </div>
+                      <div>
+                        <h5 class="text-white fw-bold mb-0 fs-6">{{ staff.name }}</h5>
+                        <span class="badge badge-role" [ngClass]="'badge-' + staff.color">{{ staff.title }}</span>
+                      </div>
+                    </div>
+                    <p class="text-secondary small mb-0 lh-sm">{{ staff.description }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Bước 2: Chọn Phân Hệ Muốn Truy Cập -->
+          <div class="mb-4 pt-3 border-top border-secondary border-opacity-25">
+            <label class="form-label text-gold small fw-bold text-uppercase mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-diagram-3-fill fs-5"></i>
+              <span>2. CHỌN PHÂN HỆ LÀM VIỆC MỤC TIÊU:</span>
+            </label>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div
+                  class="module-select-card p-3 rounded-4 border text-center cursor-pointer transition-all"
+                  [class.module-active]="targetModule() === 'admin'"
+                  (click)="targetModule.set('admin')"
+                >
+                  <i class="bi bi-speedometer2 fs-2 text-gold mb-2 d-block"></i>
+                  <h5 class="text-white fw-bold mb-1 fs-6">TRUNG TÂM QUẢN TRỊ (ADMIN PORTAL)</h5>
+                  <p class="text-secondary small mb-0">Dashboard, Khóa ghế nội bộ, Đơn vé, Voucher, Đối soát</p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div
+                  class="module-select-card p-3 rounded-4 border text-center cursor-pointer transition-all"
+                  [class.module-active]="targetModule() === 'ops'"
+                  (click)="targetModule.set('ops')"
+                >
+                  <i class="bi bi-upc-scan fs-2 text-ruby-glow mb-2 d-block"></i>
+                  <h5 class="text-white fw-bold mb-1 fs-6">CỔNG SOÁT VÉ CỬA RẠP (OPS PORTAL)</h5>
+                  <p class="text-secondary small mb-0">Quét mã QR E-ticket, Soát vé thời gian thực, Báo động vé trùng</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bước 3: Xác thực mã PIN & Vào hệ thống -->
+          <div class="mb-4 pt-3 border-top border-secondary border-opacity-25">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-6">
+                <label class="form-label text-secondary small fw-bold">MÃ PIN BẢO MẬT NHÂN VIÊN:</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark-glass text-gold border-gold-glow">
+                    <i class="bi bi-key-fill"></i>
+                  </span>
+                  <input
+                    type="password"
+                    class="form-control bg-dark-glass text-white border-gold-glow fw-bold fs-5 text-center letter-spacing-2"
+                    placeholder="Nhập mã PIN..."
+                    [ngModel]="accessPin()"
+                    (ngModelChange)="accessPin.set($event)"
+                    (keyup.enter)="onAuthenticate()"
+                  />
+                </div>
+                <small class="text-secondary opacity-75 mt-1 d-block">Mã PIN kiểm thử mặc định: <strong class="text-gold">123456</strong></small>
+              </div>
+
+              <div class="col-md-6">
+                <button
+                  type="button"
+                  class="btn btn-showman-gold py-3 fw-bold fs-5 w-100 shadow-2xl"
+                  (click)="onAuthenticate()"
+                >
+                  <i class="bi bi-box-arrow-in-right me-2"></i>
+                  ĐĂNG NHẬP VÀO HỆ THỐNG
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút quay lại trang Web Khách hàng -->
+          <div class="text-center pt-3 border-top border-secondary border-opacity-25">
+            <a routerLink="/" class="text-secondary text-decoration-none small hover-gold">
+              <i class="bi bi-arrow-left me-1"></i> Trở về Trang Web Dành Cho Khán Giả
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

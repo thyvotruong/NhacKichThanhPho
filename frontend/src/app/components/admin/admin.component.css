@@ -1,0 +1,184 @@
+/**
+ * ============================================================
+ * NHẠC KỊCH THÀNH PHỐ - ADMIN PORTAL STYLES
+ * Phong cách: The Greatest Showman (100% Montserrat)
+ * ============================================================
+ */
+
+.admin-portal-page {
+  min-height: calc(100vh - 160px);
+  background: radial-gradient(circle at 50% 10%, #151d33 0%, var(--showman-canvas-night) 70%);
+}
+
+.user-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--showman-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-tab-btn {
+  background: rgba(14, 22, 41, 0.7);
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+}
+
+.admin-tab-btn:hover {
+  color: var(--showman-gold);
+  border-color: var(--showman-gold);
+}
+
+.admin-tab-btn.active {
+  background: linear-gradient(135deg, var(--showman-gold) 0%, #D97706 100%);
+  color: #070A12;
+  border-color: var(--showman-gold);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+}
+
+.kpi-card {
+  background: rgba(14, 22, 41, 0.85);
+  backdrop-filter: blur(12px);
+  transition: transform 0.25s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+}
+
+.kpi-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-gold-subtle {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.bg-ruby-subtle {
+  background: rgba(190, 18, 60, 0.15);
+}
+
+.bg-sapphire-subtle {
+  background: rgba(37, 99, 235, 0.15);
+}
+
+.bg-success-subtle {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.seat-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.seat-available {
+  background: #1E293B;
+  border: 1px solid #475569;
+}
+
+.seat-locked {
+  background: #991B1B;
+  border: 1px solid #EF4444;
+}
+
+.seat-booked {
+  background: #334155;
+  opacity: 0.5;
+}
+
+.seat-admin-selected {
+  background: var(--showman-gold);
+  border: 1px solid #FFFFFF;
+}
+
+.stage-bar {
+  max-width: 500px;
+  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent);
+  border-top: 2px solid var(--showman-gold);
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+}
+
+.seat-grid-container {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(28px, 1fr));
+  gap: 8px;
+  max-width: 550px;
+}
+
+.seat-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.seat-btn-available {
+  background: #1E293B;
+  color: #94A3B8;
+  border: 1px solid #475569;
+}
+
+.seat-btn-available:hover {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--showman-gold);
+  border-color: var(--showman-gold);
+}
+
+.seat-btn-locked {
+  background: #991B1B;
+  color: #FFFFFF;
+  border: 1px solid #EF4444;
+}
+
+.seat-btn-booked {
+  background: #1E2230;
+  color: #475569;
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.seat-btn-selected {
+  background: var(--showman-gold) !important;
+  color: #070A12 !important;
+  border: 2px solid #FFFFFF !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,160 @@
+/* ============================================================
+   STYLES CHO MY TICKETS & HỦY VÉ (BPMN 2.2.4)
+   ============================================================ */
+
+.custom-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(7, 10, 18, 0.88);
+  backdrop-filter: blur(12px);
+  z-index: 1050;
+  overflow-y: auto;
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.max-w-500 {
+  max-width: 500px;
+}
+
+.max-w-450 {
+  max-width: 450px;
+}
+
+.modal-scrollable {
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.bg-dark-translucent {
+  background: rgba(7, 10, 18, 0.85);
+}
+
+.title-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}
+
+.ticket-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.ticket-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.ticket-stub-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, #D4AF37 0px, #D4AF37 8px, transparent 8px, transparent 14px);
+}
+
+.theatre-emblem {
+  font-size: 1.6rem;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.printable-ticket {
+  background: linear-gradient(145deg, #121829 0%, #0c101d 100%);
+  border: 2px dashed #D4AF37;
+  position: relative;
+}
+
+.border-ruby-glow {
+  border: 1px solid rgba(190, 18, 60, 0.6) !important;
+  box-shadow: 0 0 25px rgba(190, 18, 60, 0.35) !important;
+}
+
+/* ============================================================
+   PRINT STYLESHEET CHO VÉ ĐIỆN TỬ
+   ============================================================ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .custom-modal-backdrop,
+  .printable-ticket,
+  .printable-ticket * {
+    visibility: visible;
+  }
+
+  .custom-modal-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    display: block !important;
+    padding: 0 !important;
+  }
+
+  .card-showman-glass {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: #111111 !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .printable-ticket {
+    background: #ffffff !important;
+    border: 2px solid #222222 !important;
+    color: #111111 !important;
+    page-break-inside: avoid;
+    margin: 20px auto !important;
+    max-width: 600px !important;
+  }
+
+  .printable-ticket h3,
+  .printable-ticket strong,
+  .printable-ticket span {
+    color: #111111 !important;
+    -webkit-text-fill-color: #111111 !important;
+  }
+
+  .printable-ticket .bg-dark-translucent {
+    background: #f8f9fa !important;
+    border: 1px solid #cccccc !important;
+  }
+
+  .printable-ticket .badge-showman-gold {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border: 1px solid #94a3b8 !important;
+  }
+
+  .printable-ticket .qr-box {
+    border: 1px solid #000000;
+  }
+
+  /* Ẩn các nút điều khiển khi in */
+  button,
+  .d-flex.flex-wrap.gap-2.pt-2,
+  .btn,
+  .theatre-emblem {
+    display: none !important;
+  }
+}

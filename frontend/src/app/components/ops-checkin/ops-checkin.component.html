@@ -1,0 +1,262 @@
+<!-- ============================================================
+     CỔNG SOÁT VÉ & VẬN HÀNH TẠI CỬA RẠP - OPS PORTAL
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<app-staff-header></app-staff-header>
+
+<div class="ops-checkin-page position-relative py-4">
+  <div class="stardust-container" aria-hidden="true">
+    <span class="stardust-sparkle" style="top: 10%; left: 15%;">✦</span>
+    <span class="stardust-sparkle" style="top: 20%; left: 85%;">✧</span>
+    <span class="stardust-dot" style="top: 30%; left: 50%;"></span>
+  </div>
+
+  <div class="container position-relative z-2">
+    <!-- Header Top -->
+    <div class="card-showman-glass p-3 p-md-4 rounded-4 border border-gold-glow mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge badge-showman-gold px-3 py-1 rounded-pill small fw-bold">
+              <i class="bi bi-upc-scan me-1"></i> OPS PORTAL - SOÁT VÉ THỜI GIAN THỰC
+            </span>
+            <span class="badge bg-success-subtle text-success small fw-bold">
+              <span class="live-blink-dot me-1"></span> KẾT NỐI CỔNG VÉ TRỰC TIẾP
+            </span>
+          </div>
+          <h2 class="text-gold-gradient fw-black mb-0 fs-3">
+            HỆ THỐNG SOÁT VÉ ĐIỆN TỬ TẠI CỬA KHÁN PHÒNG
+          </h2>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 bg-dark-glass p-2 px-3 rounded-3 border border-secondary border-opacity-25">
+          <div class="checker-avatar">
+            <i class="bi bi-person-check-fill text-gold fs-5"></i>
+          </div>
+          <div>
+            <div class="text-white fw-bold small">{{ currentUser().fullName }}</div>
+            <div class="text-secondary" style="font-size: 0.75rem;">
+              Ca trực: <strong class="text-gold">Trưởng ca soát vé</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- CỘT TRÁI (COL-LG-7): FORM SOÁT VÉ & MÔ PHỎNG QUÉT QR -->
+      <div class="col-lg-7">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-gold fw-bold mb-0">
+              <i class="bi bi-qr-code-scan me-2"></i> QUÉT HOẶC NHẬP MÃ VÉ
+            </h4>
+            <button class="btn btn-sm btn-outline-warning fw-bold py-1 px-3 text-white border-gold-glow" (click)="simulateQrScan()">
+              <i class="bi bi-camera-fill me-1 text-gold"></i> Mô Phỏng Quét QR
+            </button>
+          </div>
+
+          <!-- Lựa chọn Cửa Soát Vé -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-bold">VỊ TRÍ CỔNG KIỂM SOÁT (GATE):</label>
+            <select
+              class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
+              [ngModel]="selectedGate()"
+              (ngModelChange)="selectedGate.set($event)"
+            >
+              @for (g of gates; track g) {
+                <option [value]="g">{{ g }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Ô nhập mã vé -->
+          <div class="mb-4">
+            <label class="form-label text-secondary small fw-bold">MÃ VÉ ĐIỆN TỬ (E-TICKET CODE):</label>
+            <div class="input-group input-group-lg">
+              <span class="input-group-text bg-dark-glass text-gold border-gold-glow">
+                <i class="bi bi-upc"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control bg-dark-glass text-white border-gold-glow fw-bold text-uppercase fs-4 letter-spacing-1"
+                placeholder="VD: NK-20261102-ABCDE"
+                [ngModel]="ticketCodeInput()"
+                (ngModelChange)="ticketCodeInput.set($event)"
+                (keyup.enter)="onExecuteCheckIn()"
+              />
+              @if (ticketCodeInput()) {
+                <button class="btn btn-outline-secondary border-gold-glow text-gold" (click)="ticketCodeInput.set('')">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Nút Xác Nhận Soát Vé -->
+          <div class="d-grid mb-4">
+            <button
+              class="btn btn-showman-gold py-3 fw-bold fs-5 shadow-2xl"
+              [disabled]="!ticketCodeInput().trim() || isProcessing()"
+              (click)="onExecuteCheckIn()"
+            >
+              @if (isProcessing()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                ĐANG XÁC THỰC VÉ...
+              } @else {
+                <i class="bi bi-check2-circle me-2"></i> XÁC NHẬN SOÁT VÉ / CHECK-IN
+              }
+            </button>
+          </div>
+
+          <!-- Danh sách mã vé mẫu để nhân viên/tester bấm thử nhanh -->
+          <div class="pt-3 border-top border-secondary border-opacity-25">
+            <label class="form-label text-secondary small fw-bold mb-2">
+              <i class="bi bi-lightning-charge text-gold me-1"></i> BẤM CHỌN NHANH VÉ MẪU TRÊN HỆ THỐNG ĐỂ THỬ NGHIỆM:
+            </label>
+            <div class="d-flex flex-wrap gap-2">
+              @for (b of sampleBookings(); track b.bookingCode) {
+                <button
+                  type="button"
+                  class="btn btn-sm sample-ticket-pill"
+                  [class.pill-confirmed]="b.bookingStatus === 'CONFIRMED'"
+                  [class.pill-checked]="b.bookingStatus === 'CHECKED_IN'"
+                  [class.pill-cancelled]="b.bookingStatus === 'CANCELLED'"
+                  (click)="useSampleCode(b.bookingCode)"
+                >
+                  <span class="fw-bold">{{ b.bookingCode }}</span>
+                  <span class="small opacity-75 ms-1">({{ b.bookingStatus }})</span>
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- KẾT QUẢ CHECK-IN THÀNH CÔNG -->
+        @if (lastSuccessResult(); as success) {
+          <div class="card-showman-glass p-4 rounded-4 border border-success checkin-success-card animate-fade-in mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="d-flex align-items-center gap-3">
+                <div class="success-icon-badge">
+                  <i class="bi bi-check-lg fs-1 text-white"></i>
+                </div>
+                <div>
+                  <span class="badge bg-success text-white px-3 py-1 rounded-pill small fw-bold">XÁC THỰC HỢP LỆ</span>
+                  <h3 class="text-success fw-bold mb-0">CỬA MỞ - XIN MỜI VÀO RẠP!</h3>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary" (click)="dismissAlert()">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+
+            <div class="p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25">
+              <div class="row g-2 text-secondary small">
+                <div class="col-sm-6">
+                  <div>Mã vé: <strong class="text-gold fs-6">{{ success.bookingCode }}</strong></div>
+                  <div>Khán giả: <strong class="text-white fs-6">{{ success.customerName }}</strong></div>
+                </div>
+                <div class="col-sm-6">
+                  <div>Vở kịch: <strong class="text-white">{{ success.musicalTitle }}</strong></div>
+                  <div>Khán phòng: <strong class="text-gold">{{ success.hall }}</strong></div>
+                </div>
+                <div class="col-12 pt-2 border-top border-secondary border-opacity-25">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      VỊ TRÍ GHẾ: <span class="badge badge-showman-ruby px-3 py-2 fs-6 fw-bold ms-1">{{ success.seats }}</span> ({{ success.quantity }} vé)
+                    </div>
+                    <div class="text-secondary" style="font-size: 0.75rem;">
+                      Giờ qua cửa: <strong class="text-light">{{ success.checkedInAt | date:'HH:mm:ss dd/MM/yyyy' }}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- KẾT QUẢ CHECK-IN LỖI / BÁO ĐỘNG -->
+        @if (lastErrorResult(); as error) {
+          <div class="card-showman-glass p-4 rounded-4 border border-danger checkin-error-card animate-fade-in mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div class="d-flex align-items-center gap-3">
+                <div class="error-icon-badge">
+                  <i class="bi bi-exclamation-triangle-fill fs-2 text-white"></i>
+                </div>
+                <div>
+                  <span class="badge bg-danger text-white px-3 py-1 rounded-pill small fw-bold">CẢNH BÁO TỪ CHỐI VÀO</span>
+                  <h3 class="text-danger fw-bold mb-0">VÉ KHÔNG HỢP LỆ!</h3>
+                </div>
+              </div>
+              <button class="btn btn-sm btn-outline-secondary" (click)="dismissAlert()">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+
+            <div class="p-3 bg-dark-glass rounded-3 border border-danger border-opacity-50">
+              <p class="text-white fw-bold mb-1 fs-5">
+                {{ error.message }}
+              </p>
+              @if (error.details) {
+                <div class="text-secondary small mt-2 pt-2 border-top border-secondary border-opacity-25">
+                  @if (error.details.checkedInAt) {
+                    <div>Lịch sử quét trước: <strong class="text-warning">{{ error.details.checkedInAt | date:'HH:mm:ss dd/MM/yyyy' }}</strong></div>
+                    <div>Người soát trước: <strong class="text-light">{{ error.details.checkedInBy || 'Cổng tự động' }}</strong></div>
+                  }
+                  @if (error.details.refundInfo) {
+                    <div>Vé đã hủy lúc: <strong class="text-danger">{{ error.details.refundInfo.refundedAt | date:'HH:mm:ss dd/MM/yyyy' }}</strong></div>
+                    <div>Lý do hủy: <strong class="text-light">{{ error.details.refundInfo.refundReason }}</strong></div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- CỘT PHẢI (COL-LG-5): NHẬT KÝ SOÁT VÉ GẦN ĐÂY (AUDIT FEED) -->
+      <div class="col-lg-5">
+        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-gold fw-bold mb-0">
+              <i class="bi bi-clock-history me-2"></i> NHẬT KÝ VÉ VỪA QUA CỬA
+            </h4>
+            <span class="badge bg-dark-glass text-secondary border border-secondary border-opacity-25">
+              {{ recentCheckins().length }} lượt
+            </span>
+          </div>
+
+          @if (recentCheckins().length === 0) {
+            <div class="text-center py-5 text-secondary">
+              <i class="bi bi-inbox fs-1 text-secondary opacity-50 mb-2 d-block"></i>
+              <p class="small mb-0">Chưa có lượt soát vé nào trong ca làm việc này.</p>
+              <small class="text-secondary opacity-75">Quét hoặc nhập mã vé bên trái để bắt đầu.</small>
+            </div>
+          } @else {
+            <div class="recent-checkins-list d-flex flex-column gap-2">
+              @for (item of recentCheckins(); track item.bookingCode + item.checkedInAt) {
+                <div class="p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="text-white fw-bold">
+                      <span class="text-gold">{{ item.bookingCode }}</span> - {{ item.customerName }}
+                    </div>
+                    <div class="text-secondary small">
+                      Ghế: <strong class="text-ruby-glow">{{ item.seats }}</strong> | {{ item.hall }}
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <span class="badge bg-success-subtle text-success small fw-bold">HỢP LỆ</span>
+                    <div class="text-secondary" style="font-size: 0.7rem;">
+                      {{ item.checkedInAt | date:'HH:mm:ss' }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

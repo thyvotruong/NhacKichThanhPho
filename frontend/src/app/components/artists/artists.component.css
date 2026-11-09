@@ -1,0 +1,53 @@
+/* ============================================================
+   STYLES CHO NGHỆ SĨ (/artists)
+   ============================================================ */
+
+.artists-page {
+  min-height: 85vh;
+  background: radial-gradient(circle at 50% 15%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+}
+
+.max-w-650 {
+  max-width: 650px;
+}
+
+.artist-avatar-wrapper {
+  width: 100px;
+  height: 100px;
+}
+
+.artist-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #D4AF37;
+  position: relative;
+  z-index: 2;
+}
+
+.artist-halo-ring {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
+  pointer-events: none;
+  animation: pulseHalo 3s infinite ease-in-out;
+}
+
+@keyframes pulseHalo {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.08); opacity: 0.9; }
+}
+
+.artist-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.artist-card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.3);
+  border-color: rgba(212, 175, 55, 0.65) !important;
+}

@@ -1,0 +1,218 @@
+<!-- ============================================================
+     PHÂN HỆ LỊCH DIỄN & SUẤT CHIẾU (/schedules)
+     Phong cách: The Greatest Showman (100% Montserrat)
+     ============================================================ -->
+
+<div class="schedules-page position-relative py-5">
+  <div class="container position-relative z-2">
+    <!-- Header Phân Hệ -->
+    <div class="text-center mb-5">
+      <h1 class="display-5 fw-black text-gold-gradient mb-3 pt-2 lh-base">LỊCH BIỂU DIỄN NHÀ HÁT</h1>
+      <p class="text-secondary max-w-650 mx-auto small mb-0">
+        Khám phá các suất diễn nhạc kịch đỉnh cao sắp diễn ra tại Nhà hát Thành phố. Chọn suất phù hợp và tiến hành đặt giữ chỗ theo thời gian thực.
+      </p>
+      <div class="showman-divider"></div>
+    </div>
+
+    <!-- BỘ LỌC THÔNG MINH MỚI (4 TIÊU CHÍ NGHIỆP VỤ) -->
+    <div class="card card-showman-glass rounded-4 p-4 mb-4 border border-secondary border-opacity-25 shadow-lg">
+      <!-- Hàng 1: Tìm kiếm theo tên vở & Thể loại & Khoảng ngày -->
+      <div class="row g-3 align-items-end mb-3">
+        <!-- 1. Thanh tìm kiếm theo tên vở -->
+        <div class="col-lg-4 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1">
+            <i class="bi bi-search me-1"></i> TÌM THEO TÊN VỞ DIỄN:
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary border-opacity-50 text-gold">
+              <i class="bi bi-music-note-beamed"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control bg-dark text-white border-secondary border-opacity-50"
+              placeholder="Nhập tên vở kịch..."
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
+            />
+            @if (searchQuery()) {
+              <button
+                class="btn btn-outline-secondary border-secondary border-opacity-50 text-gold"
+                type="button"
+                (click)="searchQuery.set('')"
+                title="Xóa tìm kiếm"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- 2. Bộ lọc theo thể loại (Category Dropdown) -->
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1">
+            <i class="bi bi-tag-fill me-1"></i> THỂ LOẠI NHẠC KỊCH:
+          </label>
+          <select
+            class="form-select bg-dark text-white border-secondary border-opacity-50"
+            [ngModel]="selectedGenre()"
+            (ngModelChange)="selectedGenre.set($event)"
+          >
+            @for (g of genres; track g.id) {
+              <option [value]="g.id">{{ g.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- 3. Bộ lọc theo khoảng thời gian (Từ ngày -> Đến ngày) -->
+        <div class="col-lg-5 col-md-12">
+          <label class="form-label text-gold small fw-bold mb-1">
+            <i class="bi bi-calendar-range me-1"></i> KHOẢNG THỜI GIAN:
+          </label>
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary small">Từ</span>
+                <input
+                  type="date"
+                  class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50 date-input-dark"
+                  [ngModel]="startDate()"
+                  (ngModelChange)="startDate.set($event)"
+                />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary small">Đến</span>
+                <input
+                  type="date"
+                  class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50 date-input-dark"
+                  [ngModel]="endDate()"
+                  (ngModelChange)="endDate.set($event)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hàng 2: Bộ lọc theo khung giờ (Multi-select Time Slots) & Trạng thái bộ lọc -->
+      <div class="pt-3 border-top border-secondary border-opacity-25 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <!-- 4. Multi-select Time Slots -->
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <span class="text-gold small fw-bold me-1">
+            <i class="bi bi-clock me-1"></i> KHUNG GIỜ DIỄN:
+          </span>
+          @for (t of availableTimeSlots; track t) {
+            <button
+              type="button"
+              class="btn btn-sm rounded-pill time-slot-chip"
+              [class.active]="isTimeSelected(t)"
+              (click)="toggleTimeSlot(t)"
+            >
+              <i class="bi" [class.bi-check-circle-fill]="isTimeSelected(t)" [class.bi-circle]="!isTimeSelected(t)"></i>
+              {{ t }}
+            </button>
+          }
+        </div>
+
+        <!-- Kết quả và nút Xóa bộ lọc -->
+        <div class="d-flex align-items-center gap-3 ms-auto">
+          <span class="text-secondary small">
+            Tìm thấy: <strong class="text-gold">{{ filteredSchedules().length }}</strong> suất diễn
+          </span>
+
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              class="btn btn-outline-warning btn-sm rounded-pill px-3 py-1 fw-bold text-nowrap"
+              (click)="resetAllFilters()"
+            >
+              <i class="bi bi-arrow-counterclockwise me-1"></i> Xóa bộ lọc
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Bảng / Lưới Danh Sách Suất Diễn -->
+    <div class="row g-4">
+      @for (sched of filteredSchedules(); track sched._id) {
+        <div class="col-lg-6">
+          <div class="card card-showman-glass rounded-4 p-4 h-100 border border-gold-glow schedule-card-hover position-relative overflow-hidden">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge badge-showman-gold px-3 py-1 rounded-pill small fw-bold">
+                    <i class="bi bi-clock-history me-1"></i> {{ sched.time }}
+                  </span>
+                  @if (sched.genre) {
+                    <span class="badge bg-dark border border-secondary border-opacity-50 text-gold-glow px-2 py-1 rounded-pill small">
+                      <i class="bi bi-tag me-1"></i> {{ sched.genre }}
+                    </span>
+                  }
+                </div>
+                <h4 class="text-white fw-bold mb-1">{{ sched.musicalTitle }}</h4>
+              </div>
+
+              @if (sched.status === 'sold_out') {
+                <span class="badge badge-status-soldout px-3 py-1 rounded-pill small fw-bold">
+                  <i class="bi bi-x-circle-fill me-1"></i> CHÁY VÉ
+                </span>
+              } @else {
+                <span class="badge badge-status-available px-3 py-1 rounded-pill small fw-bold">
+                  <i class="bi bi-check-circle-fill me-1"></i> CÒN VÉ
+                </span>
+              }
+            </div>
+
+            <div class="bg-dark-glass p-3 rounded-3 border border-secondary border-opacity-25 small text-secondary mb-4">
+              <div class="mb-2">
+                <i class="bi bi-calendar3 text-gold me-2"></i>
+                <strong class="text-white">Ngày diễn:</strong> {{ sched.performanceDate | date:'EEEE, dd/MM/yyyy' }}
+              </div>
+              <div class="mb-2">
+                <i class="bi bi-geo-alt-fill text-ruby-glow me-2"></i>
+                <strong class="text-white">Khán phòng:</strong> {{ sched.hall }}
+              </div>
+              <div>
+                <i class="bi bi-people-fill text-gold me-2"></i>
+                <strong class="text-white">Tình trạng chỗ:</strong> 
+                Đã đặt {{ sched.bookedSeats }}/{{ sched.totalSeats }} ghế 
+                <span class="text-warning">({{ sched.totalSeats - sched.bookedSeats }} ghế trống)</span>
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-auto">
+              <a [routerLink]="['/musical', sched.musicalSlug]" class="btn btn-showman-outline rounded-pill px-3 py-2 btn-sm flex-fill">
+                <i class="bi bi-info-circle me-1"></i> CHI TIẾT VỞ DIỄN
+              </a>
+
+              @if (sched.status === 'sold_out') {
+                <button class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm flex-fill text-muted" disabled>
+                  HẾT CHỖ NGỒI
+                </button>
+              } @else {
+                <a [routerLink]="['/seat-selection', sched._id]" class="btn btn-showman-ruby rounded-pill px-3 py-2 btn-sm fw-bold flex-fill shadow">
+                  <i class="bi bi-ticket-perforated me-1"></i> CHỌN GHẾ NGAY
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-12 text-center py-5">
+          <div class="card card-showman-glass rounded-4 p-5 max-w-650 mx-auto border border-secondary border-opacity-25">
+            <i class="bi bi-calendar-x display-4 text-secondary mb-3"></i>
+            <h4 class="text-white fw-bold mb-2">Không tìm thấy suất diễn phù hợp</h4>
+            <p class="text-secondary small mb-4">
+              Không có suất diễn nào khớp với từ khóa tìm kiếm, thể loại, khoảng ngày hoặc khung giờ bạn đã chọn.
+            </p>
+            <button class="btn btn-showman-gold rounded-pill px-4 py-2 fw-bold mx-auto" (click)="resetAllFilters()">
+              <i class="bi bi-arrow-counterclockwise me-1"></i> XEM TẤT CẢ SUẤT DIỄN
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
