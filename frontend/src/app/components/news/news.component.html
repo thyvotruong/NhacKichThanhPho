@@ -5,21 +5,23 @@
 
 <div class="news-page position-relative py-5">
   <!-- Bụi tiên nền -->
-  <div class="stardust-container" aria-hidden="true">
+  <!-- <div class="stardust-container" aria-hidden="true">
     <span class="stardust-sparkle" style="top: 12%; left: 14%;">✦</span>
     <span class="stardust-sparkle" style="top: 35%; left: 82%;">✧</span>
     <span class="stardust-sparkle" style="top: 70%; left: 16%;">★</span>
     <span class="stardust-dot" style="top: 20%; left: 60%;"></span>
-  </div>
+  </div> -->
 
   <div class="container position-relative z-2">
     <!-- Header Phân Hệ -->
     <div class="text-center mb-5">
-      <h1 class="display-5 fw-black text-gold-gradient mb-2">TIN TỨC & SỰ KIỆN NGHỆ THUẬT</h1>
-      <p class="text-secondary max-w-650 mx-auto small mb-0">
+      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">TIN TỨC & SỰ KIỆN NGHỆ THUẬT</h2>
+
+      <div class="showman-divider mx-auto mt-1 mb-4"></div>
+
+      <p class="text-white text-secondary max-w-800 mx-auto">
         Cập nhật những chuyển động mới nhất từ hậu trường, thông tin mở bán vé, sự kiện giao lưu nghệ sĩ và cẩm nang thưởng thức nhạc kịch.
       </p>
-      <div class="showman-divider"></div>
     </div>
 
     <!-- Lưới Bài Báo -->
@@ -27,12 +29,16 @@
       @for (item of articles(); track item.id) {
         <div class="col-md-6">
           <div class="card card-showman-glass rounded-4 h-100 border border-gold-glow overflow-hidden news-card-hover">
+            <!-- 👉 THÊM: bấm ảnh mở bài báo -->
+            <a [href]="item.url" target="_blank" rel="noopener noreferrer">
             <div class="news-img-box position-relative">
               <img [src]="item.imageUrl" [alt]="item.title" class="w-100 news-cover-img">
               <span class="badge badge-showman-ruby position-absolute top-0 start-0 m-3 px-3 py-1 rounded-pill small fw-bold">
                 {{ item.category }}
               </span>
             </div>
+            </a>
+            <!-- 👉 HẾT PHẦN THÊM -->
 
             <div class="p-4 d-flex flex-column flex-grow-1">
               <div class="d-flex justify-content-between align-items-center text-secondary extra-small mb-2">
@@ -40,7 +46,11 @@
                 <span><i class="bi bi-clock me-1"></i> {{ item.readTime }}</span>
               </div>
 
+              <!-- 👉 THÊM: bấm tiêu đề mở bài báo -->
+              <a [href]="item.url" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
               <h4 class="text-white fw-bold mb-2 news-title">{{ item.title }}</h4>
+              </a>
+              <!-- 👉 HẾT PHẦN THÊM -->
               <p class="text-secondary small leading-relaxed mb-4 flex-grow-1">
                 {{ item.summary }}
               </p>
@@ -50,11 +60,16 @@
                   <span>Đặt vé các vở liên quan</span>
                   <i class="bi bi-arrow-right"></i>
                 </a>
+                <!-- 👉 THÊM: nút đọc bài báo -->
+                <a [href]="item.url" target="_blank" rel="noopener noreferrer" class="text-gold text-decoration-none small fw-bold d-inline-flex align-items-center gap-1 hover-arrow">
+                  <span>Đọc bài báo</span>
+                  <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+                <!-- 👉 HẾT PHẦN THÊM -->
               </div>
             </div>
           </div>
         </div>
-      }
     </div>
   </div>
 </div>

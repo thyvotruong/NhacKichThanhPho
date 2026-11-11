@@ -7,18 +7,20 @@
   <div class="container position-relative z-2">
     <!-- Header Phân Hệ -->
     <div class="text-center mb-5">
-      <h1 class="display-5 fw-black text-gold-gradient mb-2">GƯƠNG MẶT NGHỆ SĨ TIÊU BIỂU</h1>
-      <p class="text-secondary max-w-650 mx-auto small mb-0">
+      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">GƯƠNG MẶT NGHỆ SĨ TIÊU BIỂU</h2>
+
+      <div class="showman-divider mx-auto mt-1 mb-4"></div>
+
+      <p class="artists-intro max-w-800 mx-auto">
         Hội tụ các bậc thầy đạo diễn, nhạc trưởng thính phòng và các nghệ sĩ sân khấu tài hoa – những người kiến tạo nên những khoảnh khắc nghệ thuật bất hủ.
       </p>
-      <div class="showman-divider"></div>
     </div>
 
     <!-- Lưới Nghệ Sĩ -->
     <div class="row g-4">
       @for (artist of artists(); track artist.name) {
         <div class="col-md-6 col-lg-4">
-          <div class="card card-showman-glass rounded-4 p-4 h-100 border border-gold-glow artist-card-hover text-center position-relative overflow-hidden">
+          <div class="card card-showman-glass rounded-4 p-4 h-100 border border-gold-glow artist-card-hover text-center d-flex flex-column align-items-center position-relative overflow-hidden">
             <!-- Avatar Nghệ Sĩ có khung hào quang vàng -->
             <div class="artist-avatar-wrapper mb-3 mx-auto position-relative">
               <img [src]="artist.avatar" [alt]="artist.name" class="rounded-circle artist-img shadow-lg">
@@ -26,23 +28,15 @@
             </div>
 
             <!-- Danh xưng & Tên -->
-            <span class="badge badge-showman-gold rounded-pill px-3 py-1 small fw-bold mb-2">
-              {{ artist.title }}
-            </span>
-            <h4 class="text-white fw-bold mb-1">{{ artist.name }}</h4>
-            <div class="text-gold small fw-bold mb-3">{{ artist.role }}</div>
+            <h4 class="artist-name mb-1">{{ artist.name }}</h4>
+            <div class="artist-role mb-3">{{ artist.role }}</div>
+
+            <div class="artist-line mb-3"></div>
 
             <!-- Tiểu sử -->
-            <p class="text-secondary small leading-relaxed mb-4">
+            <p class="artist-bio mb-0">
               {{ artist.bio }}
             </p>
-
-            <!-- Nút liên kết vở kịch -->
-            <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
-              <a routerLink="/musicals" class="btn btn-showman-outline btn-sm rounded-pill px-3 py-1">
-                <i class="bi bi-film me-1"></i> Xem các vở tham gia
-              </a>
-            </div>
           </div>
         </div>
       }

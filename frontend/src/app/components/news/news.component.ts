@@ -18,6 +18,7 @@ export interface NewsArticle {
   summary: string;
   imageUrl: string;
   readTime: string;
+  url: string;   // link bài báo gốc
 }
 
 @Component({
@@ -31,39 +32,43 @@ export class NewsComponent {
   articles = signal<NewsArticle[]>([
     {
       id: 'news-01',
-      title: 'Hậu Trường Tập Luyện Siêu Phẩm "Bông Bóng Bay" Trước Giờ Khai Màn',
+      title: '120 diễn viên ‘cháy’ hết mình với vở nhạc kịch về đời nghệ sĩ',
       category: 'HẬU TRƯỜNG',
-      date: '2026-03-20',
-      summary: 'Khám phá không khí tập luyện hăng say suốt 6 tháng qua của hơn 80 diễn viên, nhạc công và nghệ sĩ múa dưới sự chỉ đạo của NSƯT Trần Minh Đức.',
-      imageUrl: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=800&q=80',
-      readTime: '4 phút đọc'
+      date: '2024-10-07',
+      summary: 'Nhạc kịch “Sân khấu 24h” kể những nỗi niềm vui buồn, thăng hoa lẫn thất bại của người nghệ sĩ song sâu thẳm trong họ vẫn giữ ngọn lửa nghề âm ỉ cháy với nghệ thuật.',
+      imageUrl: 'https://static-images.vnncdn.net/vps_images_publish/000001/000003/2024/10/7/batch-san-khau-24h-26-11377.jpg?width=0&s=Raszpet6-lvFXNPl_JVbFg',
+      readTime: '2 phút đọc',
+      url: 'https://vietnamnet.vn/120-dien-vien-chay-het-minh-voi-vo-nhac-kich-ve-doi-nghe-si-2329337.html'
     },
     {
       id: 'news-02',
-      title: 'Chính Thức Mở Bán Vé Mùa Nhạc Kịch Broadway Grand Season 2026',
+      title: 'Nhạc kịch Rồi tôi sẽ lớn: Hàn gắn cha mẹ và con cái tuổi mới lớn',
       category: 'SỰ KIỆN',
-      date: '2026-03-18',
-      summary: 'Khán giả đặt vé sớm trên website được áp dụng mã voucher SHOWMAN20 giảm 20% cùng cơ hội chọn những vị trí ghế VIP trung tâm đẹp nhất khán phòng.',
-      imageUrl: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=800&q=80',
-      readTime: '3 phút đọc'
+      date: '2022-09-25',
+      summary: 'Tối 24-9, Nhà hát Tuổi Trẻ vừa công diễn vở nhạc kịch Rồi tôi sẽ lớn, đạo diễn Lê Ánh Tuyết dựng từ kịch bản của anh Chánh Văn - chuyên gia giải đáp tâm lý cho lứa tuổi mới lớn nổi tiếng trên báo Hoa Học Trò',
+      imageUrl: 'https://cdn.tuoitre.vn/thumb_w/730/2022/9/25/roi-toi-se-lon-1-1read-only-1664074444938854828385.jpg',
+      readTime: '3 phút đọc',
+      url: 'https://tuoitre.vn/nhac-kich-roi-toi-se-lon-han-gan-cha-me-va-con-cai-tuoi-moi-lon-20220925095642654.htm'
     },
     {
       id: 'news-03',
-      title: 'Gặp Gỡ Đạo Diễn Âm Nhạc Nguyễn Lê Hoàng: Đưa Dàn Nhạc Giao Hưởng Lên Sân Khấu Nhạc Kịch',
+      title: 'Trần Lực: Sân khấu không bao giờ chết, chỉ các nghệ sĩ chết',
       category: 'PHỎNG VẤN',
-      date: '2026-03-15',
-      summary: 'Chia sẻ tâm huyết về hành trình phối khí hơn 20 ca khúc kinh điển cho vở diễn Giấc Mơ Mùa Hè với sự hòa quyện giữa giao hưởng phương Tây và chất liệu Việt.',
-      imageUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
-      readTime: '5 phút đọc'
+      date: '2025-05-10',
+      summary: 'Khán giả không bao giờ quay lưng với một thứ nghệ thuật hay. Có người nói sân khấu chết rồi; tôi lại cho rằng sân khấu không bao giờ chết, mà do các nghệ sĩ chết',
+      imageUrl: 'https://cdn2.tuoitre.vn/thumb_w/730/471584752817336320/2025/5/10/base64-17468667898071039392631.jpeg',
+      readTime: '5 phút đọc',
+      url: 'https://tuoitre.vn/tran-luc-san-khau-khong-bao-gio-chet-chi-cac-nghe-si-chet-20250510154631789.htm'
     },
     {
       id: 'news-04',
-      title: 'Hướng Dẫn Quy Chuẩn Văn Hóa Đi Xem Nhạc Kịch Cho Khán Giả Lần Đầu Đến Nhà Hát',
+      title: 'Trọn bộ kinh nghiệm khám phá và thưởng thức nghệ thuật từ A – Z',
       category: 'CẨM NANG',
-      date: '2026-03-10',
-      summary: 'Những lưu ý quan trọng về trang phục lịch sự, thời gian vào khán phòng trước giờ diễn 15 phút và quy định check-in mã QR qua cổng tự động.',
-      imageUrl: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
-      readTime: '3 phút đọc'
+      date: '2026-06-15',
+      summary: 'Nếu bạn đang lên kế hoạch cho một buổi tối đắm chìm trong âm nhạc, ánh sáng và những vũ điệu say đắm, hãy cùng khám phá xem Nhà hát Thành phố Hồ Chí Minh có gì hay, lịch sử hình thành ra sao, và lưu lại những bí kíp tuyệt vời nhất để có một đêm thưởng thức nghệ thuật trọn vẹn!',
+      imageUrl: 'https://cdn1.finhay.com.vn/wp-content/uploads/2026/06/15093854/thong-tin-ve-nha-hat-tp-hcm.png',
+      readTime: '3 phút đọc',
+      url: 'https://www.finhay.com.vn/nha-hat-thanh-pho-ho-chi-minh'
     }
   ]);
 }

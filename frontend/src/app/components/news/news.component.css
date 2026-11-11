@@ -54,3 +54,17 @@
   text-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
   transform: translateX(4px);
 }
+
+/* 👉 THÊM: độ rộng tối đa cho đoạn mô tả */
+.max-w-800 {
+  max-width: 800px;
+}
+
+/* 👉 THÊM: thanh gạch trang trí dưới tiêu đề */
+.showman-divider {
+  width: 120px; /* Bạn có thể tăng lên 150px, 200px hoặc 250px tùy ý thích */
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
+  border-radius: 2px;
+}
