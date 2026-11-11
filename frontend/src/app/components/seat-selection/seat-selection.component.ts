@@ -83,24 +83,74 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadSeatMap(scheduleId: string): void {
-    this.musicalService.getScheduleSeats(scheduleId).subscribe({
-      next: (res) => {
-        this.scheduleInfo.set(res);
-        this.seats.set(res.seats || []);
-      },
-      error: () => {
-        // Fallback dữ liệu tĩnh nếu backend chưa sẵn sàng
-        this.scheduleInfo.set({
-          scheduleId,
-          musicalTitle: 'Bông Bóng Bay',
-          performanceDate: '2026-11-15T19:30:00Z',
-          time: '19:30',
-          hall: 'Khán phòng Grand A'
-        });
+loadSeatMap(scheduleId: string): void {
+  this.musicalService.getScheduleSeats(scheduleId).subscribe({
+    next: (res) => {
+      this.scheduleInfo.set(res);
+      if (res.seats && res.seats.length > 0) {
+        this.seats.set(res.seats);
+      } else {
+        this.seats.set(this.generateFallbackSeats(scheduleId));
       }
-    });
-  }
+    },
+    error: () => {
+      this.scheduleInfo.set({
+        scheduleId,
+        musicalTitle: 'Bông Bóng Bay',
+        musicalSlug: 'bong-bong-bay',
+        performanceDate: '2026-11-15T19:30:00Z',
+        time: '19:30',
+        hall: 'Khán phòng Grand A'
+      });
+      this.seats.set(this.generateFallbackSeats(scheduleId));
+    }
+  });
+}
+
+private generateFallbackSeats(scheduleId: string): any[] {
+  const generated: any[] = [];
+  const stallRows = ['A', 'B', 'C', 'D', 'E', 'F'];
+  const balconyRows = ['G', 'H', 'I'];
+
+  stallRows.forEach((row, rIdx) => {
+    const isVip = rIdx < 2;
+    const isCouple = rIdx === 5;
+    const totalInRow = isCouple ? 6 : 12;
+
+    for (let num = 1; num <= totalInRow; num++) {
+      let status = 'available';
+      if ((row === 'A' && (num === 5 || num === 6))) status = 'booked';
+
+      generated.push({
+        scheduleId,
+        seatCode: `${row}${num}`,
+        floor: 'Tầng Trệt',
+        row,
+        number: num,
+        type: isCouple ? 'Couple' : isVip ? 'VIP' : 'Standard',
+        price: isCouple ? 1200000 : isVip ? 800000 : 450000,
+        status
+      });
+    }
+  });
+
+  balconyRows.forEach((row) => {
+    for (let num = 1; num <= 10; num++) {
+      generated.push({
+        scheduleId,
+        seatCode: `${row}${num}`,
+        floor: 'Tầng Lầu',
+        row,
+        number: num,
+        type: 'Standard',
+        price: 450000,
+        status: 'available'
+      });
+    }
+  });
+
+  return generated;
+}
 
   getSeatsInRow(row: string): Seat[] {
     return this.filteredSeatsByFloor()
