@@ -531,6 +531,19 @@ p, span, a, button, input, select, textarea, label {
 /* ============================================================
    CUSTOM SCROLLBAR
    ============================================================ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #BE123C #070A12;
+}
+
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;

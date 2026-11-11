@@ -32,7 +32,7 @@ export class MusicalListComponent implements OnInit {
   selectedStatus = signal<string>('all');
   selectedSort = signal<string>('newest');
 
-  readonly genres = ['Tất cả', 'Broadway', 'Cổ Điển', 'Dân Gian Đương Đại', 'Lãng Mạn', 'Thiếu Nhi'];
+  readonly genres = ['Tất cả', 'Broadway', 'Cổ điển', 'Dân gian đương đại', 'Lãng mạn', 'Thiếu nhi'];
 
   ngOnInit(): void {
     this.fetchMusicals();

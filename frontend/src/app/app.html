@@ -23,3 +23,26 @@
     <router-outlet></router-outlet>
   </div>
 }
+
+@if (scrollbarVisible) {
+  <div
+    class="app-scrollbar-track"
+    role="scrollbar"
+    aria-label="Thanh cuộn trang"
+    aria-orientation="vertical"
+    aria-valuemin="0"
+    aria-valuemax="1000"
+    [attr.aria-valuenow]="scrollbarValue"
+    tabindex="0"
+    (pointerdown)="scrollFromTrack($event)"
+    (keydown)="handleScrollbarKeydown($event)"
+  >
+    <div
+      class="app-scrollbar-thumb"
+      [class.dragging]="isDraggingScrollbar"
+      [style.height.px]="scrollbarHeight"
+      [style.transform]="'translateY(' + scrollbarTop + 'px)'"
+      (pointerdown)="startScrollbarDrag($event)"
+    ></div>
+  </div>
+}

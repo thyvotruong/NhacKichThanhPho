@@ -7,7 +7,7 @@
 
 .musical-catalog-page {
   min-height: calc(100vh - 160px);
-  background: radial-gradient(circle at 50% 10%, #151d33 0%, var(--showman-canvas-night) 70%);
+  background: radial-gradient(circle at 50% 15%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
 }
 
 .max-w-700 {
@@ -19,7 +19,7 @@
 }
 
 .filter-panel-showman {
-  background: rgba(14, 22, 41, 0.75);
+  background: linear-gradient(135deg, rgba(31, 45, 72, 0.96) 0%, rgba(18, 28, 48, 0.96) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
@@ -96,4 +96,13 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+
+.showman-divider {
+  width: 120px; /* Bạn có thể tăng lên 150px, 200px hoặc 250px tùy ý thích */
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
+  border-radius: 2px;
 }

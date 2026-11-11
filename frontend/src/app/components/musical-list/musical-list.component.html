@@ -9,11 +9,11 @@
   <div class="container position-relative z-2">
     <!-- Header Tiêu Đề Danh Mục -->
     <div class="text-center mb-5">
-      <h1 class="display-4 fw-black text-gold-gradient mb-3 pt-2 lh-base drop-shadow-title">
+      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">
         KHÁM PHÁ DANH MỤC VỞ DIỄN
-      </h1>
-      <div class="showman-divider mx-auto my-3"></div>
-      <p class="lead text-secondary max-w-700 mx-auto mt-2">
+      </h2>
+      <div class="showman-divider mx-auto mt-1 mb-4"></div>
+      <p class="text-white text-secondary max-w-800 mx-auto">
         Khám phá các vở đại nhạc kịch lộng lẫy, cảm xúc thăng hoa cùng dàn diễn viên và dàn nhạc giao hưởng hàng đầu.
       </p>
     </div>
@@ -23,7 +23,7 @@
         <!-- Ô tìm kiếm -->
         <div class="col-lg-5">
           <div class="input-group">
-            <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+            <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25" style="background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 50%, #D97706 100%) !important; border-color: #F59E0B !important;">
               <i class="bi bi-search"></i>
             </span>
             <input
@@ -48,16 +48,16 @@
             [ngModel]="selectedStatus()"
             (ngModelChange)="setStatus($event)"
           >
-            <option value="all">🎭 Tất Cả Trạng Thái</option>
-            <option value="now_showing">🔥 Đang Công Diễn</option>
-            <option value="coming_soon">✨ Sắp Công Diễn</option>
+            <option value="all">Tất cả trạng thái</option>
+            <option value="now_showing">Đang công diễn</option>
+            <option value="coming_soon">Sắp công diễn</option>
           </select>
         </div>
 
         <!-- Sắp xếp -->
         <div class="col-md-4 col-lg-4">
           <div class="d-flex align-items-center gap-2">
-            <span class="text-secondary small text-nowrap"><i class="bi bi-arrow-down-up text-gold me-1"></i> Sắp xếp:</span>
+            <span class="text-white text-secondary small text-nowrap"><i class="bi bi-arrow-down-up text-gold me-1"></i> Sắp xếp:</span>
             <select
               class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
               [ngModel]="selectedSort()"
@@ -167,7 +167,7 @@
                 <div>
                   <!-- Giá vé khởi điểm -->
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-secondary small">Giá vé từ:</span>
+                    <span class="text-white text-secondary small">Giá vé từ:</span>
                     <span class="fs-5 fw-bold text-gold-gradient">
                       {{ (m.ticketPrices && m.ticketPrices.length > 0 ? m.ticketPrices[m.ticketPrices.length - 1].price : 250000) | number:'1.0-0' }} đ
                     </span>

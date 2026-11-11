@@ -1,0 +1,29 @@
+.app-scrollbar-track {
+  position: fixed;
+  z-index: 2000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 7px;
+  touch-action: none;
+}
+
+.app-scrollbar-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 7px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #BE123C 0%, #B45309 100%);
+  cursor: grab;
+}
+
+.app-scrollbar-thumb:hover,
+.app-scrollbar-thumb.dragging {
+  background: linear-gradient(180deg, #E11D48 0%, #F59E0B 100%);
+  box-shadow: 0 0 8px #F59E0B;
+}
+
+.app-scrollbar-thumb.dragging {
+  cursor: grabbing;
+}

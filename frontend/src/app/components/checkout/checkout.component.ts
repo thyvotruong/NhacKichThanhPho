@@ -46,7 +46,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   voucherError = signal<string | null>(null);
 
   // Cổng thanh toán được chọn (BPMN 2.2.3 Bước 10 & 11)
-  selectedPayment = signal<'VIETQR' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'BANK_CARD'>('VIETQR');
+  selectedPayment = signal<'VIETQR' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'BANK_CARD' | null>(null);
+  selectedPaymentName = computed(() => {
+    switch (this.selectedPayment()) {
+      case 'VIETQR': return 'VietQR';
+      case 'VNPAY': return 'Ví VNPAY';
+      case 'MOMO': return 'Ví MoMo';
+      case 'ZALOPAY': return 'Ví ZaloPay';
+      case 'BANK_CARD': return 'Thẻ ngân hàng';
+      default: return '';
+    }
+  });
 
   // Modal hiển thị mã QR thanh toán
   showQrModal = signal<boolean>(false);
@@ -166,6 +176,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   // Bước 10 & 11: Khách hàng bấm Thanh toán -> Hệ thống mở Modal hiển thị mã QR cổng tương ứng
   onOpenPaymentModal(): void {
+    if (!this.selectedPayment()) {
+      alert('Bạn cần phải chọn phương thức thanh toán!');
+      return;
+    }
+
     if (this.customerForm.invalid) {
       this.customerForm.markAllAsTouched();
       return;
@@ -181,6 +196,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   // Bước 12: Thanh toán THÀNH CÔNG
   onConfirmSuccessPayment(): void {
+    const paymentMethod = this.selectedPayment();
+    if (!paymentMethod) {
+      this.showQrModal.set(false);
+      alert('Bạn cần phải chọn phương thức thanh toán!');
+      return;
+    }
+
     this.isProcessing.set(true);
 
     const formVal = this.customerForm.value;
@@ -194,7 +216,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       customerPhone: formVal.customerPhone,
       seats: this.selectedSeats(),
       voucherCode: this.appliedVoucher() ? this.appliedVoucher().code : null,
-      paymentMethod: this.selectedPayment(),
+      paymentMethod,
       notes: formVal.notes
     };
 
@@ -222,7 +244,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Bước 13: Kiểm tra thời gian giữ ghế
     if (this.holdSecondsLeft() > 0) {
       this.paymentFailureMessage.set(
-        customMsg || `Giao dịch qua cổng ${this.selectedPayment()} thất bại hoặc bị hủy bởi người dùng. Thời gian giữ ghế vẫn còn (${this.formatTime(this.holdSecondsLeft())}), vui lòng chọn lại phương thức thanh toán!`
+        customMsg || `Giao dịch qua cổng ${this.selectedPaymentName()} thất bại hoặc bị hủy bởi người dùng. Thời gian giữ ghế vẫn còn (${this.formatTime(this.holdSecondsLeft())}), vui lòng chọn lại phương thức thanh toán!`
       );
     } else {
       alert('Đã hết thời gian giữ ghế! Hệ thống giải phóng ghế và hủy đơn hàng.');
