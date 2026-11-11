@@ -10,6 +10,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import {
   FormBuilder,
   FormGroup,
@@ -27,7 +28,7 @@ import {
 @Component({
   selector: 'app-musical-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, DatePipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './musical-detail.component.html',
   styleUrls: ['./musical-detail.component.css']
 })
@@ -36,6 +37,10 @@ export class MusicalDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly musicalService = inject(MusicalService);
+  private readonly sanitizer = inject(DomSanitizer);
+  readonly trailerUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+    'https://www.youtube.com/embed/RclpGv8673s?autoplay=1'
+  );
 
   // Angular Signals quản lý trạng thái giao diện
   slug = signal<string>('');
@@ -396,5 +401,7 @@ export class MusicalDetailComponent implements OnInit {
     this.bookingForm.patchValue({ scheduleId: this.schedules()[0]?._id });
     this.updateUnitPrice(this.bookingForm.get('ticketTier')?.value || 'VIP');
     this.isLoading.set(false);
+    
   }
+  
 }

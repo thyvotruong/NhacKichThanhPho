@@ -85,3 +85,15 @@
 .min-vh-50 {
   min-height: 50vh;
 }
+/* Bổ sung thanh divider và độ rộng chữ đồng bộ toàn web */
+.showman-divider {
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+.max-w-800 {
+  max-width: 800px;
+}
