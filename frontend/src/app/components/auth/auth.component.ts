@@ -24,6 +24,7 @@ import { MusicalService } from '../../services/musical.service';
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent implements OnInit {
+  readonly demoResetOtp = '123456';
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -40,6 +41,7 @@ export class AuthComponent implements OnInit {
   otpSent = signal<boolean>(false);
   otpCountdown = signal<number>(60);
   otpTimer: any = null;
+  resetStage = signal<'identifier' | 'otp' | 'password'>('identifier');
 
   // URL quay lại sau khi đăng nhập thành công
   returnUrl = signal<string>('/account/profile');
@@ -105,14 +107,28 @@ export class AuthComponent implements OnInit {
 
     // Form Quên mật khẩu
     this.forgotForm = this.fb.group({
-      identifier: ['', [Validators.required]]
+      identifier: ['', [Validators.required]],
+      otp: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
     });
   }
 
   switchTab(tab: 'login' | 'register' | 'forgot'): void {
+    if (this.activeTab() === 'forgot' && tab !== 'forgot') {
+      this.resetRecoveryFlow();
+    } else if (tab === 'forgot' && this.activeTab() !== 'forgot') {
+      this.resetRecoveryFlow();
+    }
+
     this.activeTab.set(tab);
     this.errorMessage.set(null);
     this.successMessage.set(null);
+  }
+
+  private resetRecoveryFlow(): void {
+    this.resetStage.set('identifier');
+    this.forgotForm?.reset({ identifier: '', otp: '', newPassword: '', confirmPassword: '' });
   }
 
   setLoginMethod(m: 'email' | 'phone' | 'google'): void {
@@ -309,17 +325,82 @@ export class AuthComponent implements OnInit {
   }
 
   // --- QUÊN MẬT KHẨU ---
-  onForgotSubmit(): void {
+  sendResetOtp(): void {
     const id = this.forgotForm.get('identifier')?.value;
     if (!id || id.trim().length < 5) {
+      this.errorMessage.set(null);
+      this.successMessage.set(null);
       this.errorMessage.set('Vui lòng nhập Email hoặc Số điện thoại đã đăng ký');
       return;
     }
 
+    this.errorMessage.set(null);
+    this.successMessage.set(`Mã xác thực đã được gửi đến ${id}. Mã OTP demo: ${this.demoResetOtp}`);
+    this.forgotForm.get('otp')?.reset('');
+    this.resetStage.set('otp');
+  }
+
+  resetForgotOtp(): void {
+    this.resetStage.set('identifier');
+    this.forgotForm.patchValue({ otp: '', newPassword: '', confirmPassword: '' });
+    this.successMessage.set(null);
+    this.errorMessage.set(null);
+  }
+
+  onForgotFormSubmit(): void {
+    switch (this.resetStage()) {
+      case 'identifier':
+        this.sendResetOtp();
+        break;
+      case 'otp':
+        this.verifyResetOtp();
+        break;
+      case 'password':
+        this.updatePassword();
+        break;
+    }
+  }
+
+  private verifyResetOtp(): void {
+    if (this.forgotForm.get('otp')?.value !== this.demoResetOtp) {
+      this.errorMessage.set('Mã OTP không chính xác. Vui lòng nhập mã thử nghiệm được hiển thị.');
+      return;
+    }
+
+    this.resetStage.set('password');
+    this.errorMessage.set(null);
+    this.successMessage.set('Xác nhận OTP thành công. Hãy tạo mật khẩu mới.');
+  }
+
+  private updatePassword(): void {
+    const { identifier, otp, newPassword, confirmPassword } = this.forgotForm.getRawValue();
+    if (this.forgotForm.get('newPassword')?.invalid) {
+      this.errorMessage.set('Mật khẩu mới phải có ít nhất 6 ký tự.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      this.errorMessage.set('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+
     this.isSubmitting.set(true);
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-      this.successMessage.set(`Đã gửi hướng dẫn khôi phục mật khẩu và mã OTP đến: ${id}. Vui lòng kiểm tra hộp thư hoặc tin nhắn SMS.`);
-    }, 800);
+    this.musicalService.resetPassword({ identifier, otp, newPassword }).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.activeTab.set('login');
+        this.resetRecoveryFlow();
+        this.loginForm.patchValue({
+          email: identifier.includes('@') ? identifier : '',
+          phone: identifier.includes('@') ? '' : identifier,
+          password: ''
+        });
+        this.errorMessage.set(null);
+        this.successMessage.set('Đổi mật khẩu thành công. Vui lòng đăng nhập lại bằng mật khẩu mới.');
+      },
+      error: (error: { message?: string }) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(error.message || 'Không thể cập nhật mật khẩu. Vui lòng thử lại.');
+      }
+    });
   }
 }

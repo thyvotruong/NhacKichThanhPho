@@ -23,10 +23,7 @@
             <div class="auth-emblem-box mx-auto mb-3 d-flex align-items-center justify-content-center">
               <span class="fs-2 text-gold-glow">🎭</span>
             </div>
-            <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold text-uppercase mb-2 shadow">
-              <i class="bi bi-person-circle text-gold me-1"></i> TÀI KHOẢN KHÁN GIẢ
-            </span>
-            <h2 class="text-gold-gradient fw-black mb-1">
+            <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">
               @if (activeTab() === 'login') {
                 ĐĂNG NHẬP TÀI KHOẢN
               } @else if (activeTab() === 'register') {
@@ -35,10 +32,10 @@
                 KHÔI PHỤC MẬT KHẨU
               }
             </h2>
-            <p class="text-secondary small mb-0">
-              Nhà Hát Thành Phố • Trải nghiệm đặt vé và quản lý lịch diễn đẳng cấp
+            <p class="text-white text-secondary max-w-800 mx-auto auth-subtitle">
+              Nhạc Kịch Thành Phố - Nơi cảm xúc thăng hoa cùng nghệ thuật sân khấu
             </p>
-            <div class="showman-divider"></div>
+            <div class="showman-divider mx-auto mt-1 mb-4"></div>
           </div>
 
           <!-- Thông báo lỗi hoặc thành công -->
@@ -316,7 +313,7 @@
               <div class="d-grid mb-3">
                 <button
                   type="submit"
-                  class="btn btn-showman-ruby py-3 fw-bold fs-6 shadow-2xl"
+                  class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
                   [disabled]="isSubmitting()"
                 >
                   @if (isSubmitting()) {
@@ -356,12 +353,13 @@
           <!-- 3: TAB QUÊN MẬT KHẨU -->
           <!-- ========================================== -->
           @if (activeTab() === 'forgot') {
-            <form [formGroup]="forgotForm" (ngSubmit)="onForgotSubmit()">
+            <form [formGroup]="forgotForm" (ngSubmit)="onForgotFormSubmit()">
               <p class="text-secondary small mb-3">
                 Nhập Email hoặc Số điện thoại bạn đã dùng để đăng ký tài khoản. Hệ thống sẽ gửi mã xác thực OTP để tạo mật khẩu mới.
               </p>
 
-              <div class="mb-4">
+              @if (resetStage() === 'identifier') {
+                <div class="mb-4">
                 <label class="form-label text-secondary small fw-bold">EMAIL HOẶC SỐ ĐIỆN THOẠI:</label>
                 <div class="input-group">
                   <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
@@ -372,23 +370,94 @@
                     class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
                     placeholder="VD: khachhang@gmail.com hoặc 0909123456"
                     formControlName="identifier"
+                    (input)="resetForgotOtp()"
                   />
                 </div>
               </div>
+              }
+
+              @if (resetStage() === 'otp') {
+                <div class="mb-4">
+                  <label class="form-label text-secondary small fw-bold">MÃ XÁC THỰC OTP:</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-shield-check"></i>
+                    </span>
+                    <input
+                      type="text"
+                      inputmode="numeric"
+                      maxlength="6"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="Nhập mã OTP 6 chữ số"
+                      formControlName="otp"
+                    />
+                  </div>
+                  <small class="text-secondary opacity-75 mt-1 d-block">
+                    Mã OTP demo: <strong class="text-gold">{{ demoResetOtp }}</strong>
+                  </small>
+                </div>
+              }
+
+              @if (resetStage() === 'password') {
+                <div class="mb-3">
+                  <label class="form-label text-secondary small fw-bold">MẬT KHẨU MỚI:</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-lock"></i>
+                    </span>
+                    <input type="password"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="Ít nhất 6 ký tự" formControlName="newPassword" />
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label text-secondary small fw-bold">XÁC NHẬN MẬT KHẨU MỚI:</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                      <i class="bi bi-check2-circle"></i>
+                    </span>
+                    <input type="password"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="Nhập lại mật khẩu mới" formControlName="confirmPassword" />
+                  </div>
+                </div>
+              }
 
               <div class="d-grid mb-3">
-                <button
-                  type="submit"
-                  class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
-                  [disabled]="isSubmitting()"
-                >
-                  @if (isSubmitting()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    ĐANG GỬI...
-                  } @else {
-                    <i class="bi bi-send-fill me-1"></i> GỬI MÃ KHÔI PHỤC
-                  }
-                </button>
+                @if (resetStage() === 'otp') {
+                  <button
+                    type="submit"
+                    class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
+                    [disabled]="isSubmitting()"
+                  >
+                    @if (isSubmitting()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                      ĐANG XÁC NHẬN...
+                    } @else {
+                      <i class="bi bi-shield-check me-1"></i> XÁC NHẬN MÃ OTP
+                    }
+                  </button>
+                } @else if (resetStage() === 'identifier') {
+                  <button
+                    type="submit"
+                    class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
+                  >
+                    <i class="bi bi-send-fill me-1"></i> GỬI MÃ XÁC THỰC
+                  </button>
+                } @else {
+                  <button
+                    type="submit"
+                    class="btn btn-showman-gold py-3 fw-bold fs-6 shadow-2xl"
+                    [disabled]="isSubmitting()"
+                  >
+                    @if (isSubmitting()) {
+                      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                      ĐANG CẬP NHẬT...
+                    } @else {
+                      <i class="bi bi-key-fill me-1"></i> CẬP NHẬT MẬT KHẨU
+                    }
+                  </button>
+                }
               </div>
 
               <div class="text-center mt-3">

@@ -6,6 +6,82 @@
 .about-page {
   min-height: 85vh;
   background: radial-gradient(circle at 50% 15%, rgba(14, 22, 41, 0.95) 0%, #070A12 100%);
+  color: #E2E8F0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.about-page,
+.about-page * {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.about-page .text-secondary {
+  color: #CBD5E1 !important;
+}
+
+.about-page .text-muted {
+  color: #A8B5C7 !important;
+}
+
+.about-page .text-gold {
+  color: #FDE68A !important;
+}
+
+.about-page .text-ruby-glow {
+  color: #FB7185 !important;
+}
+
+.about-page .about-header {
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.about-page .about-breadcrumb .breadcrumb {
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+
+.about-page .about-breadcrumb {
+  text-align: left;
+}
+
+.about-page .about-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  content: ">";
+  color: #94A3B8;
+  padding-right: 0.65rem;
+}
+
+.about-page .about-breadcrumb .breadcrumb-item {
+  color: #CBD5E1 !important;
+  font-size: 0.9rem;
+}
+
+.about-page .about-breadcrumb a:hover {
+  color: #FDE68A !important;
+}
+
+.about-page .about-header h1 {
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem) !important;
+  line-height: 1.25 !important;
+}
+
+.about-page .about-intro {
+  max-width: 800px;
+  color: #E2E8F0 !important;
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.about-page .showman-divider {
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto;
+  border-radius: 2px;
 }
 
 .about-ambient-glow {
@@ -33,15 +109,36 @@
 }
 
 .extra-small {
-  font-size: 0.78rem;
+  font-size: 0.84rem;
 }
 
 .x-small {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
 }
 
 .bg-dark-glass {
   background: rgba(7, 10, 18, 0.75);
+}
+
+.about-page p {
+  line-height: 1.7;
+}
+
+.about-page .leading-relaxed {
+  line-height: 1.7;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.about-page .quote-close {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+.about-page .card-showman-glass h2,
+.about-page .card-showman-glass h3,
+.about-page .card-showman-glass h4 {
+  line-height: 1.4;
 }
 
 /* Biểu tượng phân hệ */
@@ -62,6 +159,16 @@
   background: rgba(14, 22, 41, 0.65);
   backdrop-filter: blur(10px);
   transition: transform 0.25s ease;
+  min-height: 124px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-highlight-box span {
+  color: #CBD5E1 !important;
+  line-height: 1.5;
 }
 
 .stat-highlight-box:hover {
@@ -149,4 +256,18 @@
 .cta-about-banner {
   background: radial-gradient(circle at 50% 50%, rgba(190, 18, 60, 0.2) 0%, rgba(37, 99, 235, 0.15) 50%, #070A12 85%),
               linear-gradient(180deg, #070A12 0%, #05070D 100%);
+}
+
+@media (max-width: 575.98px) {
+  .about-page .about-header {
+    margin-bottom: 2rem !important;
+  }
+
+  .about-page .about-header h1 {
+    font-size: 1.65rem !important;
+  }
+
+  .about-page .about-intro {
+    font-size: 0.9rem;
+  }
 }

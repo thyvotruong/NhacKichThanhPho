@@ -136,6 +136,18 @@ export class MusicalService {
     );
   }
 
+  resetPassword(req: { identifier: string; otp: string; newPassword: string }): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/auth/reset-password`, req).pipe(
+      catchError((error: HttpErrorResponse) => {
+        const errorData = error.error || {};
+        return throwError(() => ({
+          success: false,
+          message: errorData.message || 'Không thể cập nhật mật khẩu'
+        }));
+      })
+    );
+  }
+
   logout(): void {
     this.isLoggedIn.set(false);
     this.currentUser.set({

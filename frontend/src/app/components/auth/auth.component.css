@@ -8,6 +8,36 @@
 .auth-page {
   min-height: calc(100vh - 160px);
   background: radial-gradient(circle at 50% 20%, #151e36 0%, var(--showman-canvas-night) 75%);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.auth-page,
+.auth-page * {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.auth-page h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem) !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+}
+
+.auth-subtitle {
+  color: #E2E8F0 !important;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.auth-page .text-secondary {
+  color: #CBD5E1 !important;
+}
+
+.auth-page .showman-divider {
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto;
+  border-radius: 2px;
 }
 
 .auth-emblem-box {
@@ -21,25 +51,31 @@
 
 .auth-tabs-wrapper {
   background: rgba(7, 10, 18, 0.7);
+  border-color: rgba(203, 213, 225, 0.3) !important;
 }
 
 .auth-tab-btn {
-  color: #94A3B8;
-  font-size: 0.9rem;
+  color: #E2E8F0 !important;
+  font-size: 0.95rem;
   transition: all 0.25s ease;
   border: none;
 }
 
+.auth-tab-btn:hover {
+  color: #FDE68A !important;
+  background: rgba(245, 158, 11, 0.12);
+}
+
 .auth-tab-btn.active {
-  background: linear-gradient(135deg, var(--showman-gold) 0%, #D97706 100%);
-  color: #070A12;
+  background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%);
+  color: #070A12 !important;
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
 }
 
 .method-pill-btn {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94A3B8;
+  border: 1px solid rgba(203, 213, 225, 0.3);
+  color: #CBD5E1;
   border-radius: 999px;
   padding: 0.3rem 0.9rem;
   font-size: 0.8rem;
@@ -54,8 +90,9 @@
 
 .method-pill-btn.active {
   background: rgba(245, 158, 11, 0.2);
-  color: var(--showman-gold);
+  color: #FDE68A;
   border-color: var(--showman-gold);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
 }
 
 .letter-spacing-2 {

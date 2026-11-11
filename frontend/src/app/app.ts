@@ -31,9 +31,9 @@ export class App implements OnDestroy {
   scrollbarVisible = false;
   scrollbarHeight = 180;
   scrollbarTop = 0;
+  isDraggingScrollbar = false;
   private dragStartY = 0;
   private dragStartScrollTop = 0;
-  private isDraggingScrollbar = false;
   private contentResizeObserver?: ResizeObserver;
 
   constructor() {
