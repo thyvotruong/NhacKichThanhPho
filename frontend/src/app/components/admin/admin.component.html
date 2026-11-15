@@ -1,286 +1,202 @@
 <!-- ============================================================
-     CỔNG QUẢN TRỊ HỆ THỐNG - ADMIN PORTAL (RBAC)
-     Phong cách: The Greatest Showman (100% Montserrat)
+     CỔNG QUẢN TRỊ HỆ THỐNG TOÀN DIỆN - ADMIN PORTAL (RBAC)
+     Phong cách: The Greatest Showman (Deep Midnight Blue & Gold Glow)
      ============================================================ -->
 
 <app-staff-header></app-staff-header>
 
-<div class="admin-portal-page position-relative py-4">
-  <!-- Bụi tiên nền -->
-  <div class="stardust-container" aria-hidden="true">
-    <span class="stardust-sparkle" style="top: 8%; left: 12%;">✦</span>
-    <span class="stardust-sparkle" style="top: 25%; left: 88%;">✧</span>
-    <span class="stardust-dot" style="top: 15%; left: 50%;"></span>
-  </div>
-
-  <div class="container-fluid px-lg-5 position-relative z-2">
-    <!-- Top Bar: Header & RBAC Quick Role Switcher -->
-    <div class="card-showman-glass p-3 p-md-4 rounded-4 border border-gold-glow mb-4">
-      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-        <div>
-          <div class="d-flex align-items-center gap-2 mb-1">
-            <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold">
-              <i class="bi bi-shield-lock-fill text-gold me-1"></i> ADMIN PORTAL (RBAC)
-            </span>
-            <span class="badge badge-showman-gold small fw-bold">HỆ THỐNG QUẢN TRỊ ĐIỀU HÀNH</span>
-          </div>
-          <h2 class="text-gold-gradient fw-black mb-0 fs-3">
-            TRUNG TÂM QUẢN TRỊ NHÀ HÁT THÀNH PHỐ
-          </h2>
+<div class="admin-portal-page position-relative py-2.5">
+  <div class="container-fluid px-3 px-xl-4 position-relative z-2">
+    <!-- Toast Notification Banner -->
+    @if (toastMessage()) {
+      <div class="alert alert-{{ toastMessage()!.type }} border border-gold-glow shadow-2xl d-flex align-items-center justify-content-between mb-4 fade show" role="alert">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-info-circle-fill fs-5"></i>
+          <span class="fw-bold">{{ toastMessage()!.text }}</span>
         </div>
-
-        <!-- Role Simulator & Profile -->
-        <div class="d-flex flex-wrap align-items-center gap-3 bg-dark-glass p-2 px-3 rounded-3 border border-secondary border-opacity-25">
-          <div class="d-flex align-items-center gap-2">
-            <div class="user-avatar-circle">
-              <i class="bi bi-person-badge-fill text-gold fs-5"></i>
-            </div>
-            <div>
-              <div class="text-white fw-bold small">{{ currentUser().fullName }}</div>
-              <div class="text-secondary" style="font-size: 0.75rem;">
-                Vai trò: <span class="text-gold fw-bold text-uppercase">{{ currentUser().role }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Role Switcher for Testing RBAC -->
-          <div class="dropdown">
-            <button class="btn btn-sm btn-outline-warning dropdown-toggle fw-bold py-1 px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-arrow-repeat me-1"></i> Đổi Vai Trò Giả Lập
-            </button>
-            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end border-gold-glow shadow-2xl">
-              <li><h6 class="dropdown-header text-gold">CHỌN PHÂN QUYỀN THỬ NGHIỆM</h6></li>
-              <li><button class="dropdown-item" (click)="switchRole('admin')"><i class="bi bi-shield-fill-check text-gold me-2"></i> Giám Đốc Điều Hành (Admin)</button></li>
-              <li><button class="dropdown-item" (click)="switchRole('editor')"><i class="bi bi-pencil-square text-info me-2"></i> Ban Biên Tập (Editor)</button></li>
-              <li><button class="dropdown-item" (click)="switchRole('accountant')"><i class="bi bi-cash-coin text-success me-2"></i> Kế Toán Trưởng (Accountant)</button></li>
-              <li><button class="dropdown-item" (click)="switchRole('ticket_checker')"><i class="bi bi-upc-scan text-warning me-2"></i> Tổ Trưởng Soát Vé (Checker)</button></li>
-              <li><hr class="dropdown-divider border-secondary border-opacity-25"></li>
-              <li><button class="dropdown-item" (click)="switchRole('customer')"><i class="bi bi-person text-secondary me-2"></i> Khách Hàng (Customer)</button></li>
-            </ul>
-          </div>
-        </div>
+        <button type="button" class="btn-close btn-close-white" (click)="toastMessage.set(null)" aria-label="Close"></button>
       </div>
+    }
+
+    <!-- 10-Tab Navigation Bar -->
+    <div class="admin-tab-strip">
+      @if (currentUser()?.role === 'admin') {
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'dashboard'" (click)="setTab('dashboard')">
+          Dashboard
+        </button>
+      }
+
+      <button class="btn admin-tab-btn" [class.active]="activeTab() === 'musicals'" (click)="setTab('musicals')">
+        Vở Kịch
+      </button>
+
+      <button class="btn admin-tab-btn" [class.active]="activeTab() === 'artists'" (click)="setTab('artists')">
+        Nghệ Sĩ
+      </button>
+
+      @if (currentUser()?.role === 'admin') {
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'auditoriums'" (click)="setTab('auditoriums')">
+          Khán Phòng & Ghế
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'schedules'" (click)="setTab('schedules')">
+          Lịch Diễn & Giá Vé
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'seat-locking'" (click)="setTab('seat-locking')">
+          Khóa Ghế Nội Bộ
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'orders'" (click)="setTab('orders')">
+          Đơn Hàng
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'discounts'" (click)="setTab('discounts')">
+          Mã Giảm Giá
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'reports'" (click)="setTab('reports')">
+          Báo Cáo & Đối Soát
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'accounts'" (click)="setTab('accounts')">
+          Quản Lý RBAC
+        </button>
+      }
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="d-flex flex-wrap gap-2 mb-4 border-bottom border-secondary border-opacity-25 pb-3">
-      <button
-        class="btn admin-tab-btn"
-        [class.active]="activeTab() === 'dashboard'"
-        (click)="setTab('dashboard')"
-      >
-        <i class="bi bi-speedometer2 me-1"></i> Dashboard Tổng Quan
-      </button>
-
-      <button
-        class="btn admin-tab-btn"
-        [class.active]="activeTab() === 'seat-lock'"
-        (click)="setTab('seat-lock')"
-      >
-        <i class="bi bi-lock-fill text-ruby-glow me-1"></i> Khóa Ghế Nội Bộ
-      </button>
-
-      <button
-        class="btn admin-tab-btn"
-        [class.active]="activeTab() === 'orders'"
-        (click)="setTab('orders')"
-      >
-        <i class="bi bi-receipt me-1"></i> Quản Lý Đơn Vé & Hoàn Tiền
-      </button>
-
-      <button
-        class="btn admin-tab-btn"
-        [class.active]="activeTab() === 'vouchers'"
-        (click)="setTab('vouchers')"
-      >
-        <i class="bi bi-ticket-perforated-fill me-1"></i> Quản Lý Voucher
-      </button>
-
-      <button
-        class="btn admin-tab-btn"
-        [class.active]="activeTab() === 'reconciliation'"
-        (click)="setTab('reconciliation')"
-      >
-        <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Đối Soát Giao Dịch
-      </button>
-
-      <button
-        class="btn admin-tab-btn"
-        [class.active]="activeTab() === 'staff'"
-        (click)="setTab('staff')"
-      >
-        <i class="bi bi-people-fill me-1"></i> Nhân Sự & Phân Quyền
-      </button>
-    </div>
-
-    <!-- TAB 1: EXECUTIVE DASHBOARD -->
+    <!-- ============================================================
+         TAB 1: DASHBOARD
+         ============================================================ -->
     @if (activeTab() === 'dashboard') {
-      <div class="dashboard-section animate-fade-in">
+      <div class="tab-pane-content fade show">
+        <div class="dashboard-heading mb-4">
+          <h1 class="text-gold-gradient fw-bold mb-1">Tổng quan hoạt động</h1>
+          <p class="text-secondary mb-0">Theo dõi doanh thu, vé bán và tình hình vận hành nhà hát.</p>
+        </div>
         @if (isLoadingStats()) {
           <div class="text-center py-5">
             <div class="spinner-border text-gold" role="status"></div>
-            <p class="text-gold mt-2 fw-bold">ĐANG TẢI DỮ LIỆU THỐNG KÊ...</p>
+            <p class="text-secondary mt-2">Đang tải dữ liệu tổng quan thời gian thực...</p>
           </div>
-        } @else if (stats(); as s) {
-          <!-- 4 Thẻ KPI Chỉ Số Chính -->
+        } @else if (stats()) {
+          <!-- 4 Stat Cards -->
           <div class="row g-4 mb-4">
-            <!-- Doanh thu -->
-            <div class="col-sm-6 col-xl-3">
-              <div class="kpi-card p-4 rounded-4 border border-gold-glow">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="text-secondary small fw-bold text-uppercase">TỔNG DOANH THU THỰC</span>
-                  <div class="kpi-icon-badge bg-gold-subtle">
-                    <i class="bi bi-currency-dollar text-gold fs-4"></i>
-                  </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="stat-card p-4 rounded-4">
+                <div class="text-secondary fw-bold text-uppercase mb-3">Tổng doanh thu</div>
+                <div class="stat-value fw-bold text-gold-gradient mb-2">
+                  {{ stats()!.totalRevenue | number:'1.0-0' }} đ
                 </div>
-                <h3 class="display-6 fw-black text-gold-gradient mb-1">
-                  {{ s.totalRevenue | number:'1.0-0' }} đ
-                </h3>
-                <span class="badge bg-success-subtle text-success small">
-                  <i class="bi bi-arrow-up-right me-1"></i> +18.4% so với tuần trước
-                </span>
+                <div class="text-success">+14.8% so với tuần trước</div>
               </div>
             </div>
 
-            <!-- Vé đã bán -->
-            <div class="col-sm-6 col-xl-3">
-              <div class="kpi-card p-4 rounded-4 border border-secondary border-opacity-25">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="text-secondary small fw-bold text-uppercase">TỔNG VÉ ĐÃ PHÁT HÀNH</span>
-                  <div class="kpi-icon-badge bg-ruby-subtle">
-                    <i class="bi bi-ticket-perforated-fill text-ruby-glow fs-4"></i>
-                  </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="stat-card p-4 rounded-4">
+                <div class="text-secondary fw-bold text-uppercase mb-3">Vé đã phát hành</div>
+                <div class="stat-value fw-bold text-white mb-2">
+                  {{ stats()!.totalTicketsSold | number }} <span class="fs-5 text-secondary fw-normal">vé</span>
                 </div>
-                <h3 class="display-6 fw-black text-white mb-1">
-                  {{ s.totalTicketsSold }} <span class="fs-6 text-secondary fw-normal">vé</span>
-                </h3>
-                <span class="badge bg-success-subtle text-success small">
-                  <i class="bi bi-arrow-up-right me-1"></i> Tăng 42 vé hôm nay
-                </span>
+                <div class="text-info">Đã xuất mã QR điện tử</div>
               </div>
             </div>
 
-            <!-- Tỷ lệ lấp đầy -->
-            <div class="col-sm-6 col-xl-3">
-              <div class="kpi-card p-4 rounded-4 border border-secondary border-opacity-25">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="text-secondary small fw-bold text-uppercase">TỶ LỆ LẤP ĐẦY KHÁN PHÒNG</span>
-                  <div class="kpi-icon-badge bg-sapphire-subtle">
-                    <i class="bi bi-pie-chart-fill text-info fs-4"></i>
-                  </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="stat-card p-4 rounded-4">
+                <div class="text-secondary fw-bold text-uppercase mb-3">Tỷ lệ lấp đầy rạp</div>
+                <div class="stat-value fw-bold text-gold-gradient mb-3">
+                  {{ stats()!.occupancyRate }}%
                 </div>
-                <h3 class="display-6 fw-black text-white mb-2">
-                  {{ s.occupancyRate }}%
-                </h3>
-                <div class="progress progress-occupancy" style="height: 6px;">
-                  <div class="progress-bar bg-gold" [style.width.%]="s.occupancyRate"></div>
+                <div class="progress bg-dark" style="height: 8px;">
+                  <div class="progress-bar bg-warning" [style.width.%]="stats()!.occupancyRate"></div>
                 </div>
               </div>
             </div>
 
-            <!-- Đơn đặt vé -->
-            <div class="col-sm-6 col-xl-3">
-              <div class="kpi-card p-4 rounded-4 border border-secondary border-opacity-25">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="text-secondary small fw-bold text-uppercase">TỔNG ĐƠN ĐẶT HÀNG</span>
-                  <div class="kpi-icon-badge bg-success-subtle">
-                    <i class="bi bi-bag-check-fill text-success fs-4"></i>
-                  </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="stat-card p-4 rounded-4">
+                <div class="text-secondary fw-bold text-uppercase mb-3">Vở đang công diễn</div>
+                <div class="stat-value fw-bold text-white mb-2">
+                  {{ stats()!.activeShowsCount }} <span class="fs-5 text-secondary fw-normal">vở diễn</span>
                 </div>
-                <h3 class="display-6 fw-black text-white mb-1">
-                  {{ s.totalOrders }} <span class="fs-6 text-secondary fw-normal">đơn</span>
-                </h3>
-                <span class="badge bg-success-subtle text-success small">
-                  <i class="bi bi-check2 me-1"></i> 100% thanh toán trực tuyến
-                </span>
+                <div class="text-secondary">Khán phòng Grand A & Blackbox</div>
               </div>
             </div>
           </div>
 
-          <!-- Phân bổ Doanh thu Cổng thanh toán & Tỷ lệ lấp đầy -->
+          <!-- Doanh thu Cổng thanh toán & Phím tắt nhanh -->
           <div class="row g-4">
-            <div class="col-lg-7">
-              <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
-                <h4 class="text-gold fw-bold mb-3">
-                  <i class="bi bi-wallet2 me-2"></i> PHÂN BỔ PHƯƠNG THỨC THANH TOÁN
-                </h4>
-                <p class="text-secondary small mb-4">
-                  Dữ liệu ghi nhận từ các cổng thanh toán kết nối trực tiếp (VietQR, VNPAY, MoMo, ZaloPay, Thẻ).
-                </p>
-
-                <div class="d-flex flex-column gap-3">
+            <div class="col-lg-8">
+              <div class="card-showman-glass p-4 rounded-4 border border-gold-glow h-100">
+                <h2 class="dashboard-section-title text-gold fw-bold mb-4">
+                  Thống kê doanh thu theo cổng thanh toán
+                </h2>
+                <div class="d-flex flex-column gap-3 mt-4">
                   <div>
-                    <div class="d-flex justify-content-between text-secondary small mb-1">
-                      <span class="text-white fw-bold"><i class="bi bi-qr-code-scan text-gold me-1"></i> VietQR (Chuyển khoản 247)</span>
-                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.VIETQR | number:'1.0-0' }} đ (43.6%)</span>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-white fw-bold">VietQR (Chuyển khoản 24/7)</span>
+                      <span class="text-gold fw-bold">{{ stats()!.paymentBreakdown.VIETQR | number }} đ (43.6%)</span>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                      <div class="progress-bar bg-warning" style="width: 43.6%"></div>
+                    <div class="progress bg-dark" style="height: 10px;">
+                      <div class="progress-bar bg-warning" style="width: 43.6%;"></div>
                     </div>
                   </div>
 
                   <div>
-                    <div class="d-flex justify-content-between text-secondary small mb-1">
-                      <span class="text-white fw-bold"><i class="bi bi-credit-card text-info me-1"></i> VNPAY Cổng Quốc Gia</span>
-                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.VNPAY | number:'1.0-0' }} đ (30.9%)</span>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-white fw-bold">VNPAY QR & Ví VNPAY</span>
+                      <span class="text-gold fw-bold">{{ stats()!.paymentBreakdown.VNPAY | number }} đ (30.9%)</span>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                      <div class="progress-bar bg-info" style="width: 30.9%"></div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div class="d-flex justify-content-between text-secondary small mb-1">
-                      <span class="text-white fw-bold"><i class="bi bi-phone-fill text-danger me-1"></i> Ví Điện Tử MoMo</span>
-                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.MOMO | number:'1.0-0' }} đ (16.4%)</span>
-                    </div>
-                    <div class="progress" style="height: 8px;">
-                      <div class="progress-bar bg-danger" style="width: 16.4%"></div>
+                    <div class="progress bg-dark" style="height: 10px;">
+                      <div class="progress-bar bg-info" style="width: 30.9%;"></div>
                     </div>
                   </div>
 
                   <div>
-                    <div class="d-flex justify-content-between text-secondary small mb-1">
-                      <span class="text-white fw-bold"><i class="bi bi-chat-square-dots text-primary me-1"></i> ZaloPay</span>
-                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.ZALOPAY | number:'1.0-0' }} đ (5.5%)</span>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-white fw-bold">Ví MoMo</span>
+                      <span class="text-gold fw-bold">{{ stats()!.paymentBreakdown.MOMO | number }} đ (16.4%)</span>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                      <div class="progress-bar bg-primary" style="width: 5.5%"></div>
+                    <div class="progress bg-dark" style="height: 10px;">
+                      <div class="progress-bar bg-danger" style="width: 16.4%;"></div>
                     </div>
                   </div>
 
                   <div>
-                    <div class="d-flex justify-content-between text-secondary small mb-1">
-                      <span class="text-white fw-bold"><i class="bi bi-credit-card-2-front text-secondary me-1"></i> Thẻ Quốc Tế Visa/Mastercard</span>
-                      <span class="text-gold fw-bold">{{ s.paymentBreakdown.BANK_CARD | number:'1.0-0' }} đ (3.6%)</span>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-white fw-bold">Thẻ Quốc Tế Visa / Mastercard & ZaloPay</span>
+                      <span class="text-gold fw-bold">{{ (stats()!.paymentBreakdown.BANK_CARD + stats()!.paymentBreakdown.ZALOPAY) | number }} đ (9.1%)</span>
                     </div>
-                    <div class="progress" style="height: 8px;">
-                      <div class="progress-bar bg-secondary" style="width: 3.6%"></div>
+                    <div class="progress bg-dark" style="height: 10px;">
+                      <div class="progress-bar bg-success" style="width: 9.1%;"></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="col-lg-5">
-              <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
-                <h4 class="text-gold fw-bold mb-3">
-                  <i class="bi bi-lightning-charge me-2"></i> LỐI TẮT THAO TÁC NHANH
-                </h4>
-                <div class="d-flex flex-column gap-3">
-                  <button class="btn btn-showman-ruby py-3 text-start fw-bold" (click)="setTab('seat-lock')">
-                    <i class="bi bi-lock-fill fs-5 me-2 text-gold"></i>
-                    KHÓA GHẾ NỘI BỘ (BÁO CHÍ / VIP)
+            <!-- Phím tắt nghiệp vụ quan trọng -->
+            <div class="col-lg-4">
+              <div class="card-showman-glass p-4 rounded-4 border border-gold-glow h-100">
+                <h2 class="dashboard-section-title text-gold fw-bold mb-4">
+                  Thao tác quản trị nhanh
+                </h2>
+                <div class="d-grid gap-2 mt-3">
+                  <button class="btn btn-outline-warning text-start py-2 px-3 fw-bold border-gold-glow" (click)="setTab('seat-locking')">
+                    Khóa ghế nội bộ suất tối nay
                   </button>
-
-                  <button class="btn btn-showman-gold py-3 text-start fw-bold" (click)="setTab('orders')">
-                    <i class="bi bi-receipt fs-5 me-2"></i>
-                    TRA CỨU & XỬ LÝ HOÀN TIỀN
+                  <button class="btn btn-outline-warning text-start py-2 px-3 fw-bold border-gold-glow" (click)="openCreateMusicalModal()">
+                    Thêm vở kịch mới lên lịch
                   </button>
-
-                  <button class="btn btn-outline-warning py-3 text-start fw-bold text-white border-gold-glow" (click)="setTab('reconciliation')">
-                    <i class="bi bi-file-earmark-check fs-5 me-2 text-gold"></i>
-                    ĐỐI SOÁT TÀI CHÍNH CỔNG TT
+                  <button class="btn btn-outline-warning text-start py-2 px-3 fw-bold border-gold-glow" (click)="openCreateScheduleModal()">
+                    Mở thêm suất diễn mới
+                  </button>
+                  <button class="btn btn-outline-warning text-start py-2 px-3 fw-bold border-gold-glow" (click)="openCreateVoucherModal()">
+                    Tạo mã giảm giá khuyến mãi
+                  </button>
+                  <button class="btn btn-outline-secondary text-start py-2 px-3 text-light" (click)="setTab('reports')">
+                    Xem báo cáo đối soát tài chính
                   </button>
                 </div>
               </div>
@@ -290,308 +206,113 @@
       </div>
     }
 
-    <!-- TAB 2: KHÓA GHẾ NỘI BỘ (CRUCIAL FLOW THEO BA) -->
-    @if (activeTab() === 'seat-lock') {
-      <div class="seat-lock-section animate-fade-in">
-        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
-          <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-            <div>
-              <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold mb-2">
-                NGHIỆP VỤ ĐẶC THÙ NHÀ HÁT
-              </span>
-              <h3 class="text-gold-gradient fw-bold mb-1">
-                QUẢN LÝ KHÓA GHẾ NỘI BỘ (SEAT LOCK)
-              </h3>
-              <p class="text-secondary small mb-0">
-                Khóa các vị trí ghế dành riêng cho Cơ quan Báo chí, Khách mời Ngoại giao, Nhà tài trợ hoặc Khu vực Kỹ thuật. Đồng bộ tức thời sang Khách hàng!
-              </p>
-            </div>
-
-            <!-- Chọn Suất Diễn -->
+    <!-- ============================================================
+         TAB 2: VỞ KỊCH (MUSICALS) - High-Density Enterprise Layout
+         ============================================================ -->
+    @if (activeTab() === 'musicals') {
+      <div class="tab-pane-content fade show">
+        <div class="admin-workspace-panel">
+          <!-- Unified Toolbar (Header + Search + Filter + CTA in ONE Row) -->
+          <div class="workspace-toolbar">
             <div class="d-flex align-items-center gap-2">
-              <label class="text-gold fw-bold small text-nowrap"><i class="bi bi-calendar3 me-1"></i> Suất diễn:</label>
-              <select
-                class="form-select bg-dark-glass text-white border-gold-glow py-2"
-                [ngModel]="selectedScheduleId()"
-                (ngModelChange)="selectSchedule($event)"
-              >
-                @for (sch of schedules(); track sch._id) {
-                  <option [value]="sch._id">
-                    {{ sch.musicalTitle }} - {{ sch.performanceDate | date:'dd/MM' }} ({{ sch.time }})
-                  </option>
-                }
-              </select>
+              <h5 class="workspace-title">
+                <i class="bi bi-film me-2"></i>DANH MỤC VỞ NHẠC KỊCH
+              </h5>
+              <span class="badge bg-gold-subtle text-gold border border-gold-glow small px-2 py-0.5">
+                {{ filteredMusicals().length }} tác phẩm
+              </span>
             </div>
-          </div>
-        </div>
 
-        <!-- Thông báo kết quả thao tác -->
-        @if (seatActionMessage(); as msg) {
-          <div class="alert rounded-3 mb-4" [class.alert-success]="msg.type === 'success'" [class.alert-danger]="msg.type === 'error'">
-            <i class="bi me-2" [class.bi-check-circle-fill]="msg.type === 'success'" [class.bi-exclamation-triangle-fill]="msg.type === 'error'"></i>
-            {{ msg.text }}
-          </div>
-        }
-
-        <!-- Khu vực Thao Tác Khóa & Sơ Đồ Ghế -->
-        <div class="row g-4">
-          <!-- Cột Trái: Bảng Điều Khiển Khóa Ghế -->
-          <div class="col-lg-4">
-            <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 h-100">
-              <h4 class="text-white fw-bold mb-3">
-                <i class="bi bi-sliders text-gold me-2"></i> THIẾT LẬP LỆNH KHÓA
-              </h4>
-
-              <div class="mb-3">
-                <label class="form-label text-secondary small fw-bold">GHẾ ĐANG CHỌN THAO TÁC:</label>
-                @if (selectedSeatsForLock().length === 0) {
-                  <div class="p-3 rounded-3 text-center border border-dashed border-secondary border-opacity-50 text-secondary small">
-                    <i class="bi bi-cursor me-1"></i> Nhấp vào các ghế trên sơ đồ bên phải để chọn
-                  </div>
-                } @else {
-                  <div class="d-flex flex-wrap gap-2 p-2 bg-dark-glass rounded-3 border border-gold-glow">
-                    @for (code of selectedSeatsForLock(); track code) {
-                      <span class="badge badge-showman-gold fw-bold px-2 py-1">
-                        {{ code }}
-                      </span>
-                    }
-                  </div>
-                  <small class="text-gold mt-1 d-block">Đã chọn: {{ selectedSeatsForLock().length }} ghế</small>
-                }
-              </div>
-
-              <!-- Lý do khóa -->
-              <div class="mb-3">
-                <label class="form-label text-secondary small fw-bold">LÝ DO KHÓA GHẾ NỘI BỘ:</label>
-                <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25 mb-2" [ngModel]="lockReason()" (ngModelChange)="lockReason.set($event)">
-                  <option value="Báo chí / Truyền thông">📰 Cơ quan Báo chí / Truyền thông</option>
-                  <option value="Khách mời danh dự (VIP Sponsor)">👑 Khách mời danh dự (VIP Sponsor)</option>
-                  <option value="Kỹ thuật / Âm thanh ánh sáng">🎛️ Bàn Kỹ thuật / Âm thanh ánh sáng</option>
-                  <option value="Bảo trì ghế ngồi">🔧 Bảo trì / Ghế dự phòng</option>
-                  <option value="Khác">✏️ Lý do khác (Nhập thủ công)</option>
-                </select>
-
-                @if (lockReason() === 'Khác') {
-                  <input
-                    type="text"
-                    class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
-                    placeholder="Nhập lý do khóa cụ thể..."
-                    [ngModel]="customLockReason()"
-                    (ngModelChange)="customLockReason.set($event)"
-                  />
-                }
-              </div>
-
-              <!-- Hành động -->
-              <div class="d-grid gap-2 pt-3 border-top border-secondary border-opacity-25">
-                <button
-                  class="btn btn-showman-ruby py-2 fw-bold"
-                  [disabled]="selectedSeatsForLock().length === 0 || isLockingSeats()"
-                  (click)="onExecuteLockSeats()"
-                >
-                  <i class="bi bi-lock-fill me-1 text-gold"></i>
-                  KHÓA GHẾ NỘI BỘ
-                </button>
-
-                <button
-                  class="btn btn-outline-warning py-2 fw-bold text-white border-gold-glow"
-                  [disabled]="selectedSeatsForLock().length === 0 || isLockingSeats()"
-                  (click)="onExecuteUnlockSeats()"
-                >
-                  <i class="bi bi-unlock-fill me-1 text-gold"></i>
-                  MỞ KHÓA GHẾ (BÁN LẠI)
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cột Phải: Sơ đồ ghế tương tác trực quan -->
-          <div class="col-lg-8">
-            <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
-              <!-- Chú thích màu sắc -->
-              <div class="d-flex flex-wrap justify-content-center gap-3 mb-4 p-2 bg-dark-glass rounded-3 border border-secondary border-opacity-25 small">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="seat-dot seat-available"></span>
-                  <span class="text-secondary">Trống (Có thể bán)</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="seat-dot seat-locked"></span>
-                  <span class="text-secondary fw-bold text-danger">Khóa nội bộ (Locked)</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="seat-dot seat-booked"></span>
-                  <span class="text-secondary">Đã bán</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="seat-dot seat-admin-selected"></span>
-                  <span class="text-gold fw-bold">Đang chọn</span>
-                </div>
-              </div>
-
-              <!-- Sân khấu -->
-              <div class="stage-bar mx-auto mb-4 text-center py-2 text-gold fw-bold text-uppercase rounded-3">
-                <i class="bi bi-stars me-1"></i> SÂN KHẤU NHÀ HÁT (STAGE) <i class="bi bi-stars ms-1"></i>
-              </div>
-
-              <!-- Ghế Tầng Trệt -->
-              @if (currentSchedule(); as sch) {
-                <div class="text-center mb-4">
-                  <h6 class="text-gold fw-bold mb-3"><i class="bi bi-layers me-1"></i> KHU VỰC TẦNG TRỆT (ORCHESTRA)</h6>
-                  <div class="seat-grid-container d-inline-block">
-                    @for (seat of sch.seats; track seat.seatCode) {
-                      @if (seat.floor === 'Tầng Trệt') {
-                        <button
-                          type="button"
-                          class="seat-btn"
-                          [class.seat-btn-available]="seat.status === 'available'"
-                          [class.seat-btn-booked]="seat.status === 'booked'"
-                          [class.seat-btn-locked]="seat.status === 'locked'"
-                          [class.seat-btn-selected]="isSeatSelected(seat.seatCode)"
-                          [disabled]="seat.status === 'booked'"
-                          (click)="toggleSeatSelection(seat)"
-                          [title]="seat.seatCode + ' (' + seat.status + ')'"
-                        >
-                          {{ seat.number }}
-                        </button>
-                      }
-                    }
-                  </div>
-                </div>
-
-                <!-- Ghế Tầng Lầu -->
-                <div class="text-center pt-3 border-top border-secondary border-opacity-25">
-                  <h6 class="text-gold fw-bold mb-3"><i class="bi bi-building me-1"></i> KHU VỰC TẦNG LẦU (BALCONY)</h6>
-                  <div class="seat-grid-container d-inline-block">
-                    @for (seat of sch.seats; track seat.seatCode) {
-                      @if (seat.floor === 'Tầng Lầu') {
-                        <button
-                          type="button"
-                          class="seat-btn"
-                          [class.seat-btn-available]="seat.status === 'available'"
-                          [class.seat-btn-booked]="seat.status === 'booked'"
-                          [class.seat-btn-locked]="seat.status === 'locked'"
-                          [class.seat-btn-selected]="isSeatSelected(seat.seatCode)"
-                          [disabled]="seat.status === 'booked'"
-                          (click)="toggleSeatSelection(seat)"
-                          [title]="seat.seatCode + ' (' + seat.status + ')'"
-                        >
-                          {{ seat.number }}
-                        </button>
-                      }
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-
-    <!-- TAB 3: QUẢN LÝ ĐƠN HÀNG & HOÀN TIỀN -->
-    @if (activeTab() === 'orders') {
-      <div class="orders-section animate-fade-in">
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
-          <div class="row g-3 align-items-center">
-            <div class="col-md-5">
-              <div class="input-group">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div class="input-group input-group-sm workspace-search">
                 <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
                   <i class="bi bi-search"></i>
                 </span>
                 <input
                   type="text"
                   class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
-                  placeholder="Tra cứu theo mã vé, SĐT, Tên KH..."
-                  [ngModel]="orderSearchKeyword()"
-                  (ngModelChange)="orderSearchKeyword.set($event); loadOrders()"
+                  placeholder="Tìm tên vở kịch, đạo diễn..."
+                  [ngModel]="musicalSearch()"
+                  (ngModelChange)="musicalSearch.set($event)"
                 />
               </div>
-            </div>
 
-            <div class="col-md-4">
               <select
-                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
-                [ngModel]="orderStatusFilter()"
-                (ngModelChange)="orderStatusFilter.set($event); loadOrders()"
+                class="form-select form-select-sm bg-dark-glass text-white border-secondary border-opacity-25 workspace-filter"
+                [ngModel]="musicalGenreFilter()"
+                (ngModelChange)="musicalGenreFilter.set($event)"
               >
-                <option value="ALL">Tất cả trạng thái</option>
-                <option value="CONFIRMED">ĐÃ XÁC NHẬN (CONFIRMED)</option>
-                <option value="CHECKED_IN">ĐÃ CHECK-IN (CHECKED_IN)</option>
-                <option value="CANCELLED">ĐÃ HỦY / HOÀN TIỀN (CANCELLED)</option>
+                <option value="ALL">Tất cả thể loại</option>
+                <option value="Broadway">Broadway</option>
+                <option value="Cổ Điển">Cổ Điển</option>
+                <option value="Dân Gian Đương Đại">Dân Gian</option>
+                <option value="Lãng Mạn">Lãng Mạn</option>
+                <option value="Thiếu Nhi">Thiếu Nhi</option>
               </select>
-            </div>
 
-            <div class="col-md-3 text-end">
-              <button class="btn btn-showman-gold px-3 py-2 fw-bold w-100" (click)="loadOrders()">
-                <i class="bi bi-arrow-clockwise me-1"></i> Làm Mới Dữ Liệu
+              <button class="btn btn-sm btn-showman-gold fw-bold px-3 py-1.5 d-flex align-items-center gap-1 text-nowrap" (click)="openCreateMusicalModal()">
+                <i class="bi bi-plus-lg"></i>
+                <span>Thêm Vở Kịch Mới</span>
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Bảng danh sách đơn hàng -->
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+          <!-- Bảng danh sách dữ liệu thanh thoát -->
           <div class="table-responsive">
-            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
-              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+            <table class="table table-dark table-hover align-middle mb-0 showman-table">
+              <thead>
                 <tr>
-                  <th>MÃ ĐƠN</th>
-                  <th>KHÁCH HÀNG</th>
-                  <th>VỞ DIỄN & SUẤT</th>
-                  <th>VỊ TRÍ GHẾ</th>
-                  <th>TỔNG TIỀN</th>
-                  <th>CỔNG TT</th>
-                  <th>TRẠNG THÁI</th>
-                  <th class="text-end">THAO TÁC</th>
+                  <th style="width: 55px;">Poster</th>
+                  <th>Tên Vở Kịch</th>
+                  <th>Thể Loại</th>
+                  <th>Thời Lượng</th>
+                  <th>Đạo Diễn & Diễn Viên</th>
+                  <th>Giá Vé Từ</th>
+                  <th>Trạng Thái</th>
+                  <th class="text-end" style="width: 120px;">Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
-                @for (o of orders(); track o.bookingCode) {
+                @for (m of filteredMusicals(); track m.slug) {
                   <tr>
                     <td>
-                      <span class="fw-bold text-gold">{{ o.bookingCode }}</span>
+                      <img [src]="m.posterUrl" [alt]="m.title" class="table-poster-thumb" />
                     </td>
                     <td>
-                      <div class="text-white fw-bold">{{ o.customerName }}</div>
-                      <div class="text-secondary small">{{ o.customerPhone }}</div>
+                      <div class="fw-bold text-white fs-6">{{ m.title }}</div>
+                      <div class="text-secondary small">{{ m.slug }}</div>
+                      @if (m.featured) {
+                        <span class="badge bg-warning text-dark small fw-bold mt-0.5">★ Tiêu biểu</span>
+                      }
                     </td>
+                    <td><span class="badge badge-showman-gold">{{ m.genre }}</span></td>
+                    <td class="text-secondary small"><i class="bi bi-clock me-1 text-gold"></i>{{ m.duration }}'</td>
                     <td>
-                      <div class="text-white small fw-bold">{{ o.musicalTitle }}</div>
-                      <div class="text-secondary small">{{ o.performanceDate | date:'dd/MM/yyyy' }} ({{ o.performanceTime }})</div>
-                    </td>
-                    <td>
-                      <div class="d-flex flex-wrap gap-1">
-                        @for (st of o.seats; track st.seatCode) {
-                          <span class="badge badge-showman-ruby small">{{ st.seatCode }}</span>
-                        }
+                      <div class="small text-gold fw-bold">{{ m.director }}</div>
+                      <div class="small text-secondary text-truncate" style="max-width: 180px;">
+                        {{ m.cast.join(', ') }}
                       </div>
                     </td>
-                    <td class="text-gold-gradient fw-bold">
-                      {{ o.totalPrice | number:'1.0-0' }} đ
+                    <td class="fw-bold text-gold">
+                      {{ m.ticketPrices[0]?.price | number }} đ
                     </td>
                     <td>
-                      <span class="badge bg-secondary-subtle text-light small">{{ o.paymentMethod }}</span>
-                    </td>
-                    <td>
-                      @if (o.bookingStatus === 'CONFIRMED') {
-                        <span class="badge bg-success-subtle text-success fw-bold">XÁC NHẬN</span>
-                      } @else if (o.bookingStatus === 'CHECKED_IN') {
-                        <span class="badge bg-primary-subtle text-info fw-bold">ĐÃ CHECK-IN</span>
-                      } @else if (o.bookingStatus === 'CANCELLED') {
-                        <span class="badge bg-danger-subtle text-danger fw-bold">ĐÃ HỦY</span>
-                      }
+                      <span class="badge" [class.bg-success]="m.status === 'now_showing'" [class.bg-secondary]="m.status !== 'now_showing'">
+                        {{ m.status === 'now_showing' ? 'Đang Chiếu' : 'Lưu Trữ' }}
+                      </span>
                     </td>
                     <td class="text-end">
-                      @if (o.bookingStatus === 'CONFIRMED') {
-                        <button
-                          class="btn btn-sm btn-outline-danger fw-bold py-1 px-2"
-                          (click)="openRefundModal(o)"
-                        >
-                          <i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn Tiền
+                      <div class="d-inline-flex gap-1.5">
+                        <button class="btn-action-icon action-edit" title="Chỉnh sửa vở kịch" (click)="openEditMusicalModal(m)">
+                          <i class="bi bi-pencil-square"></i>
                         </button>
-                      } @else {
-                        <span class="text-secondary small">Không khả dụng</span>
-                      }
+                        <button class="btn-action-icon action-toggle" title="Đổi trạng thái chiếu" (click)="toggleMusicalStatus(m)">
+                          <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                        <button class="btn-action-icon action-delete" title="Xóa vở kịch" (click)="deleteMusical(m)">
+                          <i class="bi bi-trash3"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 }
@@ -602,69 +323,540 @@
       </div>
     }
 
-    <!-- TAB 4: QUẢN LÝ VOUCHER -->
-    @if (activeTab() === 'vouchers') {
-      <div class="vouchers-section animate-fade-in">
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h3 class="text-gold-gradient fw-bold mb-1">MÃ KHUYẾN MÃI & TRI ÂN KHÁCH HÀNG</h3>
-              <p class="text-secondary small mb-0">Quản lý các mã giảm giá áp dụng khi khách hàng thanh toán vé trực tuyến.</p>
+    <!-- ============================================================
+         TAB 3: NGHỆ SĨ (ARTISTS) - High-Density Enterprise Layout
+         ============================================================ -->
+    @if (activeTab() === 'artists') {
+      <div class="tab-pane-content fade show">
+        <div class="admin-workspace-panel">
+          <!-- Unified Toolbar -->
+          <div class="workspace-toolbar">
+            <div class="d-flex align-items-center gap-2">
+              <h5 class="workspace-title">
+                <i class="bi bi-people-fill me-2"></i>QUẢN LÝ GƯƠNG MẶT NGHỆ SĨ
+              </h5>
+              <span class="badge bg-gold-subtle text-gold border border-gold-glow small px-2 py-0.5">
+                {{ filteredArtists().length }} nghệ sĩ
+              </span>
             </div>
-            <button class="btn btn-showman-gold fw-bold px-4 py-2" (click)="showCreateVoucherModal.set(true)">
-              <i class="bi bi-plus-lg me-1"></i> TẠO VOUCHER MỚI
-            </button>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div class="input-group input-group-sm" style="width: 280px;">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  placeholder="Tìm theo tên, vai trò..."
+                  [ngModel]="artistSearch()"
+                  (ngModelChange)="artistSearch.set($event)"
+                />
+              </div>
+
+              <button class="btn btn-sm btn-showman-gold fw-bold px-3 py-1.5 d-flex align-items-center gap-1 text-nowrap" (click)="openCreateArtistModal()">
+                <i class="bi bi-person-plus-fill"></i>
+                <span>Thêm Nghệ Sĩ Mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Clean Artist Cards (Flat, High-Density) -->
+          <div class="row g-3">
+            @for (a of filteredArtists(); track a.name) {
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="artist-admin-card h-100 d-flex flex-column text-center">
+                  <div class="position-relative mx-auto mb-2">
+                    <img [src]="a.avatar" [alt]="a.name" class="artist-avatar-thumb" />
+                  </div>
+                  <h6 class="text-white fw-bold mb-0.5">{{ a.name }}</h6>
+                  <div class="text-gold small fw-bold mb-0.5">{{ a.title }}</div>
+                  <div class="text-secondary small mb-2">{{ a.role }}</div>
+                  <p class="text-secondary small line-clamp-2 flex-grow-1 mb-2" style="font-size: 0.78rem;">
+                    {{ a.bio }}
+                  </p>
+                  <div class="d-flex justify-content-center gap-2 pt-2 border-top border-secondary border-opacity-25">
+                    <button class="btn btn-sm btn-outline-warning py-0.5 px-2.5 small" (click)="openEditArtistModal(a)">
+                      <i class="bi bi-pencil-square me-1"></i>Sửa
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger py-0.5 px-2.5 small" (click)="deleteArtist(a)">
+                      <i class="bi bi-trash3 me-1"></i>Xóa
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
         </div>
+      </div>
+    }
 
-        <!-- Bảng danh sách voucher -->
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+    <!-- ============================================================
+         TAB 4: KHÁN PHÒNG & SƠ ĐỒ GHẾ (AUDITORIUMS)
+         ============================================================ -->
+    @if (activeTab() === 'auditoriums') {
+      <div class="tab-pane-content fade show">
+        <div class="row g-4">
+          <!-- Cột trái: Danh sách khán phòng -->
+          <div class="col-lg-5">
+            <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="text-gold fw-bold mb-0"><i class="bi bi-building me-2"></i> DANH SÁCH KHÁN PHÒNG</h5>
+                <button class="btn btn-sm btn-showman-gold fw-bold" (click)="openCreateAuditoriumModal()">
+                  <i class="bi bi-plus-lg me-1"></i> Thêm Mới
+                </button>
+              </div>
+
+              <div class="d-flex flex-column gap-3">
+                @for (aud of auditoriums(); track aud.code) {
+                  <div
+                    class="p-3 rounded-3 border cursor-pointer transition-all"
+                    [class.border-warning]="selectedAuditorium()?.code === aud.code"
+                    [class.bg-gold-subtle]="selectedAuditorium()?.code === aud.code"
+                    [class.border-secondary]="selectedAuditorium()?.code !== aud.code"
+                    [class.border-opacity-25]="selectedAuditorium()?.code !== aud.code"
+                    (click)="selectedAuditorium.set(aud)"
+                  >
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                      <span class="text-white fw-bold fs-6">{{ aud.name }}</span>
+                      <span class="badge" [class.bg-success]="aud.status === 'active'" [class.bg-warning]="aud.status !== 'active'">
+                        {{ aud.status === 'active' ? 'Hoạt động' : 'Bảo dưỡng' }}
+                      </span>
+                    </div>
+                    <div class="text-secondary small mb-2"><i class="bi bi-geo-alt text-gold me-1"></i>{{ aud.venue }}</div>
+                    <div class="d-flex gap-3 small text-gold">
+                      <span><i class="bi bi-people-fill me-1"></i>{{ aud.totalCapacity }} chỗ</span>
+                      <span><i class="bi bi-grid-3x3 me-1"></i>{{ aud.totalRows }} hàng x {{ aud.seatsPerRow }} ghế</span>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-3 pt-2 border-top border-secondary border-opacity-25">
+                      <button class="btn btn-sm btn-outline-warning py-0 px-2 small" (click)="openEditAuditoriumModal(aud); $event.stopPropagation()">
+                        <i class="bi bi-pencil"></i> Sửa
+                      </button>
+                      <button class="btn btn-sm btn-outline-info py-0 px-2 small" (click)="toggleAuditoriumStatus(aud); $event.stopPropagation()">
+                        <i class="bi bi-arrow-repeat"></i> Trạng thái
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Cột phải: Mô phỏng Cấu Hình Sơ Đồ Ghế (Visual Seat Map Preview) -->
+          <div class="col-lg-7">
+            <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+              @if (selectedAuditorium()) {
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h5 class="text-gold fw-bold mb-0">
+                      <i class="bi bi-layout-text-sidebar-reverse me-2"></i> CẤU TRÚC SƠ ĐỒ GHẾ: {{ selectedAuditorium()!.name }}
+                    </h5>
+                    <div class="text-secondary small">Mô phỏng phân bổ hàng VIP, Thường, Ghế đôi và lối đi</div>
+                  </div>
+                  <span class="badge badge-showman-gold fw-bold">{{ selectedAuditorium()!.code }}</span>
+                </div>
+
+                <!-- Chú thích loại ghế -->
+                <div class="d-flex flex-wrap gap-3 p-2 bg-dark-glass rounded-3 border border-secondary border-opacity-25 mb-4 small">
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="legend-box bg-gold-glow"></span>
+                    <span class="text-gold">Hàng VIP ({{ selectedAuditorium()!.vipRows.join(', ') }})</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="legend-box bg-primary"></span>
+                    <span class="text-light">Hàng Standard ({{ selectedAuditorium()!.standardRows.join(', ') }})</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="legend-box bg-danger"></span>
+                    <span class="text-ruby-glow">Hàng Ghế Đôi ({{ selectedAuditorium()!.coupleRows.join(', ') }})</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="legend-box bg-secondary"></span>
+                    <span class="text-secondary">Lối đi giữa cột {{ selectedAuditorium()!.aisleColumns.join(' & ') }}</span>
+                  </div>
+                </div>
+
+                <!-- Sân khấu mô phỏng -->
+                <div class="mini-stage-banner text-center py-2 mb-4 rounded-pill border border-gold-glow">
+                  <span class="text-gold fw-bold small text-uppercase letter-spacing-1">✦ SÂN KHẤU TRUNG TÂM / STAGE ✦</span>
+                </div>
+
+                <!-- Lưới hàng ghế -->
+                <div class="d-flex flex-column gap-2 align-items-center p-3 bg-dark-glass rounded-4 border border-secondary border-opacity-25 overflow-x-auto">
+                  @for (r of getAuditoriumPreviewRows(); track r.row) {
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="fw-bold text-gold small text-center" style="width: 25px;">{{ r.row }}</span>
+                      <div class="d-flex gap-1">
+                        @for (col of [1,2,3,4,5,6,7,8,9,10,11,12,13,14]; track col) {
+                          <span
+                            class="preview-seat-dot"
+                            [class.seat-vip]="r.type === 'VIP'"
+                            [class.seat-std]="r.type === 'Standard'"
+                            [class.seat-couple]="r.type === 'Couple'"
+                            [class.me-3]="selectedAuditorium()!.aisleColumns.includes(col)"
+                            [title]="'Ghế ' + r.row + (col < 10 ? '0' + col : col)"
+                          ></span>
+                        }
+                      </div>
+                      <span class="fw-bold text-gold small text-center" style="width: 25px;">{{ r.row }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 5: LỊCH DIỄN & GIÁ VÉ (SCHEDULES)
+         ============================================================ -->
+    @if (activeTab() === 'schedules') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+              <h4 class="text-gold fw-bold mb-1"><i class="bi bi-calendar-event me-2"></i> QUẢN LÝ LỊCH DIỄN & SUẤT CHIẾU</h4>
+              <p class="text-secondary small mb-0">Mở suất diễn mới, điều chỉnh khung giờ, giá vé theo khán phòng</p>
+            </div>
+            <button class="btn btn-showman-gold py-2 px-4 fw-bold" (click)="openCreateScheduleModal()">
+              <i class="bi bi-calendar-plus me-1"></i> Mở Suất Diễn Mới
+            </button>
+          </div>
+
+          <!-- Bộ lọc -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-7">
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  placeholder="Tìm suất diễn theo tên vở hoặc khán phòng..."
+                  [ngModel]="scheduleSearch()"
+                  (ngModelChange)="scheduleSearch.set($event)"
+                />
+              </div>
+            </div>
+            <div class="col-md-5">
+              <select
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [ngModel]="scheduleMusicalFilter()"
+                (ngModelChange)="scheduleMusicalFilter.set($event)"
+              >
+                <option value="ALL">Tất cả vở kịch</option>
+                @for (m of musicals(); track m.slug) {
+                  <option [value]="m.slug">{{ m.title }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Bảng lịch diễn -->
           <div class="table-responsive">
-            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
-              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+            <table class="table table-dark table-hover align-middle mb-0 showman-table">
+              <thead>
                 <tr>
-                  <th>MÃ VOUCHER</th>
-                  <th>MÔ TẢ</th>
-                  <th>MỨC GIẢM</th>
-                  <th>ĐƠN TỐI THIỂU</th>
-                  <th>HẠN DÙNG</th>
-                  <th>LƯỢT ĐÃ DÙNG</th>
-                  <th>TRẠNG THÁI</th>
-                  <th class="text-end">BẬT / TẮT</th>
+                  <th>Mã Suất</th>
+                  <th>Vở Nhạc Kịch</th>
+                  <th>Ngày & Giờ Diễn</th>
+                  <th>Khán Phòng</th>
+                  <th>Số Ghế Đã Bán</th>
+                  <th>Trạng Thái</th>
+                  <th class="text-end">Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
-                @for (v of vouchers(); track v.code) {
+                @for (s of filteredSchedules(); track s._id) {
+                  <tr>
+                    <td><span class="badge bg-dark-glass text-gold border border-gold-glow">{{ s._id }}</span></td>
+                    <td class="fw-bold text-white">{{ s.musicalTitle }}</td>
+                    <td>
+                      <div class="text-gold fw-bold"><i class="bi bi-calendar3 me-1"></i>{{ s.performanceDate | date:'dd/MM/yyyy' }}</div>
+                      <div class="text-secondary small"><i class="bi bi-clock me-1"></i>{{ s.time }}</div>
+                    </td>
+                    <td class="text-secondary small">{{ s.hall }}</td>
+                    <td>
+                      <div class="small fw-bold text-white">{{ s.bookedSeats }} / {{ s.totalSeats }} ghế</div>
+                      <div class="progress bg-dark mt-1" style="height: 5px; width: 120px;">
+                        <div class="progress-bar bg-warning" [style.width.%]="(s.bookedSeats / s.totalSeats) * 100"></div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge" [class.bg-success]="s.status === 'available'" [class.bg-danger]="s.status === 'cancelled'">
+                        {{ s.status === 'available' ? 'Sẵn sàng' : 'Đã hủy' }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-warning" (click)="setTab('seat-locking'); onSelectScheduleForLock(s._id)" title="Khóa ghế nội bộ">
+                          <i class="bi bi-lock-fill text-ruby-glow"></i>
+                        </button>
+                        @if (s.status === 'available') {
+                          <button class="btn btn-outline-danger" (click)="cancelSchedule(s)" title="Hủy suất chiếu">
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 6: KHÓA GHẾ NỘI BỘ (SEAT-LOCKING)
+         ============================================================ -->
+    @if (activeTab() === 'seat-locking') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="mb-4">
+            <h4 class="text-gold fw-bold mb-1"><i class="bi bi-lock-fill text-ruby-glow me-2"></i> KHÓA GHẾ NỘI BỘ THỜI GIAN THỰC</h4>
+            <p class="text-secondary small mb-0">Bảo lưu ghế dành riêng cho Khách mời VIP, Kỹ thuật sân khấu, Ban giám khảo</p>
+          </div>
+
+          <div class="row g-3 mb-4 lock-schedule-filters">
+            <div class="col-md-4">
+              <label class="form-label text-secondary fw-bold" for="lock-date-filter">Ngày biểu diễn</label>
+              <select
+                id="lock-date-filter"
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [ngModel]="lockDateFilter()"
+                (ngModelChange)="onLockDateChange($event)"
+              >
+                <option value="">Chọn ngày</option>
+                @for (date of lockScheduleDates(); track date) {
+                  <option [value]="date">{{ formatLockDate(date) }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary fw-bold" for="lock-time-filter">Khung giờ</label>
+              <select
+                id="lock-time-filter"
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [disabled]="!lockDateFilter()"
+                [ngModel]="lockTimeFilter()"
+                (ngModelChange)="onLockTimeChange($event)"
+              >
+                <option value="">Chọn khung giờ</option>
+                @for (time of lockScheduleTimes(); track time) {
+                  <option [value]="time">{{ time }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary fw-bold" for="lock-musical-filter">Vở diễn</label>
+              <select
+                id="lock-musical-filter"
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [disabled]="!lockTimeFilter()"
+                [ngModel]="selectedScheduleIdForLock()"
+                (ngModelChange)="onSelectScheduleForLock($event)"
+              >
+                <option value="">Chọn vở diễn</option>
+                @for (schedule of lockScheduleOptions(); track schedule._id) {
+                  <option [value]="schedule._id">{{ getLockScheduleLabel(schedule) }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          @if (seatActionMessage(); as message) {
+            <div
+              class="alert mb-4"
+              [class.alert-success]="message.type === 'success'"
+              [class.alert-danger]="message.type === 'error'"
+              role="status"
+            >
+              {{ message.text }}
+            </div>
+          }
+
+          @if (currentScheduleForLock()) {
+            <!-- Thông tin thống kê ghế của suất -->
+            <div class="d-flex flex-wrap gap-3 mb-4 p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25 small">
+              <span class="text-white"><strong class="text-gold">{{ currentScheduleForLock()!.musicalTitle }}</strong> | {{ currentScheduleForLock()!.hall }}</span>
+              <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ghế trống: {{ currentScheduleForLock()!.totalSeats - currentScheduleForLock()!.bookedSeats - (currentScheduleForLock()!.lockedSeatsCount || 0) }}</span>
+              <span class="text-primary"><i class="bi bi-person-fill me-1"></i>Đã bán: {{ currentScheduleForLock()!.bookedSeats }}</span>
+              <span class="text-danger fw-bold"><i class="bi bi-lock-fill me-1"></i>Đã khóa nội bộ: {{ currentScheduleForLock()!.lockedSeatsCount || 0 }}</span>
+              <span class="text-warning fw-bold ms-auto"><i class="bi bi-cursor-fill me-1"></i>Đang chọn: {{ selectedSeatsForLock().length }} ghế</span>
+            </div>
+
+            <!-- Panel điều khiển khóa/mở khóa -->
+            <div class="card-showman-glass p-3 rounded-4 border border-gold-glow mb-4">
+              <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                  <label class="form-label text-secondary small fw-bold mb-1">LÝ DO KHÓA GHẾ NỘI BỘ:</label>
+                  <select
+                    class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                    [ngModel]="lockReason()"
+                    (ngModelChange)="lockReason.set($event)"
+                  >
+                    <option value="Khách mời danh dự / Ngoại giao">Khách mời danh dự / Ngoại giao</option>
+                    <option value="Kỹ thuật âm thanh / ánh sáng sân khấu">Kỹ thuật âm thanh / ánh sáng sân khấu</option>
+                    <option value="Báo chí / Truyền thông">Báo chí / Truyền thông</option>
+                    <option value="Dự phòng y tế / An ninh">Dự phòng y tế / An ninh</option>
+                    <option value="Khác">Lý do tùy chỉnh khác...</option>
+                  </select>
+                </div>
+
+                @if (lockReason() === 'Khác') {
+                  <div class="col-md-4">
+                    <label class="form-label text-secondary small fw-bold mb-1">NHẬP LÝ DO CHI TIẾT:</label>
+                    <input
+                      type="text"
+                      class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                      placeholder="VD: Gia đình diễn viên..."
+                      [ngModel]="customLockReason()"
+                      (ngModelChange)="customLockReason.set($event)"
+                    />
+                  </div>
+                }
+
+                <div class="col-md d-flex align-items-end gap-2">
+                  <button
+                    class="btn btn-showman-ruby fw-bold py-2 px-3 d-flex align-items-center gap-2"
+                    [disabled]="selectedSeatsForLock().length === 0 || isLockingSeats()"
+                    (click)="executeLockSeats()"
+                  >
+                    <i class="bi bi-lock-fill"></i> Khóa {{ selectedSeatsForLock().length }} Ghế Đã Chọn
+                  </button>
+
+                  <button
+                    class="btn btn-outline-warning fw-bold py-2 px-3 d-flex align-items-center gap-2"
+                    [disabled]="selectedSeatsForLock().length === 0 || isLockingSeats()"
+                    (click)="executeUnlockSeats()"
+                  >
+                    <i class="bi bi-unlock-fill"></i> Mở Khóa Ghế
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <app-seat-map
+              [seats]="currentScheduleForLock()!.seats || []"
+              [selectedSeatCodes]="selectedSeatsForLock()"
+              [allowLockedSelection]="true"
+              (seatClick)="toggleSeatSelectionForLock($event)"
+            ></app-seat-map>
+          } @else if (isLoadingSeatMap()) {
+            <div class="lock-seat-empty-state text-center p-4" role="status">
+              <span class="spinner-border spinner-border-sm text-gold me-2" aria-hidden="true"></span>
+              Đang tải sơ đồ ghế...
+            </div>
+          } @else {
+            <div class="lock-seat-empty-state text-center p-4">
+              Chọn ngày, khung giờ và vở diễn để xem sơ đồ ghế tương ứng.
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 7: ĐƠN HÀNG (ORDERS)
+         ============================================================ -->
+    @if (activeTab() === 'orders') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+              <h4 class="text-gold fw-bold mb-1"><i class="bi bi-receipt me-2"></i> QUẢN LÝ ĐƠN HÀNG</h4>
+              <p class="text-secondary small mb-0">Tra cứu đơn vé và kiểm tra tình trạng thanh toán</p>
+            </div>
+            <button class="btn btn-outline-warning fw-bold py-2 px-3 border-gold-glow" (click)="loadOrders()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Tải Lại Dữ Liệu
+            </button>
+          </div>
+
+          <!-- Bộ lọc -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-7">
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  placeholder="Tìm kiếm theo Mã vé (NK-...), Tên khách, Số điện thoại hoặc Email..."
+                  [ngModel]="orderSearchKeyword()"
+                  (ngModelChange)="orderSearchKeyword.set($event)"
+                />
+              </div>
+            </div>
+            <div class="col-md-5">
+              <select
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [ngModel]="orderStatusFilter()"
+                (ngModelChange)="orderStatusFilter.set($event)"
+              >
+                <option value="ALL">Tất cả trạng thái đơn</option>
+                <option value="CONFIRMED">Đã thanh toán (Chờ xem)</option>
+                <option value="CHECKED_IN">Đã check-in vào rạp</option>
+                <option value="CANCELLED">Đã hủy</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bảng đơn hàng -->
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0 showman-table">
+              <thead>
+                <tr>
+                  <th>Mã Vé</th>
+                  <th>Khách Hàng</th>
+                  <th>Vở Nhạc Kịch & Suất</th>
+                  <th>Ghế Ngồi</th>
+                  <th>Tổng Tiền</th>
+                  <th>Cổng TT</th>
+                  <th>Trạng Thái</th>
+                  <th class="text-end">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (o of filteredOrders(); track o.bookingCode) {
                   <tr>
                     <td>
-                      <span class="badge badge-showman-gold px-3 py-2 fs-6 fw-bold">{{ v.code }}</span>
+                      <span class="badge bg-dark-glass text-gold border border-gold-glow fw-bold">
+                        {{ o.bookingCode }}
+                      </span>
                     </td>
-                    <td class="text-secondary small">{{ v.description }}</td>
-                    <td class="text-gold fw-bold">
-                      @if (v.discountType === 'PERCENT') {
-                        {{ v.discountValue }}% (Tối đa {{ (v.maxDiscountAmount || 0) | number:'1.0-0' }} đ)
-                      } @else {
-                        {{ v.discountValue | number:'1.0-0' }} đ
-                      }
-                    </td>
-                    <td class="text-secondary small">{{ v.minOrderValue | number:'1.0-0' }} đ</td>
-                    <td class="text-secondary small">{{ v.validUntil | date:'dd/MM/yyyy' }}</td>
-                    <td class="text-white fw-bold">{{ v.usedCount || 0 }} lượt</td>
                     <td>
-                      @if (v.isActive) {
-                        <span class="badge bg-success-subtle text-success fw-bold">ĐANG KÍCH HOẠT</span>
+                      <div class="fw-bold text-white">{{ o.customerName }}</div>
+                      <div class="text-secondary small">{{ o.customerPhone }}</div>
+                    </td>
+                    <td>
+                      <div class="text-white small fw-bold">{{ o.musicalTitle }}</div>
+                      <div class="text-gold small">{{ o.performanceDate | date:'dd/MM' }} | {{ o.performanceTime }}</div>
+                    </td>
+                    <td>
+                      <div class="d-flex flex-wrap gap-1">
+                        @for (st of o.seats; track st.seatCode) {
+                          <span class="badge bg-secondary small">{{ st.seatCode }}</span>
+                        }
+                      </div>
+                    </td>
+                    <td class="fw-bold text-gold">{{ o.totalPrice | number }} đ</td>
+                    <td><span class="badge bg-dark border border-secondary">{{ o.paymentMethod }}</span></td>
+                    <td>
+                      @if (o.bookingStatus === 'CHECKED_IN') {
+                        <span class="badge bg-success"><i class="bi bi-check-all me-1"></i>Đã vào rạp</span>
+                      } @else if (o.bookingStatus === 'CANCELLED' || o.paymentStatus === 'REFUNDED') {
+                        <span class="badge bg-danger">Đã hủy</span>
                       } @else {
-                        <span class="badge bg-secondary-subtle text-secondary fw-bold">ĐÃ KHÓA</span>
+                        <span class="badge bg-warning text-dark"><i class="bi bi-check-circle me-1"></i>Đã thanh toán</span>
                       }
                     </td>
                     <td class="text-end">
-                      <button
-                        class="btn btn-sm py-1 px-3 fw-bold"
-                        [class.btn-outline-danger]="v.isActive"
-                        [class.btn-outline-success]="!v.isActive"
-                        (click)="onToggleVoucher(v)"
-                      >
-                        {{ v.isActive ? 'Khóa mã' : 'Kích hoạt' }}
+                      <button class="btn btn-sm btn-outline-info" title="Xem chi tiết" (click)="viewOrderDetail(o)">
+                        <i class="bi bi-eye"></i>
                       </button>
                     </td>
                   </tr>
@@ -676,63 +868,67 @@
       </div>
     }
 
-    <!-- TAB 5: ĐỐI SOÁT GIAO DỊCH TÀI CHÍNH (RECONCILIATION) -->
-    @if (activeTab() === 'reconciliation') {
-      <div class="reconciliation-section animate-fade-in">
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
-          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <!-- ============================================================
+         TAB 8: MÃ GIẢM GIÁ (DISCOUNTS / VOUCHERS)
+         ============================================================ -->
+    @if (activeTab() === 'discounts') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div>
-              <span class="badge badge-showman-ruby px-3 py-1 rounded-pill small fw-bold mb-1">KIỂM TOÁN TÀI CHÍNH</span>
-              <h3 class="text-gold-gradient fw-bold mb-1">ĐỐI SOÁT DOANH THU & CHÊNH LỆCH CỔNG TT</h3>
-              <p class="text-secondary small mb-0">Đối chiếu tự động giữa số tiền ghi nhận trên Hệ Thống và Cổng Thanh Toán đối tác.</p>
+              <h4 class="text-gold fw-bold mb-1"><i class="bi bi-ticket-perforated-fill me-2"></i> QUẢN LÝ MÃ GIẢM GIÁ (VOUCHERS)</h4>
+              <p class="text-secondary small mb-0">Thiết lập các chương trình khuyến mãi, tỷ lệ chiết khấu và hạn mức sử dụng</p>
             </div>
-            <button class="btn btn-showman-gold fw-bold px-4 py-2" (click)="triggerExportReport()">
-              <i class="bi bi-file-earmark-excel-fill me-1"></i> XUẤT BÁO CÁO ĐỐI SOÁT (EXCEL)
+            <button class="btn btn-showman-gold py-2 px-4 fw-bold" (click)="openCreateVoucherModal()">
+              <i class="bi bi-plus-lg me-1"></i> Tạo Voucher Mới
             </button>
           </div>
-        </div>
 
-        @if (showExportSuccess()) {
-          <div class="alert alert-success rounded-3 mb-4">
-            <i class="bi bi-check-circle-fill me-2"></i> Đã xuất báo cáo đối soát doanh thu thành công dưới dạng file Excel chuẩn kế toán!
-          </div>
-        }
-
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
           <div class="table-responsive">
-            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
-              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+            <table class="table table-dark table-hover align-middle mb-0 showman-table">
+              <thead>
                 <tr>
-                  <th>MÃ GIAO DỊCH</th>
-                  <th>MÃ ĐƠN VÉ</th>
-                  <th>CỔNG THANH TOÁN</th>
-                  <th>TIỀN HỆ THỐNG</th>
-                  <th>TIỀN CỔNG TT</th>
-                  <th>PHÍ CỔNG</th>
-                  <th>THỰC NHẬN</th>
-                  <th>TRẠNG THÁI</th>
+                  <th>Mã Voucher</th>
+                  <th>Mô Tả Khuyến Mãi</th>
+                  <th>Mức Giảm</th>
+                  <th>Đơn Tối Thiểu</th>
+                  <th>Đã Dùng / Giới Hạn</th>
+                  <th>Hạn Sử Dụng</th>
+                  <th>Trạng Thái</th>
+                  <th class="text-end">Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
-                @for (rec of reconciliations(); track rec.transactionId) {
+                @for (v of vouchers(); track v.code) {
                   <tr>
-                    <td class="text-white fw-bold">{{ rec.transactionId }}</td>
-                    <td class="text-gold">{{ rec.bookingCode }}</td>
-                    <td><span class="badge bg-secondary-subtle text-light">{{ rec.gateway }}</span></td>
-                    <td class="text-white">{{ rec.systemAmount | number:'1.0-0' }} đ</td>
-                    <td class="text-white">{{ rec.gatewayAmount | number:'1.0-0' }} đ</td>
-                    <td class="text-secondary small">{{ rec.fee | number:'1.0-0' }} đ</td>
-                    <td class="text-gold-gradient fw-bold">{{ rec.netAmount | number:'1.0-0' }} đ</td>
                     <td>
-                      @if (rec.status === 'MATCHED') {
-                        <span class="badge bg-success-subtle text-success fw-bold">
-                          <i class="bi bi-check2-all me-1"></i> KHỚP 100%
-                        </span>
-                      } @else {
-                        <span class="badge bg-danger-subtle text-danger fw-bold">
-                          <i class="bi bi-exclamation-triangle-fill me-1"></i> LỆCH TIỀN
-                        </span>
-                      }
+                      <span class="badge bg-dark-glass text-gold border border-gold-glow fs-6 letter-spacing-1">
+                        {{ v.code }}
+                      </span>
+                    </td>
+                    <td class="text-white">{{ v.description }}</td>
+                    <td class="fw-bold text-gold">
+                      {{ v.discountType === 'PERCENT' ? '-' + v.discountValue + '%' : '-' + (v.discountValue | number) + ' đ' }}
+                    </td>
+                    <td class="text-secondary small">{{ v.minOrderValue | number }} đ</td>
+                    <td class="text-secondary small">
+                      <span class="fw-bold text-white">{{ v.usedCount || 0 }}</span> / {{ v.usageLimit || 100 }} lượt
+                    </td>
+                    <td class="text-secondary small">{{ v.validUntil | date:'dd/MM/yyyy' }}</td>
+                    <td>
+                      <span class="badge" [class.bg-success]="v.isActive" [class.bg-secondary]="!v.isActive">
+                        {{ v.isActive ? 'Đang áp dụng' : 'Tạm dừng' }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-warning" (click)="toggleVoucherStatus(v)" title="Bật/Tắt mã">
+                          <i class="bi bi-power"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" (click)="deleteVoucher(v)" title="Xóa mã">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 }
@@ -743,59 +939,162 @@
       </div>
     }
 
-    <!-- TAB 6: NHÂN SỰ & PHÂN QUYỀN RBAC -->
-    @if (activeTab() === 'staff') {
-      <div class="staff-section animate-fade-in">
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
-          <h3 class="text-gold-gradient fw-bold mb-1">DANH SÁCH NHÂN SỰ & MA TRẬN PHÂN QUYỀN</h3>
-          <p class="text-secondary small mb-0">Hệ thống phân quyền theo vai trò (Role-Based Access Control) đảm bảo an toàn vận hành.</p>
-        </div>
+    <!-- ============================================================
+         TAB 9: BÁO CÁO & THỐNG KÊ (REPORTS)
+         ============================================================ -->
+    @if (activeTab() === 'reports') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+              <h4 class="text-gold fw-bold mb-1"><i class="bi bi-graph-up-arrow me-2"></i> BÁO CÁO DOANH THU & ĐỐI SOÁT TÀI CHÍNH</h4>
+              <p class="text-secondary small mb-0">Thống kê doanh thu theo vở kịch, theo ngày và đối soát với các cổng thanh toán</p>
+            </div>
+            <button class="btn btn-showman-gold py-2 px-4 fw-bold" (click)="exportReport()">
+              <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Xuất File Báo Cáo Excel
+            </button>
+          </div>
 
-        <div class="card-showman-glass p-4 rounded-4 border border-secondary border-opacity-25">
+          @if (revenueReport()) {
+            <!-- Thống kê doanh thu theo từng vở kịch -->
+            <h5 class="text-gold fw-bold mb-3"><i class="bi bi-trophy-fill text-gold me-2"></i> DOANH THU THEO TỪNG VỞ KỊCH</h5>
+            <div class="table-responsive mb-5">
+              <table class="table table-dark table-hover align-middle mb-0 showman-table">
+                <thead>
+                  <tr>
+                    <th>Vở Nhạc Kịch</th>
+                    <th>Số Vé Đã Bán</th>
+                    <th>Tỷ Lệ Lấp Đầy</th>
+                    <th>Doanh Thu Đạt Được</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (show of revenueReport()!.byShow; track show.musicalTitle) {
+                    <tr>
+                      <td class="fw-bold text-white">{{ show.musicalTitle }}</td>
+                      <td>{{ show.ticketsSold }} vé</td>
+                      <td>
+                        <span class="badge bg-warning text-dark fw-bold">{{ show.occupancyRate }}%</span>
+                      </td>
+                      <td class="fw-bold text-gold fs-6">{{ show.revenue | number }} đ</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Bảng đối soát tài chính ngân quỹ -->
+            <h5 class="text-gold fw-bold mb-3"><i class="bi bi-check2-all text-success me-2"></i> BẢNG ĐỐI SOÁT GIAO DỊCH TÀI CHÍNH</h5>
+            <div class="table-responsive">
+              <table class="table table-dark table-hover align-middle mb-0 showman-table">
+                <thead>
+                  <tr>
+                    <th>Mã Giao Dịch</th>
+                    <th>Mã Đơn Vé</th>
+                    <th>Cổng Thanh Toán</th>
+                    <th>Tiền Hệ Thống</th>
+                    <th>Cổng Báo Nhận</th>
+                    <th>Phí Cổng</th>
+                    <th>Trạng Thái Đối Soát</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (rec of reconciliations(); track rec.transactionId) {
+                    <tr>
+                      <td class="font-monospace text-gold small">{{ rec.transactionId }}</td>
+                      <td class="text-white">{{ rec.bookingCode }}</td>
+                      <td><span class="badge bg-dark border border-secondary">{{ rec.gateway }}</span></td>
+                      <td class="text-white fw-bold">{{ rec.systemAmount | number }} đ</td>
+                      <td class="text-gold fw-bold">{{ rec.gatewayAmount | number }} đ</td>
+                      <td class="text-secondary small">{{ rec.fee | number }} đ</td>
+                      <td>
+                        <span class="badge" [class.bg-success]="rec.status === 'MATCHED'" [class.bg-danger]="rec.status !== 'MATCHED'">
+                          {{ rec.status === 'MATCHED' ? 'Khớp 100%' : 'Sai lệch' }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 10: TÀI KHOẢN NHÂN SỰ RBAC (ACCOUNTS)
+         ============================================================ -->
+    @if (activeTab() === 'accounts') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+              <h4 class="text-gold fw-bold mb-1"><i class="bi bi-shield-check me-2"></i> QUẢN LÝ NHÂN SỰ & PHÂN QUYỀN (RBAC)</h4>
+              <p class="text-secondary small mb-0">Quản lý danh sách cán bộ nhân viên, vai trò truy cập và trạng thái bảo mật</p>
+            </div>
+            <button class="btn btn-showman-gold py-2 px-4 fw-bold" (click)="openCreateStaffModal()">
+              <i class="bi bi-person-plus-fill me-1"></i> Thêm Nhân Sự Mới
+            </button>
+          </div>
+
           <div class="table-responsive">
-            <table class="table table-dark table-hover border-secondary border-opacity-25 align-middle mb-0 bg-transparent">
-              <thead class="text-gold border-gold-glow small text-uppercase fw-bold">
+            <table class="table table-dark table-hover align-middle mb-0 showman-table">
+              <thead>
                 <tr>
-                  <th>HỌ VÀ TÊN</th>
-                  <th>EMAIL</th>
-                  <th>SỐ ĐIỆN THOẠI</th>
-                  <th>CHỨC VỤ / VAI TRÒ</th>
-                  <th>QUYỀN HẠN TRUY CẬP</th>
-                  <th>TRẠNG THÁI</th>
+                  <th>Nhân Sự</th>
+                  <th>Tài Khoản (Username)</th>
+                  <th>Email & Liên Hệ</th>
+                  <th>Vai Trò (Phân Quyền)</th>
+                  <th>Phòng Ban</th>
+                  <th>Trạng Thái</th>
+                  <th class="text-end" style="width: 120px;">Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
                 @for (u of staffUsers(); track u.email) {
                   <tr>
-                    <td class="text-white fw-bold">
-                      <i class="bi bi-person-circle text-gold me-2"></i>{{ u.fullName }}
-                    </td>
-                    <td class="text-secondary small">{{ u.email }}</td>
-                    <td class="text-secondary small">{{ u.phone }}</td>
                     <td>
-                      @if (u.role === 'admin') {
-                        <span class="badge badge-showman-ruby fw-bold">GIÁM ĐỐC (ADMIN)</span>
-                      } @else if (u.role === 'editor') {
-                        <span class="badge badge-showman-sapphire fw-bold">BAN BIÊN TẬP (EDITOR)</span>
-                      } @else if (u.role === 'accountant') {
-                        <span class="badge badge-showman-gold fw-bold">KẾ TOÁN TRƯỞNG (ACCOUNTANT)</span>
-                      } @else if (u.role === 'ticket_checker') {
-                        <span class="badge bg-warning-subtle text-dark fw-bold">SOÁT VÉ (CHECKER)</span>
-                      }
-                    </td>
-                    <td class="text-secondary small">
-                      @if (u.role === 'admin') {
-                        Toàn quyền Dashboard, Khóa ghế, Hoàn tiền, Nhân sự
-                      } @else if (u.role === 'editor') {
-                        Cập nhật nội dung vở kịch, nghệ sĩ, lịch diễn
-                      } @else if (u.role === 'accountant') {
-                        Xem báo cáo doanh thu, đối soát tài chính
-                      } @else if (u.role === 'ticket_checker') {
-                        Chỉ truy cập Cổng Soát Vé / Check-in QR
-                      }
+                      <div class="d-flex align-items-center gap-2">
+                        <img [src]="u.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'" class="rounded-circle border border-gold" style="width: 32px; height: 32px;" />
+                        <div>
+                          <div class="fw-bold text-white small">{{ u.fullName }}</div>
+                          <div class="text-secondary" style="font-size: 0.72rem;">{{ u.phone }}</div>
+                        </div>
+                      </div>
                     </td>
                     <td>
-                      <span class="badge bg-success-subtle text-success fw-bold">ĐANG HOẠT ĐỘNG</span>
+                      <code class="text-gold bg-dark px-1.5 py-0.5 rounded border border-secondary border-opacity-25">{{ u.username || u.email.split('@')[0] }}</code>
+                    </td>
+                    <td class="text-gold small">{{ u.email }}</td>
+                    <td>
+                      <span
+                        class="badge fw-bold"
+                        [class.badge-showman-gold]="u.role === 'admin'"
+                        [class.bg-info]="u.role === 'editor'"
+                        [class.bg-success]="u.role === 'accountant'"
+                        [class.bg-warning]="u.role === 'ticket_checker' || u.role === 'staff'"
+                      >
+                        {{ u.role === 'admin' ? 'ADMIN' : (u.role === 'editor' ? 'BIÊN TẬP' : (u.role === 'accountant' ? 'KẾ TOÁN' : 'SOÁT VÉ')) }}
+                      </span>
+                    </td>
+                    <td class="text-secondary small">{{ u.department || 'Ban Điều Hành' }}</td>
+                    <td>
+                      <span class="badge" [class.bg-success]="u.isActive" [class.bg-danger]="!u.isActive">
+                        {{ u.isActive ? 'Đang hoạt động' : 'Đã khóa' }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <div class="d-inline-flex gap-1.5">
+                        <button class="btn-action-icon action-toggle" (click)="toggleStaffStatus(u)" [title]="u.isActive ? 'Khóa tài khoản' : 'Mở khóa'">
+                          <i class="bi" [class.bi-lock-fill]="u.isActive" [class.bi-unlock-fill]="!u.isActive"></i>
+                        </button>
+                        @if (u.role !== 'admin' || (u.email !== 'admin@nhackichthanhpho.vn' && u.username !== 'admin')) {
+                          <button class="btn-action-icon action-delete" (click)="deleteStaffUser(u)" title="Xóa tài khoản vĩnh viễn">
+                            <i class="bi bi-trash3"></i>
+                          </button>
+                        }
+                      </div>
                     </td>
                   </tr>
                 }
@@ -808,103 +1107,436 @@
   </div>
 </div>
 
-<!-- MODAL HOÀN TIỀN / HỦY VÉ -->
-@if (selectedOrderForRefund(); as o) {
-  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.75);">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content card-showman-glass border-gold-glow text-white p-2 rounded-4">
-        <div class="modal-header border-secondary border-opacity-25">
-          <h5 class="modal-title text-gold fw-bold">
-            <i class="bi bi-arrow-counterclockwise me-2"></i> XÁC NHẬN HOÀN TIỀN ĐƠN VÉ
+<!-- ============================================================
+     MODALS SECTION
+     ============================================================ -->
+
+<!-- Modal 1: Thêm/Sửa Vở Kịch -->
+@if (showMusicalModal()) {
+  <div class="admin-modal-backdrop" (click)="showMusicalModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-film me-2"></i> {{ isEditingMusical() ? 'CHỈNH SỬA VỞ KỊCH' : 'THÊM VỞ KỊCH MỚI' }}
           </h5>
-          <button type="button" class="btn-close btn-close-white" (click)="closeRefundModal()"></button>
+          <button class="btn-close btn-close-white" (click)="showMusicalModal.set(false)"></button>
         </div>
-        <div class="modal-body">
-          <div class="p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25 mb-3">
-            <div>Mã đơn: <strong class="text-gold">{{ o.bookingCode }}</strong></div>
-            <div>Khách hàng: <strong class="text-white">{{ o.customerName }}</strong> ({{ o.customerPhone }})</div>
-            <div>Số tiền hoàn: <strong class="text-gold-gradient fs-5">{{ o.totalPrice | number:'1.0-0' }} đ</strong></div>
+
+        <form [formGroup]="musicalForm" (ngSubmit)="saveMusical()">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label text-secondary small fw-bold">Tên vở kịch:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="title" placeholder="VD: Bông Bóng Bay - Giấc Mơ Tuổi Thơ" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Slug URL:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="slug" placeholder="VD: bong-bong-bay" />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Thể loại:</label>
+              <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="genre">
+                <option value="Broadway">Broadway</option>
+                <option value="Cổ Điển">Cổ Điển</option>
+                <option value="Dân Gian Đương Đại">Dân Gian Đương Đại</option>
+                <option value="Lãng Mạn">Lãng Mạn</option>
+                <option value="Thiếu Nhi">Thiếu Nhi</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Thời lượng (phút):</label>
+              <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="duration" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Giới hạn độ tuổi:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="ageLimit" placeholder="13+" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Đạo diễn:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="director" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Dàn diễn viên (cách nhau dấu phẩy):</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="cast" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Link Ảnh Poster (URL):</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="posterUrl" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Link Trailer YouTube:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="trailerUrl" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Nội dung tóm tắt:</label>
+              <textarea class="form-control bg-dark-glass text-white border-secondary border-opacity-25" rows="3" formControlName="synopsis"></textarea>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Giá vé VIP (đ):</label>
+              <input type="number" class="form-control bg-dark-glass text-gold border-secondary border-opacity-25" formControlName="vipPrice" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Giá vé Standard (đ):</label>
+              <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="stdPrice" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Giá vé Đôi (đ):</label>
+              <input type="number" class="form-control bg-dark-glass text-ruby-glow border-secondary border-opacity-25" formControlName="couplePrice" />
+            </div>
           </div>
 
-          <label class="form-label text-secondary small fw-bold">LÝ DO HOÀN TIỀN:</label>
-          <textarea
-            class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
-            rows="3"
-            [ngModel]="refundReasonInput()"
-            (ngModelChange)="refundReasonInput.set($event)"
-          ></textarea>
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="btn btn-outline-secondary" (click)="showMusicalModal.set(false)">Hủy</button>
+            <button type="submit" class="btn btn-showman-gold fw-bold px-4">Lưu Vở Kịch</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal 2: Thêm/Sửa Nghệ Sĩ -->
+@if (showArtistModal()) {
+  <div class="admin-modal-backdrop" (click)="showArtistModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-people-fill me-2"></i> {{ isEditingArtist() ? 'CHỈNH SỬA NGHỆ SĨ' : 'THÊM NGHỆ SĨ MỚI' }}
+          </h5>
+          <button class="btn-close btn-close-white" (click)="showArtistModal.set(false)"></button>
         </div>
-        <div class="modal-footer border-secondary border-opacity-25">
-          <button type="button" class="btn btn-outline-secondary" (click)="closeRefundModal()">Đóng</button>
-          <button type="button" class="btn btn-showman-ruby fw-bold" (click)="executeRefund()">
-            XÁC NHẬN HOÀN TIỀN
-          </button>
+
+        <form [formGroup]="artistForm" (ngSubmit)="saveArtist()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Họ và tên nghệ sĩ:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="name" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Danh hiệu:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="title" placeholder="VD: NSND / NSƯT" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Vai trò đảm nhận:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="role" placeholder="VD: Giám đốc Nghệ thuật & Tổng Đạo diễn" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Link Ảnh đại diện Avatar (URL):</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="avatar" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Tiểu sử nghệ thuật:</label>
+              <textarea class="form-control bg-dark-glass text-white border-secondary border-opacity-25" rows="4" formControlName="bio"></textarea>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="btn btn-outline-secondary" (click)="showArtistModal.set(false)">Hủy</button>
+            <button type="submit" class="btn btn-showman-gold fw-bold px-4">Lưu Nghệ Sĩ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal 3: Thêm/Sửa Khán Phòng -->
+@if (showAuditoriumModal()) {
+  <div class="admin-modal-backdrop" (click)="showAuditoriumModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-building me-2"></i> {{ isEditingAuditorium() ? 'CẤU HÌNH KHÁN PHÒNG' : 'THÊM KHÁN PHÒNG MỚI' }}
+          </h5>
+          <button class="btn-close btn-close-white" (click)="showAuditoriumModal.set(false)"></button>
+        </div>
+
+        <form [formGroup]="auditoriumForm" (ngSubmit)="saveAuditorium()">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Mã khán phòng:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="code" />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label text-secondary small fw-bold">Tên khán phòng:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="name" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Tổng sức chứa (ghế):</label>
+              <input type="number" class="form-control bg-dark-glass text-gold border-secondary border-opacity-25" formControlName="totalCapacity" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label text-secondary small fw-bold">Số hàng ghế:</label>
+              <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="totalRows" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label text-secondary small fw-bold">Ghế / hàng:</label>
+              <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="seatsPerRow" />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Các hàng VIP:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="vipRows" placeholder="A, B, C" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Các hàng Standard:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="standardRows" placeholder="D, E, F, G, H, J" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-bold">Các hàng Ghế Đôi:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="coupleRows" placeholder="K, L" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Mô tả đặc điểm âm học & cơ sở vật chất:</label>
+              <textarea class="form-control bg-dark-glass text-white border-secondary border-opacity-25" rows="2" formControlName="description"></textarea>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="btn btn-outline-secondary" (click)="showAuditoriumModal.set(false)">Hủy</button>
+            <button type="submit" class="btn btn-showman-gold fw-bold px-4">Lưu Cấu Hình</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal 4: Thêm Suất Diễn -->
+@if (showScheduleModal()) {
+  <div class="admin-modal-backdrop" (click)="showScheduleModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-calendar-plus me-2"></i> MỞ SUẤT DIỄN MỚI
+          </h5>
+          <button class="btn-close btn-close-white" (click)="showScheduleModal.set(false)"></button>
+        </div>
+
+        <form [formGroup]="scheduleForm" (ngSubmit)="saveSchedule()">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Chọn Vở Kịch:</label>
+              <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="musicalSlug">
+                @for (m of musicals(); track m.slug) {
+                  <option [value]="m.slug">{{ m.title }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Ngày biểu diễn:</label>
+              <input type="date" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="performanceDate" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Giờ diễn:</label>
+              <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="time">
+                <option value="19:00">19:00</option>
+                <option value="19:30">19:30 (Khung vàng)</option>
+                <option value="20:00">20:00</option>
+                <option value="14:30">14:30 (Suất chiều)</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Khán phòng:</label>
+              <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="hall">
+                <option value="Khán Phòng Grand A - Hoàng Gia">Khán Phòng Grand A - Hoàng Gia</option>
+                <option value="Khán Phòng Blackbox - Thể Nghiệm">Khán Phòng Blackbox - Thể Nghiệm</option>
+                <option value="Phòng Thính Phòng Chamber">Phòng Thính Phòng Chamber</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="btn btn-outline-secondary" (click)="showScheduleModal.set(false)">Hủy</button>
+            <button type="submit" class="btn btn-showman-gold fw-bold px-4">Tạo Suất Chiếu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal: Chi Tiết Đơn Hàng -->
+@if (showOrderDetailModal() && selectedOrder()) {
+  <div class="admin-modal-backdrop" (click)="showOrderDetailModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-receipt me-2"></i> CHI TIẾT ĐƠN VÉ: {{ selectedOrder()!.bookingCode }}
+          </h5>
+          <button class="btn-close btn-close-white" (click)="showOrderDetailModal.set(false)"></button>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+          <div class="p-3 bg-dark-glass rounded-3 border border-secondary border-opacity-25">
+            <div class="text-white fw-bold mb-1">{{ selectedOrder()!.musicalTitle }}</div>
+            <div class="text-gold small mb-1">{{ selectedOrder()!.hall }} - {{ selectedOrder()!.performanceDate | date:'dd/MM/yyyy' }} ({{ selectedOrder()!.performanceTime }})</div>
+            <div class="text-secondary small">Mã vé QR: <strong class="text-white font-monospace">{{ selectedOrder()!.bookingCode }}</strong></div>
+          </div>
+
+          <div class="row g-2 small">
+            <div class="col-6"><span class="text-secondary">Khách hàng:</span> <strong class="text-white">{{ selectedOrder()!.customerName }}</strong></div>
+            <div class="col-6"><span class="text-secondary">Số điện thoại:</span> <strong class="text-gold">{{ selectedOrder()!.customerPhone }}</strong></div>
+            <div class="col-12"><span class="text-secondary">Email:</span> <strong class="text-white">{{ selectedOrder()!.customerEmail }}</strong></div>
+            <div class="col-6"><span class="text-secondary">Cổng thanh toán:</span> <span class="badge bg-dark">{{ selectedOrder()!.paymentMethod }}</span></div>
+            <div class="col-6"><span class="text-secondary">Tổng thanh toán:</span> <strong class="text-gold fs-6">{{ selectedOrder()!.totalPrice | number }} đ</strong></div>
+          </div>
+
+          <!-- Danh sách ghế trong đơn -->
+          <div>
+            <label class="form-label text-secondary small fw-bold mb-1">DANH SÁCH GHẾ ĐÃ ĐẶT:</label>
+            <div class="d-flex flex-wrap gap-2">
+              @for (st of selectedOrder()!.seats; track st.seatCode) {
+                <span class="badge bg-gold-subtle text-gold border border-gold-glow p-2">
+                  {{ st.seatCode }} - {{ st.type }} ({{ st.price | number }} đ)
+                </span>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end mt-4 pt-3 border-top border-secondary border-opacity-25">
+          <button type="button" class="btn btn-outline-secondary" (click)="showOrderDetailModal.set(false)">Đóng</button>
         </div>
       </div>
     </div>
   </div>
 }
 
-<!-- MODAL TẠO VOUCHER MỚI -->
-@if (showCreateVoucherModal()) {
-  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0, 0, 0, 0.75);">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content card-showman-glass border-gold-glow text-white p-2 rounded-4">
-        <div class="modal-header border-secondary border-opacity-25">
-          <h5 class="modal-title text-gold fw-bold">
-            <i class="bi bi-ticket-perforated-fill me-2"></i> TẠO MÃ GIẢM GIÁ (VOUCHER) MỚI
+<!-- Modal 6: Thêm Voucher -->
+@if (showVoucherModal()) {
+  <div class="admin-modal-backdrop" (click)="showVoucherModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-ticket-perforated-fill me-2"></i> TẠO MÃ GIẢM GIÁ MỚI
           </h5>
-          <button type="button" class="btn-close btn-close-white" (click)="showCreateVoucherModal.set(false)"></button>
+          <button class="btn-close btn-close-white" (click)="showVoucherModal.set(false)"></button>
         </div>
-        <div class="modal-body">
-          <form [formGroup]="voucherForm">
-            <div class="mb-3">
-              <label class="form-label small text-secondary fw-bold">MÃ VOUCHER (VIẾT HOA):</label>
-              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25 text-uppercase" placeholder="VD: SHOWMAN2026" formControlName="code" />
+
+        <form [formGroup]="voucherForm" (ngSubmit)="saveVoucher()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Mã Voucher (Code):</label>
+              <input type="text" class="form-control bg-dark-glass text-gold fw-bold text-uppercase border-secondary border-opacity-25" formControlName="code" placeholder="VD: SHOWMAN20" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Loại giảm giá:</label>
+              <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="discountType">
+                <option value="PERCENT">Giảm theo Phần Trăm (%)</option>
+                <option value="FIXED">Giảm Số Tiền Cố Định (đ)</option>
+              </select>
             </div>
 
-            <div class="mb-3">
-              <label class="form-label small text-secondary fw-bold">MÔ TẢ VOUCHER:</label>
-              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" placeholder="VD: Giảm 20% tri ân mùa diễn mới" formControlName="description" />
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Giá trị giảm:</label>
+              <input type="number" class="form-control bg-dark-glass text-gold border-secondary border-opacity-25" formControlName="discountValue" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Đơn tối thiểu (đ):</label>
+              <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="minOrderValue" />
             </div>
 
-            <div class="row g-2 mb-3">
-              <div class="col-6">
-                <label class="form-label small text-secondary fw-bold">LOẠI GIẢM GIÁ:</label>
-                <select class="form-select bg-dark-glass text-white border-secondary border-opacity-25" formControlName="discountType">
-                  <option value="PERCENT">Theo Phần Trăm (%)</option>
-                  <option value="FIXED">Số Tiền Cố Định (VNĐ)</option>
-                </select>
-              </div>
-              <div class="col-6">
-                <label class="form-label small text-secondary fw-bold">GIÁ TRỊ GIẢM:</label>
-                <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="discountValue" />
-              </div>
-            </div>
-
-            <div class="row g-2 mb-3">
-              <div class="col-6">
-                <label class="form-label small text-secondary fw-bold">ĐƠN TỐI THIỂU (VNĐ):</label>
-                <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="minOrderValue" />
-              </div>
-              <div class="col-6">
-                <label class="form-label small text-secondary fw-bold">GIẢM TỐI ĐA (VNĐ):</label>
-                <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="maxDiscountAmount" />
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label small text-secondary fw-bold">HẠN SỬ DỤNG:</label>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Hạn sử dụng:</label>
               <input type="date" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="validUntil" />
             </div>
-          </form>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Số lượt sử dụng tối đa:</label>
+              <input type="number" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="usageLimit" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Mô tả chương trình:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="description" placeholder="VD: Giảm 20% cho khách hàng thân thiết" />
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="btn btn-outline-secondary" (click)="showVoucherModal.set(false)">Hủy</button>
+            <button type="submit" class="btn btn-showman-gold fw-bold px-4">Tạo Voucher</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal 7: Thêm Nhân Sự RBAC -->
+@if (showStaffModal()) {
+  <div class="admin-modal-backdrop" (click)="showStaffModal.set(false)">
+    <div class="admin-modal-dialog" (click)="$event.stopPropagation()">
+      <div class="card-showman-glass p-4 rounded-4 border border-gold-glow">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="text-gold fw-bold mb-0">
+            <i class="bi bi-person-plus-fill me-2"></i> THÊM TÀI KHOẢN NHÂN SỰ MỚI
+          </h5>
+          <button class="btn-close btn-close-white" (click)="showStaffModal.set(false)"></button>
         </div>
-        <div class="modal-footer border-secondary border-opacity-25">
-          <button type="button" class="btn btn-outline-secondary" (click)="showCreateVoucherModal.set(false)">Hủy bỏ</button>
-          <button type="button" class="btn btn-showman-gold fw-bold" (click)="onSubmitNewVoucher()">
-            LƯU VÀ KÍCH HOẠT
-          </button>
-        </div>
+
+        <form [formGroup]="staffForm" (ngSubmit)="saveStaffUser()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Họ và tên nhân viên: <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="fullName" placeholder="VD: Nguyễn Văn A" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Vai trò truy cập (RBAC): <span class="text-danger">*</span></label>
+              <select class="form-select bg-dark-glass text-gold fw-bold border-secondary border-opacity-25" formControlName="role">
+                <option value="editor">Biên Tập Viên Sân Khấu (Editor - Quản lý Kịch & Nghệ Sĩ)</option>
+                <option value="staff">Nhân Viên Soát Vé & Cửa Rạp (Staff - Phân hệ Ops)</option>
+                <option value="admin">Quản Trị Viên Toàn Quyền (Admin - Toàn bộ hệ thống)</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Tên đăng nhập (Username): <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark-glass text-gold border-secondary border-opacity-25" formControlName="username" placeholder="VD: editor_hcm, staff_gate1" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Mật khẩu khởi tạo: <span class="text-danger">*</span></label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="password" placeholder="Tối thiểu 6 ký tự" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Email nội bộ: <span class="text-danger">*</span></label>
+              <input type="email" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="email" placeholder="VD: staff@nhackichthanhpho.vn" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-bold">Số điện thoại:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="phone" placeholder="VD: 0901234567" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-secondary small fw-bold">Phòng ban phụ trách:</label>
+              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="department" placeholder="VD: Tổ Trực Soát Vé Cửa Rạp / Ban Biên Tập Nghệ Thuật" />
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button type="button" class="btn btn-outline-secondary" (click)="showStaffModal.set(false)">Hủy</button>
+            <button type="submit" class="btn btn-showman-gold fw-bold px-4">Tạo Tài Khoản</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

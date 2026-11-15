@@ -5,44 +5,15 @@
 
 <app-staff-header></app-staff-header>
 
-<div class="ops-checkin-page position-relative py-4">
+<div class="ops-checkin-page position-relative py-2.5">
   <div class="stardust-container" aria-hidden="true">
     <span class="stardust-sparkle" style="top: 10%; left: 15%;">✦</span>
     <span class="stardust-sparkle" style="top: 20%; left: 85%;">✧</span>
     <span class="stardust-dot" style="top: 30%; left: 50%;"></span>
   </div>
 
-  <div class="container position-relative z-2">
-    <!-- Header Top -->
-    <div class="card-showman-glass p-3 p-md-4 rounded-4 border border-gold-glow mb-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-          <div class="d-flex align-items-center gap-2 mb-1">
-            <span class="badge badge-showman-gold px-3 py-1 rounded-pill small fw-bold">
-              <i class="bi bi-upc-scan me-1"></i> OPS PORTAL - SOÁT VÉ THỜI GIAN THỰC
-            </span>
-            <span class="badge bg-success-subtle text-success small fw-bold">
-              <span class="live-blink-dot me-1"></span> KẾT NỐI CỔNG VÉ TRỰC TIẾP
-            </span>
-          </div>
-          <h2 class="text-gold-gradient fw-black mb-0 fs-3">
-            HỆ THỐNG SOÁT VÉ ĐIỆN TỬ TẠI CỬA KHÁN PHÒNG
-          </h2>
-        </div>
+  <div class="container-fluid px-3 px-xl-4 position-relative z-2">
 
-        <div class="d-flex align-items-center gap-3 bg-dark-glass p-2 px-3 rounded-3 border border-secondary border-opacity-25">
-          <div class="checker-avatar">
-            <i class="bi bi-person-check-fill text-gold fs-5"></i>
-          </div>
-          <div>
-            <div class="text-white fw-bold small">{{ currentUser().fullName }}</div>
-            <div class="text-secondary" style="font-size: 0.75rem;">
-              Ca trực: <strong class="text-gold">Trưởng ca soát vé</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="row g-4">
       <!-- CỘT TRÁI (COL-LG-7): FORM SOÁT VÉ & MÔ PHỎNG QUÉT QR -->
@@ -177,7 +148,7 @@
         }
 
         <!-- KẾT QUẢ CHECK-IN LỖI / BÁO ĐỘNG -->
-        @if (lastErrorResult(); as error) {
+        @if (lastInvalidError(); as error) {
           <div class="card-showman-glass p-4 rounded-4 border border-danger checkin-error-card animate-fade-in mb-4">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <div class="d-flex align-items-center gap-3">
@@ -203,10 +174,6 @@
                   @if (error.details.checkedInAt) {
                     <div>Lịch sử quét trước: <strong class="text-warning">{{ error.details.checkedInAt | date:'HH:mm:ss dd/MM/yyyy' }}</strong></div>
                     <div>Người soát trước: <strong class="text-light">{{ error.details.checkedInBy || 'Cổng tự động' }}</strong></div>
-                  }
-                  @if (error.details.refundInfo) {
-                    <div>Vé đã hủy lúc: <strong class="text-danger">{{ error.details.refundInfo.refundedAt | date:'HH:mm:ss dd/MM/yyyy' }}</strong></div>
-                    <div>Lý do hủy: <strong class="text-light">{{ error.details.refundInfo.refundReason }}</strong></div>
                   }
                 </div>
               }

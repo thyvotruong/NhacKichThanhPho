@@ -12,11 +12,12 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MusicalService } from '../../services/musical.service';
 import { Seat, Schedule, BookedSeat } from '../../models/musical.model';
+import { SeatMapComponent } from '../seat-map/seat-map.component';
 
 @Component({
   selector: 'app-seat-selection',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe],
+  imports: [CommonModule, RouterLink, DatePipe, SeatMapComponent],
   templateUrl: './seat-selection.component.html',
   styleUrls: ['./seat-selection.component.css']
 })
@@ -28,10 +29,10 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   scheduleId = signal<string>('');
   scheduleInfo = signal<any>(null);
   seats = signal<Seat[]>([]);
-  activeFloor = signal<'Tầng Trệt' | 'Tầng Lầu'>('Tầng Trệt');
 
   // Danh sách ghế khách đang chọn
   selectedSeats = signal<Seat[]>([]);
+  selectedSeatCodes = computed(() => this.selectedSeats().map(seat => seat.seatCode));
 
   // Cảnh báo tính khả dụng của ghế (BPMN 2.2.3 Bước 6)
   seatWarning = signal<string | null>(null);
@@ -44,16 +45,6 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
   // Tổng tiền tạm tính
   totalSeatPrice = computed(() => {
     return this.selectedSeats().reduce((sum, s) => sum + s.price, 0);
-  });
-
-  // Phân chia ghế theo hàng
-  filteredSeatsByFloor = computed(() => {
-    return this.seats().filter(s => s.floor === this.activeFloor());
-  });
-
-  uniqueRows = computed(() => {
-    const rows = this.filteredSeatsByFloor().map(s => s.row);
-    return Array.from(new Set(rows)).sort();
   });
 
   ngOnInit(): void {
@@ -151,12 +142,6 @@ private generateFallbackSeats(scheduleId: string): any[] {
 
   return generated;
 }
-
-  getSeatsInRow(row: string): Seat[] {
-    return this.filteredSeatsByFloor()
-      .filter(s => s.row === row)
-      .sort((a, b) => a.number - b.number);
-  }
 
   toggleSeat(seat: Seat): void {
     this.seatWarning.set(null);

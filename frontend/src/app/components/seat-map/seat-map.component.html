@@ -1,0 +1,82 @@
+<div class="seat-map">
+  <div class="stage-display text-center py-2 mb-4 rounded-pill">
+    SÂN KHẤU BIỂU DIỄN CHÍNH
+  </div>
+
+  <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+    @for (floor of availableFloors(); track floor) {
+      <button
+        type="button"
+        class="btn seat-floor-btn rounded-pill px-4 py-2 fw-bold"
+        [class.btn-showman-gold]="visibleFloor() === floor"
+        [class.btn-showman-outline]="visibleFloor() !== floor"
+        [attr.aria-pressed]="visibleFloor() === floor"
+        (click)="activeFloor.set(floor)"
+      >
+        {{ floorLabel(floor) }}
+      </button>
+    }
+  </div>
+
+  <div class="seat-legend-bar d-flex flex-wrap justify-content-center gap-3 gap-md-4 py-3 px-4 rounded-3 mb-4">
+    @for (summary of seatTypeSummaries(); track summary.type) {
+      <div class="d-flex align-items-center gap-2">
+        <div class="seat-sample" [ngClass]="summary.sampleClass"></div>
+        <span>
+          {{ summary.label }}
+          ({{ summary.minPrice | number:'1.0-0' }}@if (summary.minPrice !== summary.maxPrice) { - {{ summary.maxPrice | number:'1.0-0' }} } đ)
+        </span>
+      </div>
+    }
+    <div class="d-flex align-items-center gap-2">
+      <div class="seat-sample seat-selected"></div>
+      <span>Đang Chọn</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="seat-sample seat-booked"></div>
+      <span>Đã Bán</span>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <div class="seat-sample seat-locked"></div>
+      <span>Đã khóa</span>
+    </div>
+  </div>
+
+  <div class="seat-map-viewport overflow-auto text-center py-2">
+    <div class="d-inline-flex flex-column gap-3 min-w-seatmap">
+      @for (rowName of uniqueRows(); track rowName) {
+        <div class="d-flex align-items-center justify-content-center gap-2">
+          <span class="row-label fw-bold me-2">{{ rowName }}</span>
+          <div class="d-flex gap-2">
+            @for (seat of getSeatsInRow(rowName); track seat.seatCode) {
+              <button
+                type="button"
+                class="seat-btn"
+                [class.seat-btn-vip]="seat.type === 'VIP'"
+                [class.seat-btn-standard]="seat.type === 'Standard'"
+                [class.seat-btn-couple]="seat.type === 'Couple'"
+                [class.seat-btn-selected]="isSelected(seat.seatCode)"
+                [class.seat-btn-booked]="seat.status === 'booked'"
+                [class.seat-btn-locked]="seat.status === 'locked'"
+                [disabled]="isDisabled(seat)"
+                [attr.aria-label]="seat.seatCode + ', ' + seat.type + ', ' + (seat.price | number:'1.0-0') + ' đồng, ' + seat.status"
+                [title]="seat.seatCode + ' - ' + seat.type + ' (' + (seat.price | number:'1.0-0') + ' đ)' + (seat.lockedReason ? ' [' + seat.lockedReason + ']' : '')"
+                (click)="selectSeat(seat)"
+              >
+                @if (seat.status === 'locked') {
+                  <i class="bi bi-lock-fill seat-mark"></i>
+                } @else if (seat.status === 'booked') {
+                  <span class="seat-mark">✕</span>
+                } @else {
+                  <span class="seat-number">{{ seat.number }}</span>
+                }
+                <span class="seat-price">{{ seat.price | number:'1.0-0' }} đ</span>
+              </button>
+            }
+          </div>
+          <span class="row-label fw-bold ms-2">{{ rowName }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

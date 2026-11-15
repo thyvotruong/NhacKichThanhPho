@@ -1,63 +1,255 @@
 /**
  * ============================================================
- * NHẠC KỊCH THÀNH PHỐ - ADMIN PORTAL STYLES
- * Phong cách: The Greatest Showman (100% Montserrat)
+ * NHẠC KỊCH THÀNH PHỐ - ADMIN PORTAL STYLES (ENTERPRISE UX)
+ * Tinh chỉnh: Tối ưu không gian làm việc (Maximize Workspace),
+ * Triệt tiêu viền lồng viền (Anti-Visual Clutter), Tăng mật độ dữ liệu (High-Density).
+ * Phong cách: The Greatest Showman (Deep Midnight Blue & Gold Glow)
  * ============================================================
  */
 
 .admin-portal-page {
-  min-height: calc(100vh - 160px);
-  background: radial-gradient(circle at 50% 10%, #151d33 0%, var(--showman-canvas-night) 70%);
+  min-height: calc(100vh - 60px);
+  background: radial-gradient(circle at 50% 10%, #151d33 0%, #070a12 70%);
 }
 
-.user-avatar-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid var(--showman-gold);
+/* ============================================================
+   1. ADMIN TAB STRIP (Thanh Tab ngang gọn gàng)
+   ============================================================ */
+.admin-tab-strip {
   display: flex;
+  gap: 0.35rem;
   align-items: center;
-  justify-content: center;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.admin-tab-strip::-webkit-scrollbar {
+  height: 4px;
+}
+.admin-tab-strip::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
 }
 
 .admin-tab-btn {
-  background: rgba(14, 22, 41, 0.7);
+  background: rgba(14, 22, 41, 0.6);
   color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.5rem 1.25rem;
-  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
   font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.25s ease;
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
 }
 
 .admin-tab-btn:hover {
-  color: var(--showman-gold);
-  border-color: var(--showman-gold);
+  color: var(--showman-gold, #f59e0b);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
 }
 
 .admin-tab-btn.active {
-  background: linear-gradient(135deg, var(--showman-gold) 0%, #D97706 100%);
-  color: #070A12;
-  border-color: var(--showman-gold);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--showman-gold, #f59e0b);
+  border: 1px solid var(--showman-gold, #f59e0b);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+  font-weight: 700;
 }
 
-.kpi-card {
+/* ============================================================
+   2. WORKSPACE PANEL & UNIFIED TOOLBAR (Không gian làm việc phẳng)
+   ============================================================ */
+.admin-workspace-panel {
+  background: rgba(13, 19, 33, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.workspace-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.workspace-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--showman-gold, #f59e0b);
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.workspace-search {
+  width: 240px;
+}
+
+.workspace-filter {
+  width: 175px;
+}
+
+@media (max-width: 768px) {
+  .workspace-search, .workspace-filter {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   3. HIGH-DENSITY ENTERPRISE TABLE (Bảng dữ liệu thanh thoát)
+   ============================================================ */
+.showman-table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(245, 158, 11, 0.04);
+}
+
+.showman-table th {
+  background: rgba(7, 10, 18, 0.95);
+  color: #f59e0b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 0.65rem 0.85rem;
+  white-space: nowrap;
+}
+
+.showman-table td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: middle;
+  font-size: 0.84rem;
+}
+
+.table-poster-thumb {
+  width: 44px;
+  height: 58px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.table-poster-thumb:hover {
+  transform: scale(1.08);
+  border-color: var(--showman-gold, #f59e0b);
+}
+
+/* Action Icon Buttons */
+.btn-action-icon {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+  color: #94a3b8;
+}
+
+.btn-action-icon:hover {
+  transform: translateY(-1px);
+}
+
+.btn-action-icon.action-edit:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.btn-action-icon.action-toggle:hover {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: #06b6d4;
+  color: #06b6d4;
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+}
+
+.btn-action-icon.action-delete:hover {
+  background: rgba(225, 29, 72, 0.15);
+  border-color: #e11d48;
+  color: #e11d48;
+  box-shadow: 0 0 8px rgba(225, 29, 72, 0.3);
+}
+
+.btn-action-icon.action-view:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================================
+   4. ARTIST CARD GRID (Thẻ nghệ sĩ gọn gàng)
+   ============================================================ */
+.artist-admin-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.25s ease;
+}
+
+.artist-admin-card:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(15, 23, 42, 0.85);
+  transform: translateY(-2px);
+}
+
+.artist-avatar-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(245, 158, 11, 0.4);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================================
+   5. STAT CARDS (Dashboard tối giản)
+   ============================================================ */
+.stat-card {
   background: rgba(14, 22, 41, 0.85);
   backdrop-filter: blur(12px);
-  transition: transform 0.25s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.kpi-card:hover {
-  transform: translateY(-4px);
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.12);
 }
 
-.kpi-icon-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+.stat-icon-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,114 +263,298 @@
   background: rgba(190, 18, 60, 0.15);
 }
 
-.bg-sapphire-subtle {
+.bg-primary-subtle {
   background: rgba(37, 99, 235, 0.15);
 }
 
-.bg-success-subtle {
-  background: rgba(16, 185, 129, 0.15);
+.bg-info-subtle {
+  background: rgba(6, 182, 212, 0.15);
 }
 
-.seat-dot {
+/* ============================================================
+   6. SEAT MAP & AUDITORIUM
+   ============================================================ */
+.preview-seat-dot {
   width: 14px;
   height: 14px;
-  border-radius: 4px;
+  border-radius: 3px;
   display: inline-block;
 }
 
-.seat-available {
-  background: #1E293B;
-  border: 1px solid #475569;
+.preview-seat-dot.seat-vip {
+  background: #f59e0b;
+  box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
 }
 
-.seat-locked {
-  background: #991B1B;
-  border: 1px solid #EF4444;
+.preview-seat-dot.seat-std {
+  background: #2563eb;
 }
 
-.seat-booked {
-  background: #334155;
-  opacity: 0.5;
+.preview-seat-dot.seat-couple {
+  background: #be123c;
+  width: 22px;
 }
 
-.seat-admin-selected {
-  background: var(--showman-gold);
-  border: 1px solid #FFFFFF;
+.legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
 }
 
-.stage-bar {
-  max-width: 500px;
-  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.3), transparent);
-  border-top: 2px solid var(--showman-gold);
+.mini-stage-banner, .stage-display {
+  background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.25) 0%, rgba(7, 10, 18, 0.8) 80%);
   letter-spacing: 2px;
-  font-size: 0.85rem;
 }
 
-.seat-grid-container {
-  display: grid;
-  grid-template-columns: repeat(10, minmax(28px, 1fr));
-  gap: 8px;
-  max-width: 550px;
-}
-
-.seat-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
+/* ============================================================
+   7. MODALS
+   ============================================================ */
+.admin-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(3, 7, 18, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1060;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border: none;
+  padding: 1rem;
 }
 
-.seat-btn-available {
-  background: #1E293B;
-  color: #94A3B8;
-  border: 1px solid #475569;
+.admin-modal-dialog {
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalFadeIn 0.25s ease-out;
 }
 
-.seat-btn-available:hover {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--showman-gold);
-  border-color: var(--showman-gold);
-}
-
-.seat-btn-locked {
-  background: #991B1B;
-  color: #FFFFFF;
-  border: 1px solid #EF4444;
-}
-
-.seat-btn-booked {
-  background: #1E2230;
-  color: #475569;
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-.seat-btn-selected {
-  background: var(--showman-gold) !important;
-  color: #070A12 !important;
-  border: 2px solid #FFFFFF !important;
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.35s ease-out;
-}
-
-@keyframes fadeIn {
+@keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: scale(0.95) translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.transition-all {
+  transition: all 0.2s ease;
+}
+
+.letter-spacing-1 {
+  letter-spacing: 1px;
+}
+
+/* Admin typography and surfaces */
+.admin-portal-page {
+  color: #f8fafc;
+  background: linear-gradient(180deg, #10182a 0%, #080c16 34rem, #070a12 100%);
+  padding-top: 1.5rem !important;
+}
+
+.admin-portal-page .text-secondary,
+.admin-portal-page .text-muted,
+.admin-modal-backdrop .text-secondary,
+.admin-modal-backdrop .text-muted {
+  color: #cbd5e1 !important;
+}
+
+.admin-portal-page .text-success,
+.admin-modal-backdrop .text-success {
+  color: #86efac !important;
+}
+
+.admin-portal-page .text-info,
+.admin-modal-backdrop .text-info {
+  color: #67e8f9 !important;
+}
+
+.admin-portal-page .text-warning,
+.admin-modal-backdrop .text-warning {
+  color: #fde68a !important;
+}
+
+.admin-portal-page .text-danger,
+.admin-modal-backdrop .text-danger {
+  color: #fda4af !important;
+}
+
+.admin-portal-page .small,
+.admin-portal-page small,
+.admin-modal-backdrop .small,
+.admin-modal-backdrop small {
+  font-size: 1rem !important;
+}
+
+.admin-portal-page [style*="font-size"],
+.admin-modal-backdrop [style*="font-size"] {
+  font-size: 1rem !important;
+}
+
+.admin-portal-page .btn-sm,
+.admin-modal-backdrop .btn-sm {
+  font-size: 1rem;
+}
+
+.admin-tab-strip {
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  background: rgba(14, 22, 41, 0.82);
+  scrollbar-color: rgba(245, 158, 11, 0.4) transparent;
+}
+
+.admin-tab-btn {
+  min-height: 42px;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 0.65rem;
+  color: #cbd5e1;
+  font-size: 1rem;
+}
+
+.admin-tab-btn:hover,
+.admin-tab-btn.active {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.12);
+  border: 0;
+  box-shadow: none;
+}
+
+.admin-portal-page .card-showman-glass,
+.admin-workspace-panel {
+  background: #101827;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: none;
+}
+
+.admin-workspace-panel {
+  padding: 1.5rem;
+}
+
+.workspace-title,
+.dashboard-section-title {
+  color: #fde68a;
+  font-size: 1.2rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dashboard-heading h1 {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+}
+
+.dashboard-heading p {
+  font-size: 1rem;
+}
+
+.stat-card {
+  height: 100%;
+  padding: 1.5rem !important;
+  background: #101827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.28);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.stat-value {
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.admin-portal-page .showman-table th {
+  color: #fde68a;
+  font-size: 0.95rem;
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+}
+
+.admin-portal-page .showman-table td {
+  color: #f1f5f9;
+  font-size: 1rem;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.admin-portal-page .form-label {
+  color: #e2e8f0 !important;
+  font-size: 1rem;
+}
+
+.admin-portal-page .form-control,
+.admin-portal-page .form-select,
+.admin-modal-backdrop .form-control,
+.admin-modal-backdrop .form-select {
+  min-height: 44px;
+  font-size: 1rem;
+}
+
+.lock-schedule-filters {
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.9rem;
+  background: rgba(7, 10, 18, 0.38);
+}
+
+.lock-schedule-filters .form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.lock-schedule-filters .form-select:disabled {
+  color: #94a3b8 !important;
+  background-color: #111827;
+  opacity: 0.72;
+}
+
+.lock-seat-empty-state {
+  border: 1px dashed rgba(245, 158, 11, 0.3);
+  border-radius: 0.9rem;
+  color: #cbd5e1;
+  background: rgba(7, 10, 18, 0.28);
+}
+
+.admin-portal-page .workspace-toolbar {
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 767.98px) {
+  .admin-tab-strip {
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+  }
+
+  .admin-workspace-panel {
+    padding: 1rem;
+  }
+
+  .admin-portal-page .card-showman-glass {
+    padding: 1.25rem !important;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
   }
 }

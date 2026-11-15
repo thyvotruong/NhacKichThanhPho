@@ -143,7 +143,7 @@ export class MyTicketsComponent implements OnInit {
     </section>
     <h2>Ghế đã đặt</h2>
     <ul>${seats}</ul>
-    <p class="notice">Vui lòng lưu vé điện tử và xuất trình mã vé khi đến nhà hát. Vé đã mua không hỗ trợ hủy hoặc hoàn tiền.</p>
+    <p class="notice">Vui lòng lưu vé điện tử và xuất trình mã vé khi đến nhà hát. Vé đã thanh toán không thể đổi, trả, hủy hoặc hoàn tiền.</p>
   </main>
 </body>
 </html>`;

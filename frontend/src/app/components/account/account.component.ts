@@ -6,7 +6,7 @@
  * Bao gồm các mục con:
  * 1. Thông tin cá nhân & Cập nhật hồ sơ
  * 2. Đổi mật khẩu bảo mật
- * 3. [Mục con] Vé của tôi (Lịch sử đặt vé, mã QR, in vé, hủy vé hoàn tiền)
+ * 3. [Mục con] Vé của tôi (Lịch sử đặt vé, mã QR và tải vé)
  * BẮT BUỘC ĐÃ ĐĂNG NHẬP MỚI ĐƯỢC PHÉP TRUY CẬP (Bảo vệ bởi AuthGuard)
  * ============================================================
  */

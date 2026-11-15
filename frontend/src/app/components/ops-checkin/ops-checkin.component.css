@@ -1,116 +1,192 @@
 /**
  * ============================================================
- * NHẠC KỊCH THÀNH PHỐ - OPS CHECK-IN PORTAL STYLES
- * Phong cách: The Greatest Showman (100% Montserrat)
+ * NHẠC KỊCH THÀNH PHỐ - OPS PORTAL STYLES
+ * Phong cách: The Greatest Showman (Deep Midnight Blue & Gold Glow)
  * ============================================================
  */
 
 .ops-checkin-page {
-  min-height: calc(100vh - 160px);
-  background: radial-gradient(circle at 50% 10%, #151d33 0%, var(--showman-canvas-night) 70%);
+  min-height: calc(100vh - 60px);
+  background: radial-gradient(circle at 50% 10%, #151d33 0%, #070a12 70%);
 }
 
 .checker-avatar {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: rgba(245, 158, 11, 0.15);
-  border: 1px solid var(--showman-gold);
+  border: 1.5px solid #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ops-tab-btn {
+  background: rgba(14, 22, 41, 0.6);
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+}
+
+.ops-tab-btn:hover {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.ops-tab-btn.active {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+  font-weight: 700;
+}
+
+/* Stat Cards */
+.stat-card {
+  background: rgba(14, 22, 41, 0.85);
+  backdrop-filter: blur(12px);
+  transition: transform 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-gold-subtle {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.bg-success-subtle {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.bg-info-subtle {
+  background: rgba(6, 182, 212, 0.15);
+}
+
+/* 3 MÀU KẾT QUẢ SOÁT VÉ */
+.checkin-result-card {
+  animation: resultSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes resultSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 🟢 HỢP LỆ */
+.result-valid {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.6) 0%, rgba(4, 30, 24, 0.8) 100%);
+  border-color: #10b981 !important;
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+}
+
+.badge-valid {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.2);
+  border: 2px solid #10b981;
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🟡 TRÙNG LẶP */
+.result-duplicate {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.6) 0%, rgba(45, 20, 5, 0.8) 100%);
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.3);
+}
+
+.badge-warning-custom {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.2);
+  border: 2px solid #f59e0b;
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🔴 KHÔNG HỢP LỆ / ĐÃ HỦY */
+.result-invalid {
+  background: linear-gradient(135deg, rgba(127, 29, 29, 0.6) 0%, rgba(45, 10, 10, 0.8) 100%);
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+}
+
+.badge-danger-custom {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.2);
+  border: 2px solid #ef4444;
+  color: #f87171;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .live-blink-dot {
+  display: inline-block;
   width: 8px;
   height: 8px;
+  background-color: #10b981;
   border-radius: 50%;
-  background: #10B981;
-  display: inline-block;
-  box-shadow: 0 0 8px #10B981;
-  animation: liveBlink 1.5s infinite ease-in-out;
+  animation: blinkLive 1.5s infinite ease-in-out;
 }
 
-@keyframes liveBlink {
+@keyframes blinkLive {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.showman-table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: rgba(245, 158, 11, 0.05);
+}
+
+.showman-table th {
+  background: rgba(7, 10, 18, 0.95);
+  color: #f59e0b;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(245, 158, 11, 0.3);
+  padding: 0.85rem 1rem;
+}
+
+.showman-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: middle;
 }
 
 .letter-spacing-1 {
-  letter-spacing: 1.5px;
-}
-
-.sample-ticket-pill {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #E2E8F0;
-  transition: all 0.2s ease;
-}
-
-.sample-ticket-pill:hover {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--showman-gold);
-  border-color: var(--showman-gold);
-}
-
-.pill-confirmed {
-  border-left: 3px solid #10B981;
-}
-
-.pill-checked {
-  border-left: 3px solid #3B82F6;
-  opacity: 0.7;
-}
-
-.pill-cancelled {
-  border-left: 3px solid #EF4444;
-  opacity: 0.7;
-}
-
-.success-icon-badge {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
-  background: #10B981;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.error-icon-badge {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
-  background: #EF4444;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.checkin-success-card {
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
-}
-
-.checkin-error-card {
-  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
-}
-
-.recent-checkins-list {
-  max-height: 480px;
-  overflow-y: auto;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  letter-spacing: 1px;
 }

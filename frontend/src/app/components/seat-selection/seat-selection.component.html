@@ -55,97 +55,11 @@
 
     <!-- KHU VỰC SƠ ĐỒ SÂN KHẤU & GHẾ -->
     <div class="card card-showman-glass rounded-4 p-4 mb-4">
-      
-
-      <!-- BỘ CHUYỂN TẦNG: TẦNG TRỆT & TẦNG LẦU -->
-      <div class="d-flex justify-content-center gap-2 mb-4">
-        <button
-          class="btn btn-sm rounded-pill px-4 py-2 fw-bold"
-          [class.btn-showman-gold]="activeFloor() === 'Tầng Trệt'"
-          [class.btn-showman-outline]="activeFloor() !== 'Tầng Trệt'"
-          (click)="activeFloor.set('Tầng Trệt')"
-        >
-          TẦNG TRỆT (STALLS)
-        </button>
-        <button
-          class="btn btn-sm rounded-pill px-4 py-2 fw-bold"
-          [class.btn-showman-gold]="activeFloor() === 'Tầng Lầu'"
-          [class.btn-showman-outline]="activeFloor() !== 'Tầng Lầu'"
-          (click)="activeFloor.set('Tầng Lầu')"
-        >
-          TẦNG LẦU (BALCONY)
-        </button>
-      </div>
-
-      <!-- CHÚ THÍCH PHÂN LOẠI GHẾ & TRẠNG THÁI -->
-      <div class="seat-legend-bar d-flex flex-wrap justify-content-center gap-3 gap-md-4 py-3 px-4 rounded-3 mb-5">
-        <div class="d-flex align-items-center gap-2">
-          <div class="seat-sample seat-vip"></div>
-          <span class="small text-white">VIP (800k - 950k)</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <div class="seat-sample seat-standard"></div>
-          <span class="small text-white">Thường (450k - 500k)</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <div class="seat-sample seat-couple"></div>
-          <span class="small text-white">Ghế Đôi Sweetbox (1.200k)</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <div class="seat-sample seat-selected"></div>
-          <span class="small text-gold-glow fw-bold">Đang Chọn</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <div class="seat-sample seat-booked"></div>
-          <span class="small text-white">Đã Bán</span>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-          <div class="seat-sample seat-locked"></div>
-          <span class="small text-ruby-glow">Đã khóa</span>
-        </div>
-      </div>
-
-      <!-- MA TRẬN GHẾ NGỒI THEO HÀNG (SEAT GRID) -->
-      <div class="seat-map-viewport overflow-auto text-center py-2">
-        <div class="d-inline-flex flex-column gap-3 min-w-seatmap">
-          @for (rowName of uniqueRows(); track rowName) {
-            <div class="d-flex align-items-center justify-content-center gap-2">
-              <!-- Nhãn hàng bên trái -->
-              <span class="row-label fw-bold me-2">{{ rowName }}</span>
-
-              <!-- Danh sách ghế trong hàng -->
-              <div class="d-flex gap-2">
-                @for (seat of getSeatsInRow(rowName); track seat.seatCode) {
-                  <button
-                    class="seat-btn"
-                    [class.seat-btn-vip]="seat.type === 'VIP'"
-                    [class.seat-btn-standard]="seat.type === 'Standard'"
-                    [class.seat-btn-couple]="seat.type === 'Couple'"
-                    [class.seat-btn-selected]="isSelected(seat.seatCode)"
-                    [class.seat-btn-booked]="seat.status === 'booked'"
-                    [class.seat-btn-locked]="seat.status === 'locked'"
-                    [disabled]="seat.status === 'booked' || seat.status === 'locked'"
-                    (click)="toggleSeat(seat)"
-                    [title]="seat.seatCode + ' - ' + seat.type + ' (' + (seat.price | number:'1.0-0') + ' đ)' + (seat.lockedReason ? ' [' + seat.lockedReason + ']' : '')"
-                  >
-                    @if (seat.status === 'locked') {
-                      <i class="bi bi-lock-fill seat-mark"></i>
-                    } @else if (seat.status === 'booked') {
-                      <span class="seat-mark">✕</span>
-                    } @else {
-                      <span class="seat-number">{{ seat.number }}</span>
-                    }
-                    <span class="seat-price">{{ seat.price | number:'1.0-0' }} đ</span>
-                  </button>
-                }
-              </div>
-
-              <!-- Nhãn hàng bên phải -->
-              <span class="row-label fw-bold ms-2">{{ rowName }}</span>
-            </div>
-          }
-        </div>
-      </div>
+      <app-seat-map
+        [seats]="seats()"
+        [selectedSeatCodes]="selectedSeatCodes()"
+        (seatClick)="toggleSeat($event)"
+      ></app-seat-map>
     </div>
 
     <!-- THANH TỔNG HỢP VÉ NỔI DƯỚI ĐÁY (STICKY FLOATING SUMMARY BAR) -->

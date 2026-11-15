@@ -215,58 +215,27 @@
         }
 
         <!-- ==========================================
-             MỤC 5: CHÍNH SÁCH ĐỔI/HỦY VÉ & HOÀN TIỀN (REFUND POLICY)
+             MỤC 5: CHÍNH SÁCH VÉ KHÔNG ĐỔI TRẢ
              ========================================== -->
-        @if (activeSection() === 'refund') {
+        @if (activeSection() === 'tickets') {
           <div class="card card-showman-glass rounded-4 p-4 p-lg-5 border border-gold-glow animate-fade-in">
             <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom border-secondary border-opacity-25">
               <div class="policy-icon-badge">
-                <i class="bi bi-arrow-counterclockwise text-gold fs-3"></i>
+                <i class="bi bi-ticket-perforated text-gold fs-3"></i>
               </div>
               <div>
-               
-                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">CHÍNH SÁCH ĐỔI, HỦY VÉ & HOÀN TIỀN</h2>
+                <h2 class="text-gold-gradient fw-bold fs-4 mb-0">CHÍNH SÁCH VÉ KHÔNG ĐỔI, TRẢ</h2>
               </div>
             </div>
 
-            <p class="text-secondary small leading-relaxed mb-3">
-              Nhà hát áp dụng chính sách đổi và hoàn hủy vé linh hoạt, minh bạch dựa trên thời điểm tiếp nhận yêu cầu so với giờ bắt đầu của suất diễn ghi trên vé:
+            <p class="text-white fs-5 fw-semibold leading-relaxed mb-3">
+              Vé đã thanh toán không thể đổi, trả, hủy hoặc hoàn tiền.
             </p>
 
-            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">1. Các Mốc Thời Gian & Tỷ Lệ Hoàn Tiền Vé</h3>
-            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-2 policy-bullet-list">
-              <li>
-                <strong>Hủy trước thời điểm diễn trên > 24 Giờ:</strong><br />
-                Khách hàng được <span class="text-success fw-bold">hoàn trả 90%</span> tổng giá trị vé đã thanh toán. Nhà hát thu khoản phí xử lý hủy giữ chỗ là 10%.
-              </li>
-              <li>
-                <strong>Hủy trong khoảng từ 12 Giờ đến 24 Giờ:</strong><br />
-                Khách hàng được <span class="text-warning fw-bold">hoàn trả 70%</span> tổng giá trị vé đã thanh toán. Khoản phí hủy vé là 30% nhằm bù đắp chi phí phát sinh khi mở bán lại ghế sát giờ diễn.
-              </li>
-              <li>
-                <strong>Hủy dưới &lt; 12 Giờ so với giờ biểu diễn:</strong><br />
-                <span class="text-danger fw-bold">Không áp dụng hoàn hủy vé (0%)</span>. Vào thời điểm này, danh sách khán phòng và công tác tiếp đón đã được chốt hoàn toàn để chuẩn bị lên đèn sân khấu.
-              </li>
-            </ul>
-
-            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">2. Điều Kiện & Quy Định Đổi Suất Diễn</h3>
-            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
-              <li>Khách hàng được hỗ trợ đổi vé sang một suất diễn khác của cùng vở kịch nếu gửi yêu cầu <strong>trước giờ diễn tối thiểu 24 giờ</strong> (tùy thuộc vào tình trạng ghế trống của suất diễn mới).</li>
-              <li>Nếu chọn vị trí ghế có giá cao hơn, khách hàng thanh toán thêm phần chênh lệch. Nếu chọn ghế có giá thấp hơn, nhà hát không hoàn trả phần chênh lệch giá vé.</li>
-              <li>Mỗi vé xem kịch chỉ được hỗ trợ chuyển đổi suất diễn tối đa 01 lần duy nhất.</li>
-            </ul>
-
-            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">3. Trường Hợp Bất Khả Kháng (Hủy Do Nhà Hát)</h3>
-            <ul class="text-secondary small leading-relaxed mb-3 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
-              <li>Trong các trường hợp bất khả kháng (thiên tai, dịch bệnh, sự cố kỹ thuật sân khấu hoặc diễn viên chính gặp lý do sức khỏe đột xuất), nhà hát sẽ thông báo dời lịch hoặc hủy suất diễn qua Email và Tin nhắn SMS.</li>
-              <li>Khách hàng sẽ được lựa chọn: Đổi sang suất biểu diễn thay thế hoặc nhận <span class="text-gold fw-bold">hoàn lại 100% tiền vé</span> trong vòng 48 giờ mà không phải chịu bất kỳ khoản phí nào.</li>
-            </ul>
-
-            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">4. Hình Thức & Thời Gian Hoàn Tiền Thực Tế</h3>
+            <h3 class="text-white fw-bold fs-5 mb-2 mt-4">Trước khi thanh toán</h3>
             <ul class="text-secondary small leading-relaxed mb-0 ps-3 d-flex flex-column gap-1.5 policy-bullet-list">
-              <li>Thao tác hủy vé được thực hiện trực tiếp tại mục <strong>Vé Của Tôi</strong> bằng Mã đặt vé (Booking Code) và Số điện thoại đặt vé.</li>
-              <li>Số tiền hoàn sẽ được hệ thống chuyển khoản tự động về đúng tài khoản ngân hàng hoặc ví điện tử (VietQR, VNPAY, MoMo, ZaloPay) mà quý khách đã dùng để thanh toán ban đầu.</li>
-              <li>Thời gian nhận tiền hoàn từ <strong>3 - 5 ngày làm việc</strong> tùy thuộc vào ngân hàng thụ hưởng của quý khách.</li>
+              <li>Vui lòng kiểm tra kỹ tên vở diễn, ngày giờ, địa điểm, hạng ghế và số lượng vé trước khi xác nhận giao dịch.</li>
+              <li>Sau khi thanh toán thành công, thông tin suất diễn và ghế trên vé được cố định; nhà hát không tiếp nhận yêu cầu đổi hoặc trả vé.</li>
             </ul>
           </div>
         }

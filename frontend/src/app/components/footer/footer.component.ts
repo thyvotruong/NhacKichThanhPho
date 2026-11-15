@@ -49,7 +49,7 @@ import { RouterLink } from '@angular/router';
               <li><a routerLink="/policy" [queryParams]="{ tab: 'pricing' }" class="text-decoration-none footer-link">2. Chính sách giá dịch vụ</a></li>
               <li><a routerLink="/policy" [queryParams]="{ tab: 'payment' }" class="text-decoration-none footer-link">3. Chính sách thanh toán</a></li>
               <li><a routerLink="/policy" [queryParams]="{ tab: 'terms' }" class="text-decoration-none footer-link">4. Điều khoản & Quy định sử dụng</a></li>
-              <li><a routerLink="/policy" [queryParams]="{ tab: 'refund' }" class="text-decoration-none footer-link">5. Chính sách đổi/hủy vé & hoàn tiền</a></li>
+              <li><a routerLink="/policy" [queryParams]="{ tab: 'tickets' }" class="text-decoration-none footer-link">5. Chính sách vé không đổi trả</a></li>
             </ul>
           </div>
 

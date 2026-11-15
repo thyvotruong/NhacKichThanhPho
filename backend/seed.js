@@ -438,7 +438,7 @@ async function seedDatabase() {
     // Khởi tạo một số vé mẫu để test:
     // 1 vé CHƯA DÙNG (hợp lệ để nhân viên soát vé quét Check-in)
     // 1 vé ĐÃ SỬ DỤNG (để test cảnh báo trùng vé)
-    // 1 vé ĐÃ HỦY (để test tính năng hoàn tiền)
+    // Sample bookings for active and checked-in tickets.
     const firstSchedule = createdSchedules[0];
     const sampleBookings = [
       {
@@ -496,35 +496,6 @@ async function seedDatabase() {
           gate: 'Cửa Chính Khán Phòng A'
         }
       },
-      {
-        bookingCode: 'NK-20261102-CNCLD',
-        musicalId: firstSchedule.musicalId,
-        musicalTitle: firstSchedule.musicalTitle,
-        musicalSlug: firstSchedule.musicalSlug,
-        scheduleId: firstSchedule._id,
-        performanceDate: firstSchedule.performanceDate,
-        performanceTime: firstSchedule.time,
-        venue: firstSchedule.venue,
-        hall: firstSchedule.hall,
-        customerName: 'Hoàng Nam',
-        customerEmail: 'hoangnam@gmail.com',
-        customerPhone: '0933222111',
-        seats: [{ seatCode: 'D08', floor: 'Tầng Trệt', row: 'D', number: 8, type: 'Standard', price: 450000 }],
-        quantity: 1,
-        subtotal: 450000,
-        voucherCode: null,
-        discountAmount: 0,
-        totalPrice: 450000,
-        paymentMethod: 'MOMO',
-        paymentStatus: 'REFUNDED',
-        bookingStatus: 'CANCELLED',
-        refundInfo: {
-          refundedAt: new Date(),
-          refundAmount: 405000, // Hoàn 90% theo quy định hủy trước 48h
-          refundFee: 45000,
-          refundReason: 'Khách bận công tác đột xuất'
-        }
-      }
     ];
 
     await Booking.insertMany(sampleBookings);

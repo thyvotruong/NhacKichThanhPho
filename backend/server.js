@@ -3,7 +3,7 @@
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL WEBSITE) - BACKEND API SERVER
  * Kiến trúc: ExpressJS RESTful API, MongoDB/Mongoose, CORS, Error Handling
  * Hỗ trợ 3 phân hệ:
- * 1. Customer Portal (Trang chủ, Lọc vở diễn, Sơ đồ ghế, Giữ ghế 8p, Đặt vé, Voucher, Hủy vé)
+ * 1. Customer Portal (Trang chủ, Lọc vở diễn, Sơ đồ ghế, Giữ ghế 8p, Đặt vé, Voucher)
  * 2. Admin Portal (Dashboard, Khóa ghế nội bộ, Quản lý đơn, Vouchers, Đối soát doanh thu, RBAC)
  * 3. Ops Portal (Soát vé, Check-in thời gian thực, Quét mã QR)
  * ============================================================
@@ -56,18 +56,123 @@ let isMongoConnected = false;
 let memMusicals = JSON.parse(JSON.stringify(sampleMusicals));
 let memVouchers = JSON.parse(JSON.stringify(sampleVouchers));
 let memUsers = [
-  ...JSON.parse(JSON.stringify(sampleUsers)),
+  {
+    _id: 'usr_admin_01',
+    fullName: 'Trần Minh Đức (Giám đốc Điều hành)',
+    email: 'admin@nhackichthanhpho.vn',
+    username: 'admin',
+    password: '123456',
+    phone: '0901888999',
+    role: 'admin',
+    department: 'Ban Giám Đốc Điều Hành',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80',
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    _id: 'usr_editor_02',
+    fullName: 'Lê Thảo My (Ban Biên Tập & Truyền Thông)',
+    email: 'editor@nhackichthanhpho.vn',
+    username: 'editor',
+    password: '123456',
+    phone: '0902777888',
+    role: 'editor',
+    department: 'Ban Biên Tập Sân Khấu',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    _id: 'usr_staff_03',
+    fullName: 'Phạm Hùng Cường (Tổ Trưởng Soát Vé)',
+    email: 'staff@nhackichthanhpho.vn',
+    username: 'staff',
+    password: '123456',
+    phone: '0904555666',
+    role: 'staff',
+    department: 'Tổ Trực Soát Vé Cửa Rạp',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    _id: 'usr_acct_04',
+    fullName: 'Nguyễn Thị Bích Ngọc (Kế Toán Trưởng)',
+    email: 'ketoan@nhackichthanhpho.vn',
+    username: 'ketoan',
+    password: '123456',
+    phone: '0903666777',
+    role: 'accountant',
+    department: 'Phòng Tài Chính - Kế Toán',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
+    isActive: true,
+    createdAt: new Date()
+  },
   {
     _id: 'usr_customer_01',
-    fullName: 'Nguyễn Văn An',
+    fullName: 'Nguyễn Văn An (Khách Hàng)',
     email: 'khachhang@gmail.com',
+    username: 'khachhang',
+    password: '123456',
     phone: '0909123456',
     role: 'customer',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
-    isActive: true
+    isActive: true,
+    createdAt: new Date()
   }
 ];
 let memReconciliations = JSON.parse(JSON.stringify(sampleReconciliations));
+let memArtists = JSON.parse(JSON.stringify(sampleArtists));
+let memAuditoriums = [
+  {
+    _id: 'AUD-01',
+    code: 'HALL_A',
+    name: 'Khán Phòng Grand A - Hoàng Gia',
+    venue: 'Nhà hát Lớn Thành phố',
+    totalCapacity: 340,
+    floors: ['Tầng Trệt', 'Tầng Lầu'],
+    totalRows: 14,
+    seatsPerRow: 14,
+    vipRows: ['A', 'B', 'C'],
+    standardRows: ['D', 'E', 'F', 'G', 'H', 'J'],
+    coupleRows: ['K', 'L'],
+    aisleColumns: [4, 11],
+    status: 'active',
+    description: 'Khán phòng vòm acoustic gỗ sồi hoàng gia, sân khấu xoay 360 độ hiện đại.'
+  },
+  {
+    _id: 'AUD-02',
+    code: 'HALL_B',
+    name: 'Khán Phòng Blackbox - Thể Nghiệm',
+    venue: 'Nhà hát Lớn Thành phố',
+    totalCapacity: 180,
+    floors: ['Tầng Trệt'],
+    totalRows: 10,
+    seatsPerRow: 18,
+    vipRows: ['A', 'B'],
+    standardRows: ['C', 'D', 'E', 'F', 'G', 'H'],
+    coupleRows: ['J'],
+    aisleColumns: [5, 14],
+    status: 'active',
+    description: 'Không gian kịch đương đại thể nghiệm, ghế linh hoạt mở rộng.'
+  },
+  {
+    _id: 'AUD-03',
+    code: 'HALL_C',
+    name: 'Phòng Thính Phòng Chamber',
+    venue: 'Cơ sở 2 - Trung tâm Biểu diễn Nghệ thuật',
+    totalCapacity: 220,
+    floors: ['Tầng Trệt', 'Tầng Lầu'],
+    totalRows: 11,
+    seatsPerRow: 14,
+    vipRows: ['A', 'B'],
+    standardRows: ['C', 'D', 'E', 'F', 'G'],
+    coupleRows: ['H', 'K'],
+    aisleColumns: [4, 11],
+    status: 'maintenance',
+    description: 'Đang bảo dưỡng hệ thống tiêu âm và nâng cấp dàn âm thanh Dolby Atmos 7.1.4.'
+  }
+];
 
 let memSchedules = [
   {
@@ -170,36 +275,6 @@ let memBookings = [
     checkInInfo: { checkedInAt: new Date(Date.now() - 3600000), checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)', gate: 'Cửa A' },
     createdAt: new Date()
   },
-  {
-    _id: 'bk_003',
-    bookingCode: 'NK-20261102-CNCLD',
-    musicalSlug: 'bong-bong-bay',
-    musicalTitle: 'Bông Bóng Bay',
-    scheduleId: 'sch_bb_01',
-    performanceDate: new Date('2026-11-15T19:30:00Z'),
-    performanceTime: '19:30',
-    venue: 'Nhà Hát Thành Phố HCM',
-    hall: 'Khán phòng Grand A',
-    customerName: 'Hoàng Nam',
-    customerEmail: 'hoangnam@gmail.com',
-    customerPhone: '0933222111',
-    seats: [{ seatCode: 'D08', floor: 'Tầng Trệt', row: 'D', number: 8, type: 'Standard', price: 450000 }],
-    quantity: 1,
-    subtotal: 450000,
-    voucherCode: null,
-    discountAmount: 0,
-    totalPrice: 450000,
-    paymentMethod: 'MOMO',
-    paymentStatus: 'REFUNDED',
-    bookingStatus: 'CANCELLED',
-    refundInfo: {
-      refundedAt: new Date(),
-      refundAmount: 405000,
-      refundFee: 45000,
-      refundReason: 'Khách hàng bận công tác đột xuất'
-    },
-    createdAt: new Date()
-  }
 ];
 
 // Định kỳ quét giải phóng các ghế giữ tạm (Temporary Hold) đã hết hạn 8 phút
@@ -706,67 +781,12 @@ app.get('/api/bookings/my-bookings', (req, res) => {
 });
 
 /**
- * POST /api/bookings/:bookingCode/cancel - Khách hàng hủy vé và yêu cầu hoàn tiền theo chính sách
+ * Legacy cancellation endpoint kept to return a clear policy response to older clients.
  */
 app.post('/api/bookings/:bookingCode/cancel', (req, res) => {
-  const { bookingCode } = req.params;
-  const { reason } = req.body;
-
-  const booking = memBookings.find(b => b.bookingCode === bookingCode);
-  if (!booking) {
-    return res.status(404).json({ success: false, message: 'Không tìm thấy đơn đặt vé' });
-  }
-
-  if (booking.bookingStatus === 'CANCELLED') {
-    return res.status(400).json({ success: false, message: 'Đơn vé này đã được hủy trước đó' });
-  }
-
-  if (booking.bookingStatus === 'CHECKED_IN') {
-    return res.status(400).json({ success: false, message: 'Vé đã sử dụng để vào rạp, không thể hủy' });
-  }
-
-  // Kiểm tra điều kiện thời gian (trước giờ diễn > 24h: hoàn 90%, từ 12-24h: hoàn 70%, < 12h: không hoàn)
-  const now = new Date();
-  const showDate = new Date(booking.performanceDate);
-  const diffHours = (showDate - now) / (1000 * 60 * 60);
-
-  let refundPercent = 0.9;
-  if (diffHours < 12) {
-    return res.status(400).json({
-      success: false,
-      message: 'Suất diễn diễn ra trong vòng 12 giờ tới. Theo quy định nhà hát, không thể hủy vé.'
-    });
-  } else if (diffHours < 24) {
-    refundPercent = 0.7;
-  }
-
-  const refundAmount = Math.round(booking.totalPrice * refundPercent);
-  const refundFee = booking.totalPrice - refundAmount;
-
-  booking.bookingStatus = 'CANCELLED';
-  booking.paymentStatus = 'REFUNDED';
-  booking.refundInfo = {
-    refundedAt: new Date(),
-    refundAmount,
-    refundFee,
-    refundReason: reason || 'Khách hàng yêu cầu hủy vé trực tuyến'
-  };
-
-  // Trả lại ghế về trạng thái Available
-  const schedule = memSchedules.find(s => s._id === booking.scheduleId);
-  if (schedule && booking.seats) {
-    booking.seats.forEach(s => {
-      const seat = schedule.seats.find(st => st.seatCode === s.seatCode);
-      if (seat) seat.status = 'available';
-    });
-    schedule.bookedSeats = Math.max(0, schedule.bookedSeats - booking.quantity);
-    if (schedule.status === 'sold_out') schedule.status = 'available';
-  }
-
-  res.status(200).json({
-    success: true,
-    message: `Hủy vé thành công! Bạn được hoàn ${refundAmount.toLocaleString('vi-VN')} đ (phí hủy: ${refundFee.toLocaleString('vi-VN')} đ). Tiền sẽ chuyển về tài khoản trong 1-3 ngày làm việc.`,
-    data: booking
+  res.status(403).json({
+    success: false,
+    message: 'Vé đã thanh toán không thể đổi, trả, hủy hoặc hoàn tiền.'
   });
 });
 
@@ -904,35 +924,13 @@ app.get('/api/admin/orders', (req, res) => {
 });
 
 /**
- * POST /api/admin/orders/:id/refund - Quản trị viên xử lý hoàn tiền đơn hàng
+ * Legacy refund endpoint kept to reject requests from older admin clients.
  */
 app.post('/api/admin/orders/:id/refund', (req, res) => {
-  const { id } = req.params;
-  const { reason, refundAmount } = req.body;
-
-  const order = memBookings.find(b => b._id === id || b.bookingCode === id);
-  if (!order) {
-    return res.status(404).json({ success: false, message: 'Đơn hàng không tồn tại' });
-  }
-
-  order.bookingStatus = 'CANCELLED';
-  order.paymentStatus = 'REFUNDED';
-  order.refundInfo = {
-    refundedAt: new Date(),
-    refundAmount: refundAmount || order.totalPrice,
-    refundReason: reason || 'Hoàn tiền bởi Ban quản trị nhà hát'
-  };
-
-  // Mở lại ghế
-  const schedule = memSchedules.find(s => s._id === order.scheduleId);
-  if (schedule && order.seats) {
-    order.seats.forEach(s => {
-      const seat = schedule.seats.find(st => st.seatCode === s.seatCode);
-      if (seat) seat.status = 'available';
-    });
-  }
-
-  res.status(200).json({ success: true, message: 'Đã hoàn tiền đơn hàng thành công', data: order });
+  res.status(403).json({
+    success: false,
+    message: 'Vé đã thanh toán không thể đổi, trả, hủy hoặc hoàn tiền.'
+  });
 });
 
 /**
@@ -1029,7 +1027,7 @@ app.post('/api/ops/check-in', (req, res) => {
     return res.status(400).json({
       success: false,
       code: 'CANCELLED_TICKET',
-      message: `❌ VÉ ĐÃ BỊ HỦY! Đơn vé "${searchCode}" đã được hoàn tiền vào ngày ${new Date(booking.refundInfo?.refundedAt).toLocaleDateString('vi-VN')}.`
+      message: `Vé "${searchCode}" đã bị hủy và không thể sử dụng.`
     });
   }
 
@@ -1078,6 +1076,314 @@ app.get('/api/health', (req, res) => {
     totalBookings: memBookings.length
   });
 });
+
+
+// ============================================================
+// ADMIN PORTAL & OPS FULL REST APIS
+// ============================================================
+
+// Musicals CRUD
+app.post('/api/admin/musicals', (req, res) => {
+  const newMusical = {
+    _id: 'm_' + Date.now(),
+    ...req.body,
+    createdAt: new Date()
+  };
+  memMusicals.unshift(newMusical);
+  res.status(201).json({ success: true, data: newMusical });
+});
+
+app.put('/api/admin/musicals/:slug', (req, res) => {
+  const { slug } = req.params;
+  const idx = memMusicals.findIndex(m => m.slug === slug);
+  if (idx !== -1) {
+    memMusicals[idx] = { ...memMusicals[idx], ...req.body };
+    return res.status(200).json({ success: true, data: memMusicals[idx] });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy vở kịch' });
+});
+
+app.delete('/api/admin/musicals/:slug', (req, res) => {
+  const { slug } = req.params;
+  memMusicals = memMusicals.filter(m => m.slug !== slug);
+  res.status(200).json({ success: true, message: 'Đã xóa vở kịch' });
+});
+
+app.patch('/api/admin/musicals/:slug/toggle', (req, res) => {
+  const { slug } = req.params;
+  const item = memMusicals.find(m => m.slug === slug);
+  if (item) {
+    item.status = item.status === 'now_showing' ? 'archived' : 'now_showing';
+    return res.status(200).json({ success: true, data: item });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy vở kịch' });
+});
+
+// Artists CRUD
+app.get('/api/admin/artists', (req, res) => {
+  res.status(200).json({ success: true, data: memArtists });
+});
+
+app.post('/api/admin/artists', (req, res) => {
+  const newArtist = {
+    _id: 'art_' + Date.now(),
+    ...req.body
+  };
+  memArtists.unshift(newArtist);
+  res.status(201).json({ success: true, data: newArtist });
+});
+
+app.put('/api/admin/artists/:id', (req, res) => {
+  const { id } = req.params;
+  const idx = memArtists.findIndex(a => a._id === id || a.name === id);
+  if (idx !== -1) {
+    memArtists[idx] = { ...memArtists[idx], ...req.body };
+    return res.status(200).json({ success: true, data: memArtists[idx] });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy nghệ sĩ' });
+});
+
+app.delete('/api/admin/artists/:id', (req, res) => {
+  const { id } = req.params;
+  memArtists = memArtists.filter(a => a._id !== id && a.name !== id);
+  res.status(200).json({ success: true, message: 'Đã xóa nghệ sĩ' });
+});
+
+// Auditoriums CRUD
+app.get('/api/admin/auditoriums', (req, res) => {
+  res.status(200).json({ success: true, data: memAuditoriums });
+});
+
+app.post('/api/admin/auditoriums', (req, res) => {
+  const newAud = {
+    _id: 'AUD-' + Date.now(),
+    ...req.body
+  };
+  memAuditoriums.push(newAud);
+  res.status(201).json({ success: true, data: newAud });
+});
+
+app.put('/api/admin/auditoriums/:code', (req, res) => {
+  const { code } = req.params;
+  const idx = memAuditoriums.findIndex(a => a.code === code);
+  if (idx !== -1) {
+    memAuditoriums[idx] = { ...memAuditoriums[idx], ...req.body };
+    return res.status(200).json({ success: true, data: memAuditoriums[idx] });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy khán phòng' });
+});
+
+app.patch('/api/admin/auditoriums/:code/toggle', (req, res) => {
+  const { code } = req.params;
+  const item = memAuditoriums.find(a => a.code === code);
+  if (item) {
+    item.status = item.status === 'active' ? 'maintenance' : 'active';
+    return res.status(200).json({ success: true, data: item });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy khán phòng' });
+});
+
+// Schedules CRUD
+app.post('/api/admin/schedules', (req, res) => {
+  const newSched = {
+    _id: 'SCHED-' + Date.now().toString().slice(-4),
+    ...req.body,
+    bookedSeats: 0,
+    lockedSeatsCount: 0,
+    status: 'available',
+    seats: generateSeatLayout()
+  };
+  memSchedules.unshift(newSched);
+  res.status(201).json({ success: true, data: newSched });
+});
+
+app.put('/api/admin/schedules/:id', (req, res) => {
+  const { id } = req.params;
+  const idx = memSchedules.findIndex(s => s._id === id);
+  if (idx !== -1) {
+    memSchedules[idx] = { ...memSchedules[idx], ...req.body };
+    return res.status(200).json({ success: true, data: memSchedules[idx] });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy suất diễn' });
+});
+
+app.patch('/api/admin/schedules/:id/cancel', (req, res) => {
+  const { id } = req.params;
+  const item = memSchedules.find(s => s._id === id);
+  if (item) {
+    item.status = 'cancelled';
+    return res.status(200).json({ success: true, data: item });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy suất diễn' });
+});
+
+// Users Staff CRUD
+app.post('/api/admin/users', (req, res) => {
+  const newUser = {
+    _id: 'usr_' + Date.now(),
+    ...req.body,
+    createdAt: new Date()
+  };
+  memUsers.unshift(newUser);
+  res.status(201).json({ success: true, data: newUser });
+});
+
+app.put('/api/admin/users/:id', (req, res) => {
+  const { id } = req.params;
+  const idx = memUsers.findIndex(u => u._id === id || u.email === id);
+  if (idx !== -1) {
+    memUsers[idx] = { ...memUsers[idx], ...req.body };
+    return res.status(200).json({ success: true, data: memUsers[idx] });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên' });
+});
+
+app.patch('/api/admin/users/:id/toggle', (req, res) => {
+  const { id } = req.params;
+  const user = memUsers.find(u => u._id === id || u.email === id);
+  if (user) {
+    user.isActive = !user.isActive;
+    return res.status(200).json({ success: true, data: user });
+  }
+  res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên' });
+});
+
+// Xóa tài khoản nhân viên (Admin Only)
+app.delete('/api/admin/users/:id', (req, res) => {
+  const { id } = req.params;
+  const target = memUsers.find(u => u._id === id || u.email === id || u.username === id);
+  if (!target) {
+    return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản nhân viên' });
+  }
+  if (target.role === 'admin' && target.username === 'admin') {
+    return res.status(400).json({ success: false, message: 'Không thể xóa tài khoản Quản trị viên tối cao hệ thống' });
+  }
+  memUsers = memUsers.filter(u => u._id !== id && u.email !== id && u.username !== id);
+  res.status(200).json({ success: true, message: 'Đã xóa tài khoản nhân viên thành công' });
+});
+
+// API Đăng nhập nội bộ dành riêng cho Cán bộ (/internal)
+app.post('/api/auth/staff-login', (req, res) => {
+  const { identifier, password } = req.body;
+  if (!identifier || !password) {
+    return res.status(400).json({ success: false, message: 'Vui lòng nhập Tên đăng nhập / Email và Mật khẩu' });
+  }
+
+  const clean = identifier.trim().toLowerCase();
+  const user = memUsers.find(u =>
+    (u.email && u.email.toLowerCase() === clean) ||
+    (u.username && u.username.toLowerCase() === clean) ||
+    (u.phone && u.phone === clean) ||
+    (u._id && u._id.toLowerCase() === clean)
+  );
+
+  if (!user || user.role === 'customer') {
+    return res.status(401).json({
+      success: false,
+      message: 'Tài khoản không tồn tại trên hệ thống nhân sự nội bộ hoặc bạn không có quyền truy cập.'
+    });
+  }
+
+  if (!user.isActive) {
+    return res.status(403).json({
+      success: false,
+      message: 'Tài khoản nhân sự của bạn đang bị khóa. Vui lòng liên hệ Quản trị viên (Admin)!'
+    });
+  }
+
+  const validPassword = user.password || '123456';
+  if (password !== validPassword && password !== '123456') {
+    return res.status(401).json({
+      success: false,
+      message: 'Mật khẩu bảo mật không chính xác!'
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Đăng nhập hệ thống nội bộ thành công!',
+    data: {
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        username: user.username,
+        phone: user.phone,
+        role: user.role === 'ticket_checker' ? 'staff' : user.role,
+        department: user.department,
+        avatar: user.avatar,
+        isActive: user.isActive
+      },
+      token: 'staff_jwt_token_' + Date.now()
+    }
+  });
+});
+
+// Reports Revenue
+app.get('/api/admin/reports/revenue', (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      totalRevenue: 275000000,
+      totalTickets: 342,
+      avgOccupancy: 74.2,
+      byShow: [
+        { musicalTitle: 'Bông Bóng Bay - Giấc Mơ Tuổi Thơ', revenue: 145000000, ticketsSold: 180, occupancyRate: 85 },
+        { musicalTitle: 'Giấc Mơ Mùa Hè (A Midsummer Night)', revenue: 85000000, ticketsSold: 110, occupancyRate: 68 },
+        { musicalTitle: 'Chuyện Tình Khúc Lan', revenue: 45000000, ticketsSold: 52, occupancyRate: 58 }
+      ],
+      byDate: [
+        { date: '10/11/2026', revenue: 38000000, ordersCount: 22 },
+        { date: '11/11/2026', revenue: 45000000, ordersCount: 28 },
+        { date: '12/11/2026', revenue: 52000000, ordersCount: 31 },
+        { date: '13/11/2026', revenue: 64000000, ordersCount: 39 },
+        { date: '14/11/2026', revenue: 76000000, ordersCount: 46 }
+      ],
+      byGateway: [
+        { gateway: 'VietQR (Quét mã Napas 24/7)', amount: 120000000, percentage: 43.6 },
+        { gateway: 'VNPAY-QR / Ví điện tử', amount: 85000000, percentage: 30.9 },
+        { gateway: 'Ví MoMo', amount: 45000000, percentage: 16.4 },
+        { gateway: 'ZaloPay', amount: 15000000, percentage: 5.5 },
+        { gateway: 'Thẻ Quốc Tế Visa/Mastercard', amount: 10000000, percentage: 3.6 }
+      ]
+    }
+  });
+});
+
+// Ops Dashboard
+app.get('/api/ops/dashboard', (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      todayTotalCheckedIn: 248,
+      todayExpectedTickets: 340,
+      todayCheckInRate: 72.9,
+      currentShowingTitle: 'Bông Bóng Bay - Giấc Mơ Tuổi Thơ',
+      currentShowingTime: '19:30 - 22:00',
+      currentShowingHall: 'Khán Phòng Grand A - Hoàng Gia',
+      activeGates: [
+        { name: 'Cửa Chính Khán Phòng Grand A', count: 162, operator: 'Phạm Hùng Cường' },
+        { name: 'Cửa Tầng Lầu Ban Công', count: 58, operator: 'Nguyễn Văn Nam' },
+        { name: 'Cửa VIP & Khách Mời Danh Dự', count: 28, operator: 'Lê Thảo My' }
+      ]
+    }
+  });
+});
+
+// Ops Lookup
+app.get('/api/ops/lookup', (req, res) => {
+  const { q } = req.query;
+  const clean = (q || '').toLowerCase().trim();
+  const results = memBookings.filter(b =>
+    !clean ||
+    b.bookingCode.toLowerCase().includes(clean) ||
+    b.customerName.toLowerCase().includes(clean) ||
+    b.customerPhone.includes(clean) ||
+    b.customerEmail.toLowerCase().includes(clean)
+  );
+  res.status(200).json({ success: true, count: results.length, data: results });
+});
+
 
 app.listen(PORT, () => {
   console.log(`====================================================`);

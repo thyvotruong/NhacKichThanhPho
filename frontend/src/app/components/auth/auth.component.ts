@@ -56,10 +56,26 @@ export class AuthComponent implements OnInit {
   registerForm!: FormGroup;
   forgotForm!: FormGroup;
 
+  
+  private getSafeRedirectUrl(): string {
+    const target = this.returnUrl();
+    const role = this.musicalService.currentUser().role;
+    if ((target.startsWith('/admin') || target.startsWith('/ops')) && role === 'customer') {
+      return '/account/profile';
+    }
+    return target;
+  }
+
   ngOnInit(): void {
     // Nếu người dùng đã đăng nhập, tự động chuyển về Profile hoặc returnUrl
     if (this.musicalService.isLoggedIn()) {
       const ret = this.route.snapshot.queryParamMap.get('returnUrl') || '/account/profile';
+      const role = this.musicalService.currentUser().role;
+      // Khách hàng thông thường (role: customer) không được tự chuyển về admin/ops
+      if ((ret.startsWith('/admin') || ret.startsWith('/ops')) && role === 'customer') {
+        this.router.navigateByUrl('/account/profile');
+        return;
+      }
       this.router.navigateByUrl(ret);
       return;
     }
@@ -81,6 +97,9 @@ export class AuthComponent implements OnInit {
       if (tab === 'register') this.activeTab.set('register');
       else if (tab === 'forgot') this.activeTab.set('forgot');
       else if (tab === 'login') this.activeTab.set('login');
+
+      const authMsg = params.get('authMessage');
+      if (authMsg) this.errorMessage.set(authMsg);
     });
 
     this.initForms();
@@ -198,7 +217,7 @@ export class AuthComponent implements OnInit {
         this.isSubmitting.set(false);
         this.successMessage.set('🎉 Đăng nhập thành công! Đang chuyển hướng...');
         setTimeout(() => {
-          this.router.navigateByUrl(this.returnUrl());
+          this.router.navigateByUrl(this.getSafeRedirectUrl());
         }, 800);
       },
       error: (err) => {
@@ -228,7 +247,7 @@ export class AuthComponent implements OnInit {
         next: () => {
           this.isSubmitting.set(false);
           this.successMessage.set('🎉 Đăng nhập Google thành công! Đang chuyển hướng...');
-          setTimeout(() => this.router.navigateByUrl(this.returnUrl()), 800);
+          setTimeout(() => this.router.navigateByUrl(this.getSafeRedirectUrl()), 800);
         },
         error: () => this.isSubmitting.set(false)
       });

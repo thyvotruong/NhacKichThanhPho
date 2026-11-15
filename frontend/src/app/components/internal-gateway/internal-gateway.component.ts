@@ -2,14 +2,15 @@
  * ============================================================
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL SPA) - ANGULAR FRONTEND
  * File: components/internal-gateway/internal-gateway.component.ts
- * Chức năng: Cổng Đăng Nhập & Truy Cập Nội Bộ Riêng Biệt (Staff Gateway)
- * Tách biệt hoàn toàn khỏi trang website phía khách hàng.
+ * Chức năng: Cổng Đăng Nhập Nội Bộ Tiêu Chuẩn & Bảo Mật (/internal)
+ * Không để lộ danh sách nhân sự công khai trên màn hình.
+ * Xác thực theo 3 cấp độ vai trò (Admin, Editor, Staff).
  * ============================================================
  */
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MusicalService } from '../../services/musical.service';
 
@@ -20,76 +21,87 @@ import { MusicalService } from '../../services/musical.service';
   templateUrl: './internal-gateway.component.html',
   styleUrls: ['./internal-gateway.component.css']
 })
-export class InternalGatewayComponent {
+export class InternalGatewayComponent implements OnInit {
   private readonly musicalService = inject(MusicalService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  currentUser = this.musicalService.currentUser;
+  // Form Fields
+  identifier = signal<string>('admin');
+  password = signal<string>('123456');
+  showPassword = signal<boolean>(false);
+  isSubmitting = signal<boolean>(false);
 
-  selectedRole = signal<'admin' | 'ticket_checker' | 'accountant' | 'editor'>('admin');
-  accessPin = signal<string>('123456');
-  targetModule = signal<'admin' | 'ops'>('admin');
+  // Thông báo lỗi & điều hướng
   errorMessage = signal<string | null>(null);
+  returnUrl = signal<string | null>(null);
 
-  staffProfiles = [
-    {
-      role: 'admin' as const,
-      name: 'Trần Minh Đức',
-      title: 'Giám Đốc Điều Hành',
-      icon: 'bi-shield-shaded',
-      color: 'gold',
-      target: 'admin' as const,
-      description: 'Toàn quyền Dashboard, Khóa ghế nội bộ, Quản lý đơn, Hoàn tiền, RBAC'
-    },
-    {
-      role: 'ticket_checker' as const,
-      name: 'Phạm Hùng Cường',
-      title: 'Tổ Trưởng Soát Vé',
-      icon: 'bi-upc-scan',
-      color: 'ruby',
-      target: 'ops' as const,
-      description: 'Quét mã QR soát vé tại cửa rạp, kiểm tra vé hợp lệ / vé trùng'
-    },
-    {
-      role: 'accountant' as const,
-      name: 'Nguyễn Thị Bích Ngọc',
-      title: 'Kế Toán Trưởng',
-      icon: 'bi-cash-coin',
-      color: 'emerald',
-      target: 'admin' as const,
-      description: 'Báo cáo doanh thu, đối soát tài chính với cổng VietQR, VNPAY, MoMo'
-    },
-    {
-      role: 'editor' as const,
-      name: 'Lê Thảo My',
-      title: 'Ban Biên Tập Sân Khấu',
-      icon: 'bi-pencil-square',
-      color: 'sapphire',
-      target: 'admin' as const,
-      description: 'Quản lý danh mục vở nhạc kịch, lịch diễn và thông tin nghệ sĩ'
+  ngOnInit(): void {
+    // Đọc returnUrl và thông báo bảo mật từ Route Guard (nếu có)
+    this.route.queryParamMap.subscribe(params => {
+      const ret = params.get('returnUrl');
+      if (ret) this.returnUrl.set(ret);
+
+      const authMsg = params.get('authMessage');
+      if (authMsg) this.errorMessage.set(authMsg);
+    });
+
+    // Nếu đã đăng nhập với vai trò nội bộ hợp lệ, tự động điều hướng đúng phân hệ
+    if (this.musicalService.isLoggedIn()) {
+      const user = this.musicalService.currentUser();
+      if (user.role === 'admin') {
+        this.router.navigateByUrl(this.returnUrl() || '/admin');
+      } else if (user.role === 'editor') {
+        this.router.navigateByUrl('/admin/musicals');
+      } else if (user.role === 'staff' || user.role === 'ticket_checker') {
+        this.router.navigateByUrl('/ops/check-in');
+      }
     }
-  ];
+  }
 
-  selectStaff(staff: typeof this.staffProfiles[0]): void {
-    this.selectedRole.set(staff.role);
-    this.targetModule.set(staff.target);
+  toggleShowPassword(): void {
+    this.showPassword.update(v => !v);
+  }
+
+  fillQuickCredential(type: 'admin' | 'editor' | 'staff'): void {
+    this.identifier.set(type);
+    this.password.set('123456');
     this.errorMessage.set(null);
   }
 
-  onAuthenticate(): void {
-    if (!this.accessPin()) {
-      this.errorMessage.set('Vui lòng nhập mã PIN bảo mật nhân viên');
+  onSubmit(): void {
+    const id = this.identifier().trim();
+    const pass = this.password().trim();
+
+    if (!id || !pass) {
+      this.errorMessage.set('Vui lòng nhập đầy đủ Tên đăng nhập và Mật khẩu bảo mật.');
       return;
     }
 
-    // Thiết lập vai trò tương ứng trong service
-    this.musicalService.setRole(this.selectedRole());
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
 
-    // Chuyển hướng đến phân hệ tương ứng
-    if (this.targetModule() === 'ops') {
-      this.router.navigate(['/ops']);
-    } else {
-      this.router.navigate(['/admin']);
-    }
+    this.musicalService.staffLogin(id, pass).subscribe({
+      next: (res) => {
+        this.isSubmitting.set(false);
+        const role = res.user.role;
+
+        // Điều hướng thông minh theo đúng 3 cấp độ phân quyền (RBAC)
+        if (role === 'admin') {
+          const dest = this.returnUrl() && !this.returnUrl()!.includes('/ops') ? this.returnUrl()! : '/admin';
+          this.router.navigateByUrl(dest);
+        } else if (role === 'editor') {
+          this.router.navigateByUrl('/admin/musicals');
+        } else if (role === 'staff' || role === 'ticket_checker') {
+          this.router.navigateByUrl('/ops/check-in');
+        } else {
+          this.router.navigateByUrl('/account/profile');
+        }
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(err.message || 'Tài khoản hoặc Mật khẩu không chính xác.');
+      }
+    });
   }
 }

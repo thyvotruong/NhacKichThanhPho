@@ -67,11 +67,50 @@ export interface Schedule {
 }
 
 export interface Artist {
+  _id?: string;
   name: string;
   role: string;
   title: string;
   avatar: string;
   bio: string;
+  featuredMusicals?: string[];
+  status?: 'active' | 'inactive';
+}
+
+export interface Auditorium {
+  _id?: string;
+  code: string;
+  name: string;
+  venue: string;
+  totalCapacity: number;
+  floors: string[];
+  totalRows: number;
+  seatsPerRow: number;
+  vipRows: string[];
+  standardRows: string[];
+  coupleRows: string[];
+  aisleColumns: number[];
+  status: 'active' | 'maintenance';
+  description?: string;
+}
+
+export interface RevenueReport {
+  totalRevenue: number;
+  totalTickets: number;
+  avgOccupancy: number;
+  byShow: { musicalTitle: string; revenue: number; ticketsSold: number; occupancyRate: number }[];
+  byDate: { date: string; revenue: number; ordersCount: number }[];
+  byGateway: { gateway: string; amount: number; percentage: number }[];
+}
+
+export interface OpsDashboardStats {
+  todayTotalCheckedIn: number;
+  todayExpectedTickets: number;
+  todayCheckInRate: number;
+  currentShowingTitle: string;
+  currentShowingTime: string;
+  currentShowingHall: string;
+  activeGates: { name: string; count: number; operator: string }[];
 }
 
 export interface Voucher {
@@ -207,9 +246,14 @@ export interface UserStaff {
   fullName: string;
   email: string;
   phone: string;
-  role: 'customer' | 'admin' | 'editor' | 'accountant' | 'ticket_checker';
+  username?: string;
+  password?: string;
+  role: 'customer' | 'admin' | 'editor' | 'accountant' | 'ticket_checker' | 'staff';
+  department?: string;
   avatar?: string;
   isActive: boolean;
+  lastLogin?: string | Date;
+  createdAt?: string | Date;
 }
 
 export interface AuthLoginRequest {

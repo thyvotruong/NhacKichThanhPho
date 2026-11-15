@@ -24,6 +24,8 @@
 
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
+import { opsGuard } from './guards/ops.guard';
 import { AboutComponent } from './components/about/about.component';
 
 export const routes: Routes = [
@@ -223,17 +225,35 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./components/admin/admin.component').then((m) => m.AdminComponent),
+    title: 'Trung Tâm Quản Trị Hệ Thống - Nhạc Kịch Thành Phố'
+  },
+  {
+    path: 'admin/:tab',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./components/admin/admin.component').then((m) => m.AdminComponent),
     title: 'Trung Tâm Quản Trị Hệ Thống - Nhạc Kịch Thành Phố'
   },
   {
     path: 'ops',
+    canActivate: [opsGuard],
     loadComponent: () =>
       import('./components/ops-checkin/ops-checkin.component').then(
         (m) => m.OpsCheckinComponent
       ),
-    title: 'Cổng Soát Vé & Check-in QR - Nhạc Kịch Thành Phố'
+    title: 'Cổng Soát Vé & Vận Hành - Nhạc Kịch Thành Phố'
+  },
+  {
+    path: 'ops/:tab',
+    canActivate: [opsGuard],
+    loadComponent: () =>
+      import('./components/ops-checkin/ops-checkin.component').then(
+        (m) => m.OpsCheckinComponent
+      ),
+    title: 'Cổng Soát Vé & Vận Hành - Nhạc Kịch Thành Phố'
   },
 
   // Fallback Route
