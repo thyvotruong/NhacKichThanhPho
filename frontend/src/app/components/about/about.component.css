@@ -74,3 +74,11 @@
   border: 2px solid rgba(245, 158, 11, 0.75);
   object-fit: cover;
 }
+
+.showman-divider {
+  width: 120px; /* Bạn có thể tăng lên 150px, 200px hoặc 250px tùy ý thích */
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
+  border-radius: 2px;
+}
