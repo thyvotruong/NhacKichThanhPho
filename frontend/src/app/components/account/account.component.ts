@@ -11,7 +11,7 @@
  * ============================================================
  */
 
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -31,11 +31,17 @@ export class AccountComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
+  readonly accountName = computed(() => {
+    const fullName = this.musicalService.currentUser()?.fullName?.trim() || '';
+    return fullName.replace(/\s*\(Khách Hàng Thân Thiết\)$/i, '') || 'Khách Hàng';
+  });
+
   // Tab đang kích hoạt: 'profile' (Thông tin) | 'security' (Đổi mật khẩu) | 'tickets' (Vé của tôi)
   activeTab = signal<'profile' | 'security' | 'tickets'>('profile');
 
   // Thông báo lưu hồ sơ / mật khẩu
   profileMessage = signal<string | null>(null);
+  profileError = signal<string | null>(null);
   securityMessage = signal<string | null>(null);
   securityError = signal<string | null>(null);
 
@@ -47,10 +53,17 @@ export class AccountComponent implements OnInit {
     // Khởi tạo form thông tin cá nhân từ User hiện tại
     const user = this.musicalService.currentUser();
     this.profileForm = this.fb.group({
-      fullName: [user?.fullName || 'Khách Hàng', [Validators.required, Validators.minLength(2)]],
-      email: [{ value: user?.email || 'khachhang@gmail.com', disabled: true }],
-      phone: [user?.phone || '0909123456', [Validators.required, Validators.pattern(/^(0[3|5|7|8|9])[0-9]{8}$/)]],
-      address: ['7 Lam Sơn, Bến Nghé, Quận 1, TP. Hồ Chí Minh'],
+      fullName: [
+        this.accountName(),
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(100),
+          Validators.pattern(/^\s*\S(?:[\s\S]*\S)\s*$/)
+        ]
+      ],
+      email: [user?.email || '', [Validators.required, Validators.email, Validators.maxLength(254)]],
+      phone: [user?.phone || '0909123456', [Validators.required, Validators.pattern(/^0[35789]\d{8}$/)]],
       gender: ['MALE']
     });
 
@@ -83,30 +96,68 @@ export class AccountComponent implements OnInit {
   setTab(tab: 'profile' | 'security' | 'tickets'): void {
     this.activeTab.set(tab);
     this.profileMessage.set(null);
+    this.profileError.set(null);
     this.securityMessage.set(null);
     this.securityError.set(null);
   }
 
   saveProfile(): void {
+    this.profileMessage.set(null);
+    this.profileError.set(null);
+
     if (this.profileForm.invalid) {
-      this.profileMessage.set('Vui lòng kiểm tra lại họ tên và số điện thoại hợp lệ.');
+      this.profileForm.markAllAsTouched();
+      this.profileError.set('Vui lòng chỉnh sửa các trường được đánh dấu trước khi lưu.');
       return;
     }
 
     const val = this.profileForm.getRawValue();
     const updated = {
       ...this.musicalService.currentUser(),
-      fullName: val.fullName,
-      phone: val.phone
+      fullName: val.fullName.trim(),
+      email: val.email.trim().toLowerCase(),
+      phone: val.phone.trim()
     };
 
-    this.musicalService.currentUser.set(updated);
     try {
-      localStorage.setItem('showman_user', JSON.stringify(updated));
-    } catch {}
+      localStorage.setItem('nhackich_user', JSON.stringify(updated));
+    } catch {
+      this.profileError.set('Không thể lưu thông tin. Vui lòng kiểm tra quyền lưu trữ của trình duyệt và thử lại.');
+      return;
+    }
 
+    this.musicalService.currentUser.set(updated);
     this.profileMessage.set('🎉 Đã cập nhật thông tin tài khoản thành công!');
     setTimeout(() => this.profileMessage.set(null), 4000);
+  }
+
+  shouldShowProfileFieldError(field: 'fullName' | 'email' | 'phone'): boolean {
+    const control = this.profileForm.get(field);
+    return !!control && control.invalid && (control.touched || control.dirty);
+  }
+
+  getProfileFieldError(field: 'fullName' | 'email' | 'phone'): string | null {
+    const control = this.profileForm.get(field);
+    if (!control || !this.shouldShowProfileFieldError(field)) return null;
+
+    if (control.hasError('required')) {
+      if (field === 'fullName') return 'Vui lòng nhập họ và tên.';
+      if (field === 'email') return 'Vui lòng nhập email nhận vé điện tử.';
+      return 'Vui lòng nhập số điện thoại.';
+    }
+
+    if (control.hasError('minlength')) return 'Họ tên phải có ít nhất 2 ký tự.';
+    if (control.hasError('maxlength')) {
+      return field === 'email'
+        ? 'Email không được vượt quá 254 ký tự.'
+        : 'Họ tên không được vượt quá 100 ký tự.';
+    }
+    if (control.hasError('email')) return 'Vui lòng nhập địa chỉ email hợp lệ.';
+    if (control.hasError('pattern')) {
+      if (field === 'fullName') return 'Họ tên cần có ít nhất 2 ký tự khác khoảng trắng.';
+      return 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 03, 05, 07, 08 hoặc 09.';
+    }
+    return null;
   }
 
   changePassword(): void {

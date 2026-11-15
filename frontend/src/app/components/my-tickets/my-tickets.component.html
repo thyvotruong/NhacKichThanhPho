@@ -1,13 +1,13 @@
 <!-- ============================================================
-     PHÂN HỆ QUẢN LÝ VÉ CÁ NHÂN & HỦY VÉ HOÀN TIỀN (BPMN 2.2.4)
+     PHÂN HỆ QUẢN LÝ VÉ CÁ NHÂN
      ============================================================ -->
-<div class="py-5 position-relative">
+<div class="my-tickets-page py-5 position-relative">
   <div class="container">
     <!-- TIÊU ĐỀ & TÌM KIẾM -->
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 pb-3 border-bottom border-gold-glow gap-3">
       <div>
-        <h2 class="display-6 fw-bold text-gold-gradient mb-1">VÉ CỦA TÔI (MY E-TICKETS)</h2>
-        <p class="text-secondary small mb-0">Quản lý lịch sử vé, xem chi tiết E-ticket, in vé hoặc yêu cầu hủy vé hoàn tiền tự động</p>
+        <h4 class="fw-bold text-gold-gradient mb-1">VÉ CỦA TÔI</h4>
+        <p class="text-secondary small mb-0">Xem thông tin và tải vé điện tử. Vé đã mua không hỗ trợ hủy hoặc hoàn tiền.</p>
       </div>
 
       <div class="d-flex flex-column flex-sm-row gap-2">
@@ -43,14 +43,6 @@
           >
             ĐÃ CHECK-IN
           </button>
-          <button
-            class="btn btn-sm rounded-pill px-3 py-2 fw-bold text-nowrap"
-            [class.btn-showman-ruby]="activeTab() === 'CANCELLED'"
-            [class.btn-showman-outline]="activeTab() !== 'CANCELLED'"
-            (click)="activeTab.set('CANCELLED')"
-          >
-            ĐÃ HỦY
-          </button>
         </div>
       </div>
     </div>
@@ -76,10 +68,6 @@
               } @else if (order.bookingStatus === 'CHECKED_IN') {
                 <span class="badge badge-showman-gold">
                   <i class="bi bi-check2-circle me-1"></i> Đã Check-in
-                </span>
-              } @else if (order.bookingStatus === 'CANCELLED') {
-                <span class="badge badge-status-soldout">
-                  <i class="bi bi-x-circle-fill me-1"></i> Đã Hủy / Hoàn Tiền
                 </span>
               }
             </div>
@@ -120,12 +108,6 @@
                 </div>
               }
 
-              @if (order.refundInfo?.refundAmount) {
-                <div class="text-warning pt-2 border-top border-secondary border-opacity-25 small">
-                  <i class="bi bi-arrow-return-left me-1"></i> Đã hoàn tiền: {{ order.refundInfo?.refundAmount | number:'1.0-0' }} đ 
-                  (Phí: {{ (order.refundInfo?.refundFee || 0) | number:'1.0-0' }} đ)
-                </div>
-              }
             </div>
 
             <!-- Nút hành động trên từng vé -->
@@ -138,15 +120,9 @@
                 <i class="bi bi-qr-code"></i>
               </button>
 
-              <button class="btn btn-outline-light rounded-pill btn-sm py-2 px-3" (click)="printTicket(order)" title="In vé / Lưu PDF">
-                <i class="bi bi-printer"></i>
+              <button class="btn btn-showman-outline rounded-pill fw-bold btn-sm py-2 px-3" (click)="downloadTicket(order)" aria-label="Tải vé điện tử">
+                <i class="bi bi-download me-1"></i> TẢI VÉ
               </button>
-
-              @if (order.bookingStatus === 'CONFIRMED') {
-                <button class="btn btn-outline-danger rounded-pill fw-bold btn-sm py-2 px-3" (click)="openCancelModal(order)">
-                  <i class="bi bi-x-circle me-1"></i> HỦY VÉ
-                </button>
-              }
             </div>
           </div>
         </div>
@@ -166,7 +142,7 @@
   </div>
 
   <!-- ============================================================
-       MODAL 1: CHI TIẾT VÉ ĐIỆN TỬ (E-TICKET) - BPMN 2.2.4 Bước 2 & 3
+       MODAL: CHI TIẾT VÉ ĐIỆN TỬ (E-TICKET)
        ============================================================ -->
   @if (selectedDetailOrder(); as detail) {
     <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
@@ -183,8 +159,8 @@
           <button class="btn btn-sm btn-outline-secondary rounded-circle" (click)="closeDetailModal()">✕</button>
         </div>
 
-        <!-- KHUNG VÉ ĐIỆN TỬ IN ẤN ĐƯỢC (PRINTABLE TICKET) -->
-        <div id="printable-ticket-content" class="printable-ticket p-4 rounded-4 mb-4">
+        <!-- Thông tin vé điện tử -->
+        <div class="ticket-document p-4 rounded-4 mb-4">
           <!-- Huy hiệu trạng thái vé -->
           <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="font-monospace text-gold fw-bold fs-5">MÃ VÉ: {{ detail.bookingCode }}</span>
@@ -195,10 +171,6 @@
             } @else if (detail.bookingStatus === 'CHECKED_IN') {
               <span class="badge badge-showman-gold fs-6 px-3 py-2">
                 <i class="bi bi-check2-circle me-1"></i> ĐÃ CHECK-IN
-              </span>
-            } @else if (detail.bookingStatus === 'CANCELLED') {
-              <span class="badge badge-status-soldout fs-6 px-3 py-2">
-                <i class="bi bi-x-circle-fill me-1"></i> ĐÃ HỦY VÉ
               </span>
             }
           </div>
@@ -272,19 +244,11 @@
           </div>
         </div>
 
-        <!-- NÚT THAO TÁC RẼ NHÁNH THEO BPMN 2.2.4 Bước 3 -->
+        <!-- Tải vé điện tử hoặc đóng chi tiết -->
         <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
-          <!-- Nhánh A: In / Tải vé PDF -->
-          <button class="btn btn-showman-gold rounded-pill py-2 px-4 fw-bold flex-grow-1" (click)="printTicket(detail)">
-            <i class="bi bi-printer-fill me-1"></i> TẢI VÉ / IN VÉ ĐIỆN TỬ (PDF/PRINT)
+          <button class="btn btn-showman-gold rounded-pill py-2 px-4 fw-bold flex-grow-1" (click)="downloadTicket(detail)">
+            <i class="bi bi-download me-1"></i> TẢI VÉ ĐIỆN TỬ
           </button>
-
-          <!-- Nhánh B: Yêu cầu hủy vé (nếu vé chưa dùng) -->
-          @if (detail.bookingStatus === 'CONFIRMED') {
-            <button class="btn btn-outline-danger rounded-pill py-2 px-3 fw-bold" (click)="openCancelModal(detail)">
-              <i class="bi bi-x-circle me-1"></i> HỦY VÉ & HOÀN TIỀN
-            </button>
-          }
 
           <button class="btn btn-showman-outline rounded-pill py-2 px-3" (click)="closeDetailModal()">
             ĐÓNG
@@ -295,109 +259,7 @@
   }
 
   <!-- ============================================================
-       MODAL 2: THÔNG BÁO LỖI KHÔNG ĐỦ ĐIỀU KIỆN HỦY VÉ (< 12 GIỜ)
-       BPMN 2.2.4 Bước 3 - Cổng quyết định "Suất diễn diễn ra trong vòng < 12h"
-       ============================================================ -->
-  @if (cancelErrorAlert(); as errMsg) {
-    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
-      <div class="card card-showman-glass rounded-4 p-4 max-w-500 w-100 border-ruby-glow shadow-2xl text-center">
-        <div class="mb-3">
-          <i class="bi bi-exclamation-octagon-fill text-danger display-4"></i>
-        </div>
-        <h4 class="text-ruby-glow fw-bold mb-2">KHÔNG ĐỦ ĐIỀU KIỆN HỦY VÉ</h4>
-        <p class="text-white fs-6 mb-3 px-2">{{ errMsg }}</p>
-
-        <div class="alert alert-dark border-secondary border-opacity-25 p-3 rounded-3 small text-secondary text-start mb-4">
-          <h6 class="text-warning fw-bold mb-1"><i class="bi bi-shield-lock me-1"></i> Chính sách vé Nhà Hát:</h6>
-          <ul class="mb-0 ps-3">
-            <li>Vé kịch được khóa sơ đồ biểu diễn trước 12 giờ để chuẩn bị khâu tiếp đón và kỹ thuật sân khấu.</li>
-            <li>Trong vòng 12h trước giờ diễn, hệ thống không thể xử lý hoàn hủy để đảm bảo quyền lợi tổ chức nghệ thuật.</li>
-          </ul>
-        </div>
-
-        <button class="btn btn-showman-gold w-100 rounded-pill py-2 fw-bold" (click)="cancelErrorAlert.set(null)">
-          QUAY LẠI MÀN HÌNH VÉ
-        </button>
-      </div>
-    </div>
-  }
-
-  <!-- ============================================================
-       MODAL 3: XÁC NHẬN HỦY VÉ & HOÀN TIỀN TỰ ĐỘNG (>= 12 GIỜ)
-       BPMN 2.2.4 Bước 3 Nhánh B: Đủ điều kiện hủy -> Tính hoàn tiền -> Xác nhận
-       ============================================================ -->
-  @if (cancellingOrder(); as cancelTarget) {
-    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
-      <div class="card card-showman-glass rounded-4 p-4 max-w-500 w-100 border-gold-glow shadow-2xl">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="text-ruby-glow fw-bold mb-0">HỦY VÉ & HOÀN TIỀN</h4>
-          <button class="btn btn-sm btn-outline-secondary rounded-circle" (click)="closeCancelModal()">✕</button>
-        </div>
-
-        @if (!cancelSuccessMessage()) {
-          <div class="mb-3 text-secondary small">
-            <div>Mã vé: <strong class="text-gold">{{ cancelTarget.bookingCode }}</strong></div>
-            <div>Vở kịch: <strong class="text-white">{{ cancelTarget.musicalTitle }}</strong></div>
-            <div>Tổng giá trị vé: <strong class="text-white">{{ cancelTarget.totalPrice | number:'1.0-0' }} đ</strong></div>
-          </div>
-
-          <!-- BẢNG TÍNH TOÁN TIỀN HOÀN DỰA TRÊN THỜI GIAN -->
-          @if (refundEstimate(); as est) {
-            <div class="alert alert-dark border-warning p-3 rounded-3 small mb-3">
-              <div class="d-flex justify-content-between mb-1">
-                <span class="text-secondary">Thời gian tới giờ diễn:</span>
-                <span class="text-warning fw-bold">{{ est.hoursRemaining }} giờ</span>
-              </div>
-              <div class="d-flex justify-content-between mb-1">
-                <span class="text-secondary">Tỷ lệ hoàn tiền:</span>
-                <span class="text-success fw-bold">{{ est.rate }}% giá trị vé</span>
-              </div>
-              <div class="d-flex justify-content-between mb-1">
-                <span class="text-secondary">Phí hủy quy định:</span>
-                <span class="text-danger">{{ est.fee | number:'1.0-0' }} đ</span>
-              </div>
-              <div class="d-flex justify-content-between pt-2 border-top border-secondary border-opacity-50">
-                <strong class="text-white">Số tiền hoàn thực tế:</strong>
-                <strong class="text-gold-gradient fs-6">{{ est.refundAmount | number:'1.0-0' }} đ</strong>
-              </div>
-            </div>
-          }
-
-          <div class="mb-3">
-            <label class="form-label text-gold small fw-bold">Lý do hủy vé *</label>
-            <select class="form-select bg-dark text-white border-secondary" [value]="cancelReason()" (change)="cancelReason.set($any($event.target).value)">
-              <option value="Bận lịch cá nhân đột xuất">Bận lịch cá nhân đột xuất</option>
-              <option value="Thay đổi ngày xem / muốn đổi suất khác">Muốn đổi sang suất chiếu khác</option>
-              <option value="Đặt nhầm số lượng hoặc vị trí ghế">Đặt nhầm số lượng hoặc vị trí ghế</option>
-              <option value="Lý do sức khỏe hoặc công tác">Lý do sức khỏe hoặc công tác</option>
-            </select>
-          </div>
-
-          <div class="d-flex gap-2">
-            <button class="btn btn-showman-outline w-100 rounded-pill py-2" (click)="closeCancelModal()">HỦY BỎ</button>
-            <button class="btn btn-showman-ruby w-100 rounded-pill py-2 fw-bold" [disabled]="isSubmittingCancel()" (click)="confirmCancelBooking()">
-              @if (isSubmittingCancel()) {
-                <span class="spinner-border spinner-border-sm me-1"></span> Đang xử lý...
-              } @else {
-                XÁC NHẬN HỦY VÉ & HOÀN TIỀN
-              }
-            </button>
-          </div>
-        } @else {
-          <!-- MÀN HÌNH HOÀN TẤT HỦY VÉ -->
-          <div class="alert alert-success p-4 rounded-3 text-white bg-dark border-success text-center mb-3">
-            <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
-            <h5 class="fw-bold text-success mb-2">HỦY VÉ THÀNH CÔNG</h5>
-            <p class="small mb-0 text-white">{{ cancelSuccessMessage() }}</p>
-          </div>
-          <button class="btn btn-showman-gold w-100 rounded-pill py-2 fw-bold" (click)="closeCancelModal()">ĐÃ HIỂU & ĐÓNG</button>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- ============================================================
-       MODAL 4: XEM MÃ QR CHECK-IN PHÓNG TO
+       MODAL: XEM MÃ QR CHECK-IN PHÓNG TO
        ============================================================ -->
   @if (viewingQrOrder(); as qrTarget) {
     <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">

@@ -110,9 +110,9 @@
 
       <!-- Cảnh báo nếu giao dịch thanh toán thất bại (BPMN 2.2.3 Bước 12 & 13) -->
       @if (paymentFailureMessage(); as failMsg) {
-        <div class="alert alert-danger border-danger-subtle p-3 rounded-4 mb-4 d-flex align-items-center justify-content-between animate-fade-in">
+        <div class="alert payment-failure-alert p-3 rounded-4 mb-4 d-flex align-items-center justify-content-between animate-fade-in">
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
+            <i class="bi bi-exclamation-triangle-fill fs-4 payment-failure-icon"></i>
             <div>
               <strong class="text-white d-block">GIAO DỊCH CHƯA THÀNH CÔNG</strong>
               <span class="small text-light">{{ failMsg }}</span>
@@ -362,7 +362,7 @@
           <div class="modal-content card-showman-glass border-gold-glow text-white p-2 rounded-4 shadow-2xl">
             <div class="modal-header border-secondary border-opacity-25">
               <div class="d-flex align-items-center gap-2">
-                <span class="badge badge-showman-gold fw-bold">BƯỚC 11</span>
+                
                 <h5 class="modal-title text-gold fw-bold mb-0">CỔNG THANH TOÁN: {{ selectedPaymentName() }}</h5>
               </div>
               <button type="button" class="btn-close btn-close-white" (click)="closePaymentModal()"></button>

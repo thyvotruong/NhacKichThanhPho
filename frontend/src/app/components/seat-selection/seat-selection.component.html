@@ -8,7 +8,7 @@
     <!-- Tiêu đề chuẩn đồng bộ theo mẫu chung của nhóm -->
     <div class="text-center mb-5">
       <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">
-        SƠ ĐỒ CHỌN GHẾ
+        SƠ ĐỒ GHẾ NGỒI
       </h2>
       <div class="showman-divider mx-auto mt-1 mb-4"></div>
       <p class="text-white text-secondary max-w-800 mx-auto">
@@ -20,12 +20,6 @@
     <!-- Header thông tin suất diễn -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom border-gold-glow">
       <div>
-        <nav aria-label="breadcrumb" class="mb-1">
-          <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a routerLink="/" class="text-gold text-decoration-none fw-bold">TRANG CHỦ</a></li>
-            <li class="breadcrumb-item text-secondary active">SƠ ĐỒ CHỌN GHẾ</li>
-          </ol>
-        </nav>
         <h2 class="display-6 fw-bold text-gold-gradient mb-1">
           {{ scheduleInfo()?.musicalTitle || 'Vở Nhạc Kịch Sân Khấu' }}
         </h2>
@@ -61,14 +55,7 @@
 
     <!-- KHU VỰC SƠ ĐỒ SÂN KHẤU & GHẾ -->
     <div class="card card-showman-glass rounded-4 p-4 mb-4">
-      <!-- MÔ PHỎNG VỊ TRÍ SÂN KHẤU TRUNG TÂM -->
-      <div class="stage-screen-box text-center mx-auto mb-5 position-relative">
-        <div class="stage-screen-curve"></div>
-        <span class="font-cinzel text-gold-glow tracking-wider fw-bold text-uppercase d-block mt-2">
-          🎭 SÂN KHẤU CHÍNH (THE GRAND BROADWAY STAGE)
-        </span>
-        <span class="x-small text-secondary">Âm thanh vòm Dolby Atmos • Ánh sáng đa chiều</span>
-      </div>
+      
 
       <!-- BỘ CHUYỂN TẦNG: TẦNG TRỆT & TẦNG LẦU -->
       <div class="d-flex justify-content-center gap-2 mb-4">
@@ -110,11 +97,11 @@
         </div>
         <div class="d-flex align-items-center gap-2">
           <div class="seat-sample seat-booked"></div>
-          <span class="small text-muted">Đã Bán</span>
+          <span class="small text-white">Đã Bán</span>
         </div>
         <div class="d-flex align-items-center gap-2">
           <div class="seat-sample seat-locked"></div>
-          <span class="small text-ruby-glow">Khóa Nội Bộ</span>
+          <span class="small text-ruby-glow">Đã khóa</span>
         </div>
       </div>
 
@@ -124,7 +111,7 @@
           @for (rowName of uniqueRows(); track rowName) {
             <div class="d-flex align-items-center justify-content-center gap-2">
               <!-- Nhãn hàng bên trái -->
-              <span class="row-label fw-bold text-gold me-2">{{ rowName }}</span>
+              <span class="row-label fw-bold me-2">{{ rowName }}</span>
 
               <!-- Danh sách ghế trong hàng -->
               <div class="d-flex gap-2">
@@ -142,18 +129,19 @@
                     [title]="seat.seatCode + ' - ' + seat.type + ' (' + (seat.price | number:'1.0-0') + ' đ)' + (seat.lockedReason ? ' [' + seat.lockedReason + ']' : '')"
                   >
                     @if (seat.status === 'locked') {
-                      <i class="bi bi-lock-fill"></i>
+                      <i class="bi bi-lock-fill seat-mark"></i>
                     } @else if (seat.status === 'booked') {
-                      ✕
+                      <span class="seat-mark">✕</span>
                     } @else {
-                      {{ seat.number }}
+                      <span class="seat-number">{{ seat.number }}</span>
                     }
+                    <span class="seat-price">{{ seat.price | number:'1.0-0' }} đ</span>
                   </button>
                 }
               </div>
 
               <!-- Nhãn hàng bên phải -->
-              <span class="row-label fw-bold text-gold ms-2">{{ rowName }}</span>
+              <span class="row-label fw-bold ms-2">{{ rowName }}</span>
             </div>
           }
         </div>
@@ -165,8 +153,8 @@
       <div class="row align-items-center g-3">
         <div class="col-lg-6">
           <div class="d-flex flex-column">
-            <span class="x-small text-gold fw-bold text-uppercase mb-1">
-              <i class="bi bi-check-circle-fill me-1"></i> Ghế Đã Chọn ({{ selectedSeats().length }}/5):
+            <span class="text-white small text-gold fw-bold text-uppercase mb-1">
+              Ghế Đã Chọn ({{ selectedSeats().length }}/5):
             </span>
             <div class="d-flex flex-wrap gap-2">
               @for (s of selectedSeats(); track s.seatCode) {

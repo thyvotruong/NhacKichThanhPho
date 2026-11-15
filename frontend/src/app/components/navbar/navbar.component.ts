@@ -49,7 +49,7 @@ import { MusicalService } from '../../services/musical.service';
 
           <!-- Danh sách Menu Khách Hàng (Sitemap Chuẩn Hóa - Đã loại bỏ "Vé của tôi" khỏi menu chung) -->
           <div class="collapse navbar-collapse" id="theaterNavbar">
-            <ul class="navbar-nav ms-auto align-items-xl-center gap-1 gap-xl-2">
+            <ul class="navbar-nav ms-auto align-items-xl-center gap-1 gap-xl-4">
               <!-- 1. TRANG CHỦ -->
               <li class="nav-item">
                 <a
@@ -58,7 +58,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLinkActive="active"
                   [routerLinkActiveOptions]="{ exact: true }"
                 >
-                  <i class="bi bi-stars text-gold me-1"></i> TRANG CHỦ
+                  TRANG CHỦ
                 </a>
               </li>
 
@@ -69,7 +69,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLink="/musicals"
                   routerLinkActive="active"
                 >
-                  <i class="bi bi-film text-ruby-glow me-1"></i> VỞ DIỄN
+                  VỞ DIỄN
                 </a>
               </li>
 
@@ -80,7 +80,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLink="/schedules"
                   routerLinkActive="active"
                 >
-                  <i class="bi bi-calendar-event text-gold me-1"></i> LỊCH DIỄN
+                  LỊCH DIỄN
                 </a>
               </li>
 
@@ -91,7 +91,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLink="/artists"
                   routerLinkActive="active"
                 >
-                  <i class="bi bi-person-heart text-ruby-glow me-1"></i> NGHỆ SĨ
+                  NGHỆ SĨ
                 </a>
               </li>
 
@@ -102,7 +102,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLink="/news"
                   routerLinkActive="active"
                 >
-                  <i class="bi bi-newspaper text-gold me-1"></i> TIN TỨC
+                  TIN TỨC
                 </a>
               </li>
 
@@ -114,7 +114,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLinkActive="active"
                   (click)="onNavigate('/about')"
                 >
-                  <i class="bi bi-building text-ruby-glow me-1"></i> VỀ CHÚNG TÔI
+                  VỀ CHÚNG TÔI
                 </a>
               </li>
 
@@ -126,7 +126,7 @@ import { MusicalService } from '../../services/musical.service';
                   routerLinkActive="active"
                   (click)="onNavigate('/policy')"
                 >
-                  <i class="bi bi-shield-check text-gold me-1"></i> CHÍNH SÁCH
+                  CHÍNH SÁCH
                 </a>
               </li>
 
@@ -143,64 +143,69 @@ import { MusicalService } from '../../services/musical.service';
                   </a>
                 </li>
               } @else {
-                <!-- ĐÃ ĐĂNG NHẬP: Hiển thị menu Dropdown Tài Khoản Cá Nhân & [Mục con] Vé của tôi -->
+                <!-- ĐÃ ĐĂNG NHẬP: Hiển thị menu Tài khoản của tôi -->
                 <li class="nav-item dropdown ms-xl-2">
-                  <a
-                    class="nav-link nav-link-showman dropdown-toggle text-uppercase fw-bold d-inline-flex align-items-center gap-2"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <div class="nav-user-circle">
-                      <i class="bi bi-person-fill text-gold"></i>
-                    </div>
-                    <span class="text-white text-truncate max-w-150">{{ musicalService.currentUser()?.fullName || 'Khách Hàng' }}</span>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end border-gold-glow shadow-2xl p-2 animate-dropdown">
-                    <!-- Header người dùng trong menu -->
-                    <li class="px-3 py-2 border-bottom border-secondary border-opacity-25 mb-1">
-                      <div class="fw-bold text-gold small">{{ musicalService.currentUser()?.fullName || 'Khách Hàng' }}</div>
-                      <div class="text-secondary extra-small">{{ musicalService.currentUser()?.email || '' }}</div>
-                      <span class="badge badge-showman-gold rounded-pill extra-small mt-1">SHOWMAN VIP</span>
-                    </li>
+                  <div class="d-flex align-items-center">
+                    <a
+                      class="nav-link nav-link-showman text-uppercase fw-bold d-inline-flex align-items-center gap-2"
+                      routerLink="/account/profile"
+                      [queryParams]="{ tab: 'profile' }"
+                      routerLinkActive="active"
+                    >
+                      <div class="nav-user-circle">
+                        <i class="bi bi-person-fill text-gold"></i>
+                      </div>
+                      <span class="text-white">TÀI KHOẢN CỦA TÔI</span>
+                    </a>
+                    <button
+                      type="button"
+                      class="btn nav-account-menu-toggle dropdown-toggle"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      aria-label="Mở menu tài khoản"
+                    ></button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end nav-account-dropdown border-gold-glow shadow-2xl p-2 animate-dropdown">
+                      <!-- Header người dùng trong menu -->
+                      <li class="nav-account-dropdown-header px-3 py-2 border-bottom border-secondary border-opacity-25 mb-1">
+                        <div class="fw-bold text-white small">{{ musicalService.currentUser()?.fullName || 'Khách Hàng' }}</div>
+                        <div class="text-secondary extra-small">{{ musicalService.currentUser()?.email || '' }}</div>
+                      </li>
 
-                    <!-- 1. Thông tin tài khoản -->
-                    <li>
-                      <a class="dropdown-item py-2 rounded-2" routerLink="/account/profile" [queryParams]="{ tab: 'profile' }">
-                        <i class="bi bi-person-badge text-gold me-2"></i>
-                        <span>Thông tin tài khoản</span>
-                      </a>
-                    </li>
+                      <!-- Hồ sơ cá nhân -->
+                      <li>
+                        <a class="dropdown-item py-2 rounded-2" routerLink="/account/profile" [queryParams]="{ tab: 'profile' }">
+                          <i class="bi bi-person-badge text-gold me-2"></i>
+                          <span>Hồ sơ cá nhân</span>
+                        </a>
+                      </li>
 
-                    <!-- 2. [MỤC CON] VÉ CỦA TÔI (Chỉ xuất hiện khi đã đăng nhập) -->
-                    <li>
-                      <a class="dropdown-item py-2 rounded-2 d-flex justify-content-between align-items-center" routerLink="/account/my-tickets">
-                        <div>
+                      <!-- Vé của tôi -->
+                      <li>
+                        <a class="dropdown-item py-2 rounded-2" routerLink="/account/my-tickets">
                           <i class="bi bi-ticket-perforated-fill text-gold me-2"></i>
-                          <span class="fw-bold text-white">[Mục con] Vé của tôi</span>
-                        </div>
-                        <span class="badge bg-danger rounded-pill extra-small">Mới</span>
-                      </a>
-                    </li>
+                          <span>Vé của tôi</span>
+                        </a>
+                      </li>
 
-                    <!-- 3. Đổi mật khẩu -->
-                    <li>
-                      <a class="dropdown-item py-2 rounded-2" routerLink="/account/profile" [queryParams]="{ tab: 'security' }">
-                        <i class="bi bi-shield-lock text-gold me-2"></i>
-                        <span>Đổi mật khẩu</span>
-                      </a>
-                    </li>
+                      <!-- Đổi mật khẩu -->
+                      <li>
+                        <a class="dropdown-item py-2 rounded-2" routerLink="/account/profile" [queryParams]="{ tab: 'security' }">
+                          <i class="bi bi-shield-lock text-gold me-2"></i>
+                          <span>Đổi mật khẩu</span>
+                        </a>
+                      </li>
 
-                    <li><hr class="dropdown-divider border-secondary border-opacity-25 my-1"></li>
+                      <li><hr class="dropdown-divider border-secondary border-opacity-25 my-1"></li>
 
-                    <!-- 4. Đăng xuất -->
-                    <li>
-                      <button class="dropdown-item py-2 rounded-2 text-danger" (click)="onLogout()">
-                        <i class="bi bi-box-arrow-right me-2"></i>
-                        <span>Đăng xuất</span>
-                      </button>
-                    </li>
-                  </ul>
+                      <!-- Đăng xuất -->
+                      <li>
+                        <button class="dropdown-item py-2 rounded-2 text-danger" (click)="onLogout()">
+                          <i class="bi bi-box-arrow-right me-2"></i>
+                          <span>Đăng xuất</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
                 </li>
               }
             </ul>
@@ -280,6 +285,19 @@ import { MusicalService } from '../../services/musical.service';
       justify-content: center;
       font-size: 0.8rem;
     }
+    .nav-account-menu-toggle {
+      color: #CBD5E1;
+      padding: 0.35rem 0.25rem;
+      border: 0;
+    }
+    .nav-account-menu-toggle:hover,
+    .nav-account-menu-toggle:focus-visible {
+      color: #FDE68A;
+    }
+    .nav-account-menu-toggle:focus-visible {
+      outline: 2px solid #F59E0B;
+      outline-offset: 2px;
+    }
     .tracking-wider {
       letter-spacing: 2px;
     }
@@ -295,15 +313,46 @@ import { MusicalService } from '../../services/musical.service';
       backdrop-filter: blur(16px);
       min-width: 260px;
     }
+    .nav-account-dropdown {
+      width: 19rem;
+      max-width: calc(100vw - 1.5rem);
+      margin-top: 0.5rem !important;
+      border: 1px solid rgba(245, 158, 11, 0.4) !important;
+      border-radius: 0.85rem;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.08);
+    }
+    .nav-account-dropdown-header {
+      padding-top: 0.75rem !important;
+      padding-bottom: 0.75rem !important;
+      overflow-wrap: anywhere;
+    }
+    .nav-account-dropdown .text-secondary {
+      color: #CBD5E1 !important;
+    }
     .dropdown-item {
       font-size: 0.82rem;
       font-weight: 600;
       color: #CBD5E1;
       transition: all 0.2s ease;
     }
+    .nav-account-dropdown .dropdown-item {
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding-right: 0.75rem;
+      padding-left: 0.75rem;
+    }
+    .nav-account-dropdown .dropdown-item i {
+      width: 1rem;
+      text-align: center;
+    }
     .dropdown-item:hover, .dropdown-item.active {
       background: rgba(245, 158, 11, 0.15);
       color: var(--showman-gold);
+    }
+    .nav-account-dropdown .dropdown-item:focus-visible {
+      outline: 2px solid #F59E0B;
+      outline-offset: -2px;
     }
     .max-w-150 {
       max-width: 150px;

@@ -2,8 +2,7 @@
  * ============================================================
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL SPA) - ANGULAR FRONTEND
  * File: components/my-tickets/my-tickets.component.ts
- * Chức năng: Quản lý vé cá nhân, lịch sử vé, xem chi tiết E-ticket,
- * in/tải vé điện tử và Hủy vé hoàn tiền tự động theo BPMN 2.2.4
+ * Chức năng: Quản lý vé cá nhân, lịch sử vé, xem và tải E-ticket
  * ============================================================
  */
 
@@ -26,20 +25,12 @@ export class MyTicketsComponent implements OnInit {
   private readonly router = inject(Router);
 
   bookings = signal<BookingOrder[]>([]);
-  activeTab = signal<'UPCOMING' | 'USED' | 'CANCELLED'>('UPCOMING');
+  activeTab = signal<'UPCOMING' | 'USED'>('UPCOMING');
   isLoading = signal<boolean>(true);
   searchCode = signal<string>('');
 
   // Modal Chi tiết vé điện tử (E-Ticket) - BPMN 2.2.4 Bước 2
   selectedDetailOrder = signal<BookingOrder | null>(null);
-
-  // Modal hủy vé & Đánh giá chính sách thời gian - BPMN 2.2.4 Bước 3 Nhánh B
-  cancellingOrder = signal<BookingOrder | null>(null);
-  cancelReason = signal<string>('Bận lịch cá nhân đột xuất');
-  isSubmittingCancel = signal<boolean>(false);
-  cancelSuccessMessage = signal<string | null>(null);
-  cancelErrorAlert = signal<string | null>(null);
-  refundEstimate = signal<{ rate: number; refundAmount: number; fee: number; hoursRemaining: number } | null>(null);
 
   // Modal QR Code phóng to
   viewingQrOrder = signal<BookingOrder | null>(null);
@@ -48,12 +39,8 @@ export class MyTicketsComponent implements OnInit {
     const tab = this.activeTab();
     const query = this.searchCode().trim().toLowerCase();
     return this.bookings().filter(b => {
-      let matchesTab = true;
-      if (tab === 'UPCOMING') matchesTab = b.bookingStatus === 'CONFIRMED';
-      else if (tab === 'USED') matchesTab = b.bookingStatus === 'CHECKED_IN';
-      else if (tab === 'CANCELLED') matchesTab = b.bookingStatus === 'CANCELLED';
-
-      if (!matchesTab) return false;
+      const expectedStatus = tab === 'UPCOMING' ? 'CONFIRMED' : 'CHECKED_IN';
+      if (b.bookingStatus !== expectedStatus) return false;
       if (!query) return true;
       return (
         b.bookingCode.toLowerCase().includes(query) ||
@@ -86,105 +73,90 @@ export class MyTicketsComponent implements OnInit {
   // --- XEM CHI TIẾT VÉ (BPMN 2.2.4 Bước 2) ---
   openDetailModal(order: BookingOrder): void {
     this.selectedDetailOrder.set(order);
-    this.cancelErrorAlert.set(null);
   }
 
   closeDetailModal(): void {
     this.selectedDetailOrder.set(null);
-    this.cancelErrorAlert.set(null);
   }
 
-  // --- NHÁNH A: TẢI / IN VÉ ĐIỆN TỬ (PDF/PRINT) ---
-  printTicket(order?: BookingOrder): void {
-    if (order && !this.selectedDetailOrder()) {
-      this.selectedDetailOrder.set(order);
-    }
-    setTimeout(() => {
-      window.print();
-    }, 150);
-  }
-
-  // --- NHÁNH B: YÊU CẦU HỦY VÉ & HOÀN TIỀN TỰ ĐỘNG ---
-  getRemainingHours(order: BookingOrder): number {
-    try {
-      const dateStr = typeof order.performanceDate === 'string'
-        ? order.performanceDate.split('T')[0]
-        : new Date(order.performanceDate).toISOString().split('T')[0];
-      const timeStr = order.performanceTime || '20:00';
-      const showDateTime = new Date(`${dateStr}T${timeStr}:00`);
-      const now = new Date();
-      return (showDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-    } catch {
-      return 48; // Giả định an toàn nếu parsing lỗi
-    }
-  }
-
-  openCancelModal(order: BookingOrder): void {
-    this.cancelErrorAlert.set(null);
-    this.cancelSuccessMessage.set(null);
-
-    // Đánh giá điều kiện thời gian theo BPMN 2.2.4 Bước 3 Nhánh B
-    const diffHours = this.getRemainingHours(order);
-
-    if (diffHours < 12) {
-      // Cổng quyết định: KHÔNG HỢP LỆ (< 12h)
-      this.cancelErrorAlert.set(
-        'Suất diễn diễn ra trong vòng 12 giờ tới, theo quy định nhà hát không thể hủy vé.'
-      );
-      // Hiển thị modal thông báo lỗi hoặc giữ ở màn hình chi tiết
-      return;
-    }
-
-    // Cổng quyết định: HỢP LỆ (>= 12h) -> Tính toán số tiền hoàn
-    let rate = 0.9;
-    if (diffHours < 24) {
-      rate = 0.7; // 12h - 24h: 70%
-    } // > 24h: 90%
-
-    const refundAmount = Math.round(order.totalPrice * rate);
-    const fee = order.totalPrice - refundAmount;
-
-    this.refundEstimate.set({
-      rate: rate * 100,
-      refundAmount,
-      fee,
-      hoursRemaining: Math.round(diffHours)
+  downloadTicket(order: BookingOrder): void {
+    const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, character => {
+      const entities: Record<string, string> = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      };
+      return entities[character];
     });
-
-    this.cancellingOrder.set(order);
-  }
-
-  closeCancelModal(): void {
-    this.cancellingOrder.set(null);
-    this.cancelSuccessMessage.set(null);
-    this.cancelErrorAlert.set(null);
-    this.refundEstimate.set(null);
-  }
-
-  confirmCancelBooking(): void {
-    const order = this.cancellingOrder();
-    if (!order) return;
-
-    this.isSubmittingCancel.set(true);
-    this.musicalService.cancelBooking(order.bookingCode, this.cancelReason()).subscribe({
-      next: (res) => {
-        this.isSubmittingCancel.set(false);
-        const refundAmt = this.refundEstimate()?.refundAmount.toLocaleString('vi-VN') || '';
-        this.cancelSuccessMessage.set(
-          `Hủy vé thành công! Bạn được hoàn ${refundAmt} đ về tài khoản. Hệ thống đã gửi email xác nhận hủy vé & hóa đơn hoàn tiền đến ${order.customerEmail}. Ghế đã được giải phóng về khán phòng.`
-        );
-        // Cập nhật lại danh sách vé
-        this.loadTickets();
-        // Cập nhật lại vé đang mở chi tiết nếu có
-        if (this.selectedDetailOrder()?.bookingCode === order.bookingCode) {
-          this.selectedDetailOrder.update(curr => curr ? { ...curr, bookingStatus: 'CANCELLED' } : null);
-        }
-      },
-      error: (err) => {
-        this.isSubmittingCancel.set(false);
-        this.cancelErrorAlert.set(err.message || 'Không thể hủy vé theo quy định nhà hát');
-      }
+    const formattedDate = new Date(order.performanceDate).toLocaleDateString('vi-VN', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
+    const seats = order.seats.map(seat =>
+      `<li>${escapeHtml(seat.seatCode)} (${escapeHtml(seat.type)}) — ${new Intl.NumberFormat('vi-VN').format(seat.price)} đ</li>`
+    ).join('');
+    const status = order.bookingStatus === 'CONFIRMED'
+      ? 'Chưa sử dụng'
+      : order.bookingStatus === 'CHECKED_IN'
+        ? 'Đã check-in'
+        : 'Đã hủy';
+    const ticketHtml = `<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vé điện tử ${escapeHtml(order.bookingCode)}</title>
+  <style>
+    body{margin:0;padding:32px;background:#070a12;color:#f8fafc;font:16px/1.6 Arial,sans-serif}
+    .ticket{max-width:760px;margin:auto;padding:32px;border:1px solid #f59e0b;border-radius:20px;background:#0e1629}
+    header{display:flex;justify-content:space-between;gap:16px;padding-bottom:18px;border-bottom:1px solid #334155;color:#fde68a;font-weight:700}
+    h1{margin:24px 0 4px;font-size:28px}
+    .muted{color:#cbd5e1}
+    .code{margin:24px 0;padding:16px;border:1px dashed #f59e0b;border-radius:12px;text-align:center}
+    .code span{display:block;color:#cbd5e1;font-size:13px}
+    .code strong{font:700 24px/1.5 monospace;color:#fde68a;letter-spacing:1px}
+    .details{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .details div{padding:12px;background:#090d16;border-radius:8px}
+    .details strong{display:block;color:#cbd5e1;font-size:13px}
+    ul{padding-left:20px}
+    .notice{margin-top:24px;padding-top:16px;border-top:1px solid #334155;color:#cbd5e1}
+    @media(max-width:600px){body{padding:16px}.ticket{padding:20px}.details{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="ticket">
+    <header><span>NHÀ HÁT NHẠC KỊCH THÀNH PHỐ</span><span>VÉ ĐIỆN TỬ</span></header>
+    <h1>${escapeHtml(order.musicalTitle)}</h1>
+    <p class="muted">${escapeHtml(formattedDate)} • ${escapeHtml(order.performanceTime)}</p>
+    <div class="code"><span>MÃ VÉ</span><strong>${escapeHtml(order.bookingCode)}</strong></div>
+    <section class="details">
+      <div><strong>Khách hàng</strong>${escapeHtml(order.customerName)}</div>
+      <div><strong>Liên hệ</strong>${escapeHtml(order.customerPhone)} • ${escapeHtml(order.customerEmail)}</div>
+      <div><strong>Địa điểm</strong>${escapeHtml(order.hall)} • ${escapeHtml(order.venue || 'Nhà hát Thành phố')}</div>
+      <div><strong>Trạng thái</strong>${status}</div>
+      <div><strong>Tổng thanh toán</strong>${new Intl.NumberFormat('vi-VN').format(order.totalPrice)} đ</div>
+      <div><strong>Thanh toán</strong>${escapeHtml(order.paymentMethod)} (${escapeHtml(order.paymentStatus)})</div>
+    </section>
+    <h2>Ghế đã đặt</h2>
+    <ul>${seats}</ul>
+    <p class="notice">Vui lòng lưu vé điện tử và xuất trình mã vé khi đến nhà hát. Vé đã mua không hỗ trợ hủy hoặc hoàn tiền.</p>
+  </main>
+</body>
+</html>`;
+    const blob = new Blob([ticketHtml], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const safeCode = order.bookingCode.replace(/[^a-zA-Z0-9_-]/g, '_');
+    link.href = url;
+    link.download = `${safeCode || 've-dien-tu'}.html`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   openQrModal(order: BookingOrder): void {

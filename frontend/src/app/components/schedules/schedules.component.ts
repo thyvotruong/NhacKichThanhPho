@@ -15,11 +15,14 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { MusicalService } from '../../services/musical.service';
-import { Schedule } from '../../models/musical.model';
+import { Musical, Schedule } from '../../models/musical.model';
 
 export interface ScheduleWithGenre extends Schedule {
   genre?: string;
+  posterUrl?: string;
+  subtitle?: string;
 }
 
 @Component({
@@ -143,24 +146,42 @@ export class SchedulesComponent implements OnInit {
 
   loadSchedules(): void {
     this.isLoading.set(true);
-    this.musicalService.getSchedules().subscribe({
-      next: (data: Schedule[]) => {
-        if (data && data.length > 0) {
-          const enriched: ScheduleWithGenre[] = data.map(s => ({
-            ...s,
-            genre: (s as any).genre || this.genreMap[s.musicalSlug] || 'Broadway'
-          }));
-          this.schedules.set(enriched);
-        } else {
-          this.schedules.set(this.getMockSchedules());
-        }
+    forkJoin({
+      schedules: this.musicalService.getSchedules(),
+      musicals: this.musicalService.getMusicals()
+    }).subscribe({
+      next: ({ schedules, musicals }) => {
+        const scheduleList = schedules.length > 0 ? schedules : this.getMockSchedules();
+        this.schedules.set(this.enrichSchedules(scheduleList, musicals));
         this.isLoading.set(false);
       },
       error: () => {
-        this.schedules.set(this.getMockSchedules());
+        this.schedules.set(this.enrichSchedules(this.getMockSchedules(), []));
         this.isLoading.set(false);
       }
     });
+  }
+
+  private enrichSchedules(schedules: Schedule[], musicals: Musical[]): ScheduleWithGenre[] {
+    const musicalsBySlug = new Map(musicals.map(musical => [musical.slug, musical]));
+
+    return schedules.map(schedule => {
+      const musical = musicalsBySlug.get(schedule.musicalSlug);
+      return {
+        ...schedule,
+        genre: musical?.genre || this.genreMap[schedule.musicalSlug] || 'Broadway',
+        posterUrl: musical?.posterUrl,
+        subtitle: musical?.subtitle || musical?.synopsis
+      };
+    });
+  }
+
+  availableSeatCount(schedule: ScheduleWithGenre): number {
+    if (schedule.seats?.length) {
+      return schedule.seats.filter(seat => seat.status === 'available').length;
+    }
+
+    return Math.max(0, schedule.totalSeats - schedule.bookedSeats - (schedule.lockedSeatsCount ?? 0));
   }
 
   // ==========================================

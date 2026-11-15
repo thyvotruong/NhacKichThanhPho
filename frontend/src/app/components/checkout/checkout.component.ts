@@ -244,7 +244,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Bước 13: Kiểm tra thời gian giữ ghế
     if (this.holdSecondsLeft() > 0) {
       this.paymentFailureMessage.set(
-        customMsg || `Giao dịch qua cổng ${this.selectedPaymentName()} thất bại hoặc bị hủy bởi người dùng. Thời gian giữ ghế vẫn còn (${this.formatTime(this.holdSecondsLeft())}), vui lòng chọn lại phương thức thanh toán!`
+        customMsg || `Giao dịch qua ${this.selectedPaymentName()} thất bại. Thời gian giữ ghế vẫn còn, quý khách vui lòng thử lại!`
       );
     } else {
       alert('Đã hết thời gian giữ ghế! Hệ thống giải phóng ghế và hủy đơn hàng.');

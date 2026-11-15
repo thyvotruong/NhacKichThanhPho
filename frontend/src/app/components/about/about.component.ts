@@ -18,7 +18,6 @@ export interface KeyLeader {
   avatarUrl: string;
   bio: string;
   experience: string;
-  badge: string;
 }
 
 @Component({
@@ -36,32 +35,28 @@ export class AboutComponent {
       role: 'Giám Đốc Nghệ Thuật & Tổng Đạo Diễn',
       avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
       bio: 'Hơn 25 năm cống hiến cho sân khấu kịch nói và nhạc kịch hàn lâm, người định hình ngôn ngữ biểu diễn tráng lệ và dẫn dắt các vở diễn khai màn mùa diễn.',
-      experience: '25+ năm kinh nghiệm • Đạo diễn của năm 2024',
-      badge: 'Ban Giám Đốc Nghệ Thuật'
+      experience: '25+ năm kinh nghiệm • Đạo diễn của năm 2024'
     },
     {
       name: 'Nhạc sĩ Lê Quang Vũ',
       role: 'Giám Đốc Âm Nhạc & Nhạc Trưởng',
       avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
       bio: 'Tốt nghiệp Nhạc viện Tchaikovsky, chỉ huy dàn nhạc giao hưởng trực tiếp với 45 nghệ sĩ biểu diễn live 100% trong từng đêm diễn.',
-      experience: 'Chỉ huy trưởng Dàn nhạc Giao hưởng Sân khấu',
-      badge: 'Ban Giám Đốc Âm Nhạc'
+      experience: 'Chỉ huy trưởng Dàn nhạc Giao hưởng Sân khấu'
     },
     {
       name: 'Biên đạo Hoàng Yến Chi',
       role: 'Giám Đốc Sáng Tạo & Biên Đạo Múa',
       avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
       bio: 'Tu nghiệp chuyên sâu tại Broadway Dance Center (New York), người kiến tạo những đại cảnh vũ đạo bùng nổ, giàu nhịp điệu và cảm xúc thăng hoa.',
-      experience: 'Biên đạo trưởng 12 vở nhạc kịch kinh điển',
-      badge: 'Ban Sáng Tạo Nghệ Thuật'
+      experience: 'Biên đạo trưởng 12 vở nhạc kịch kinh điển'
     },
     {
       name: 'ThS. Nguyễn Quốc Thái',
       role: 'Giám Đốc Điều Hành & Trải Nghiệm Khán Giả',
       avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
       bio: 'Chuyên gia quản trị nghệ thuật biểu diễn, tiên phong số hóa hệ thống vé điện tử QR Code không chạm và chuẩn hóa dịch vụ tiếp đón hoàng gia.',
-      experience: 'Thạc sĩ Quản trị Nghệ thuật Sân khấu',
-      badge: 'Ban Vận Hành & Khán Giả'
+      experience: 'Thạc sĩ Quản trị Nghệ thuật Sân khấu'
     }
   ];
 

@@ -19,9 +19,12 @@
     </div>
     <!-- Thanh Tìm Kiếm & Bộ Lọc Nâng Cao -->
     <div class="filter-panel-showman p-4 rounded-4 mb-5 border border-gold-glow">
-      <div class="row g-3 align-items-center mb-4">
+      <div class="row g-3 align-items-end mb-4">
         <!-- Ô tìm kiếm -->
         <div class="col-lg-5">
+          <label class="form-label text-gold small fw-bold mb-1">
+            <i class="bi bi-search me-1"></i> TÌM KIẾM:
+          </label>
           <div class="input-group">
             <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25" style="background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 50%, #D97706 100%) !important; border-color: #F59E0B !important;">
               <i class="bi bi-search"></i>
@@ -29,7 +32,7 @@
             <input
               type="text"
               class="form-control bg-dark-glass text-white border-secondary border-opacity-25 py-2"
-              placeholder="Tìm theo tên vở diễn, diễn viên, đạo diễn..."
+              placeholder="Nhập tên vở diễn, diễn viên, đạo diễn"
               [ngModel]="searchKeyword()"
               (ngModelChange)="searchKeyword.set($event); onSearch()"
             />
@@ -43,6 +46,9 @@
 
         <!-- Lọc theo Trạng thái -->
         <div class="col-md-4 col-lg-3">
+          <label class="form-label text-gold small fw-bold mb-1">
+            <i class="bi bi-funnel-fill me-1"></i> TRẠNG THÁI VỞ DIỄN:
+          </label>
           <select
             class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
             [ngModel]="selectedStatus()"
@@ -56,19 +62,19 @@
 
         <!-- Sắp xếp -->
         <div class="col-md-4 col-lg-4">
-          <div class="d-flex align-items-center gap-2">
-            <span class="text-white text-secondary small text-nowrap"><i class="bi bi-arrow-down-up text-gold me-1"></i> Sắp xếp:</span>
-            <select
-              class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
-              [ngModel]="selectedSort()"
-              (ngModelChange)="setSort($event)"
-            >
-              <option value="newest">Mới nhất</option>
-              <option value="price_asc">Giá vé tăng dần</option>
-              <option value="price_desc">Giá vé giảm dần</option>
-              <option value="duration">Thời lượng dài nhất</option>
-            </select>
-          </div>
+          <label class="form-label text-gold small fw-bold mb-1">
+            <i class="bi bi-arrow-down-up me-1"></i> SẮP XẾP:
+          </label>
+          <select
+            class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
+            [ngModel]="selectedSort()"
+            (ngModelChange)="setSort($event)"
+          >
+            <option value="newest">Mới nhất</option>
+            <option value="price_asc">Giá vé tăng dần</option>
+            <option value="price_desc">Giá vé giảm dần</option>
+            <option value="duration">Thời lượng dài nhất</option>
+          </select>
         </div>
       </div>
 
@@ -103,7 +109,7 @@
         <i class="bi bi-emoji-neutral fs-1 text-gold mb-3 d-block"></i>
         <h3 class="text-white fw-bold">Không tìm thấy vở nhạc kịch phù hợp</h3>
         <p class="text-secondary mb-4">Hãy thử tìm kiếm với từ khóa khác hoặc bỏ chọn các bộ lọc thể loại.</p>
-        <button class="btn btn-showman-gold px-4 py-2" (click)="searchKeyword.set(''); selectedGenre.set('all'); selectedStatus.set('all'); fetchMusicals()">
+        <button class="btn btn-showman-gold px-4 py-2" (click)="resetFilters()">
           <i class="bi bi-arrow-clockwise me-1"></i> Đặt lại bộ lọc
         </button>
       </div>
@@ -123,23 +129,16 @@
                 <div class="poster-overlay"></div>
 
                 <!-- Tag Trạng Thái -->
-                <div class="position-absolute top-0 start-0 m-3 z-3">
+                <div class="position-absolute top-0 start-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
                   @if (m.status === 'now_showing') {
-                    <span class="badge badge-showman-ruby px-3 py-2 rounded-pill fw-bold shadow">
+                    <span>
                       <i class="bi bi-broadcast text-gold me-1"></i> ĐANG DIỄN
                     </span>
                   } @else {
-                    <span class="badge badge-showman-sapphire px-3 py-2 rounded-pill fw-bold shadow">
-                      <i class="bi bi-calendar-event me-1"></i> SẮP DIỄN
+                    <span>
+                      <i class="bi bi-calendar-event text-gold me-1"></i> SẮP DIỄN
                     </span>
                   }
-                </div>
-
-                <!-- Thể loại -->
-                <div class="position-absolute bottom-0 start-0 m-3 z-3">
-                  <span class="badge badge-showman-gold px-3 py-1 rounded-pill small fw-bold">
-                    {{ m.genre }}
-                  </span>
                 </div>
 
                 <!-- Thời lượng -->
@@ -159,8 +158,10 @@
                   </p>
 
                   <div class="small text-secondary mb-3 pb-3 border-bottom border-secondary border-opacity-25">
-                    <div class="mb-1"><i class="bi bi-person-fill text-gold me-1"></i> Đạo diễn: <strong class="text-white">{{ m.director }}</strong></div>
-                    <div class="text-truncate"><i class="bi bi-people text-ruby-glow me-1"></i> Diễn viên: <span class="text-light">{{ m.cast.join(', ') }}</span></div>
+                    <span class="text-white">
+                        <i class="bi bi-tag-fill me-1"></i>
+                        <strong class="fw-semibold"></strong> {{ m.genre }}
+                    </span>
                   </div>
                 </div>
 

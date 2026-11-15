@@ -2,44 +2,36 @@
  * ============================================================
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL SPA) - ANGULAR FRONTEND
  * File: components/musical-detail/musical-detail.component.ts
- * Chức năng: Hiển thị chi tiết Vở Diễn theo Slug SEO &
- * Tích hợp Reactive Form Đặt Vé Trực Tuyến với đầy đủ Validators.
+ * Chức năng: Hiển thị chi tiết Vở Diễn, chọn ngày/giờ và điều hướng chọn ghế.
  * ============================================================
  */
 
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
 import { MusicalService } from '../../services/musical.service';
-import {
-  Musical,
-  Schedule,
-  BookingRequest,
-  BookingResponse
-} from '../../models/musical.model';
+import { Musical, Schedule } from '../../models/musical.model';
+
+interface ScheduleDayOption {
+  dateKey: string;
+  date: Date;
+  schedules: Schedule[];
+}
 
 @Component({
   selector: 'app-musical-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, DatePipe, RouterLink],
   templateUrl: './musical-detail.component.html',
   styleUrls: ['./musical-detail.component.css']
 })
 export class MusicalDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
-  private readonly fb = inject(FormBuilder);
   private readonly musicalService = inject(MusicalService);
   private readonly sanitizer = inject(DomSanitizer);
   readonly trailerUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-    'https://www.youtube.com/embed/RclpGv8673s?autoplay=1'
+    'https://www.youtube.com/embed/KzhS5r5l54g?autoplay=1'
   );
 
   // Angular Signals quản lý trạng thái giao diện
@@ -47,24 +39,19 @@ export class MusicalDetailComponent implements OnInit {
   musical = signal<Musical | null>(null);
   schedules = signal<Schedule[]>([]);
   isLoading = signal<boolean>(true);
-  isSubmitting = signal<boolean>(false);
-  errorMessage = signal<string | null>(null);
   showTrailerModal = signal<boolean>(false);
+  selectedDateKey = signal<string | null>(null);
 
-  // Kết quả đặt vé thành công
-  bookingSuccessData = signal<BookingResponse | null>(null);
+  private readonly mockScheduleTimes = ['15:00', '19:30', '20:00'];
+  private readonly scheduleEndDate = new Date(2026, 10, 30);
 
-  // Reactive Form Đặt Vé Trực Tuyến
-  bookingForm!: FormGroup;
-
-  // Signal theo dõi giá vé đơn vị và tổng tiền theo thời gian thực
-  selectedTierPrice = signal<number>(800000);
-  selectedQuantity = signal<number>(1);
-  totalCalculatedPrice = computed(() => this.selectedTierPrice() * this.selectedQuantity());
+  scheduleDays = computed(() => this.groupSchedulesByDate(this.schedules()));
+  visibleScheduleDays = computed(() => this.scheduleDays().slice(0, 4));
+  selectedDateSchedules = computed(() =>
+    this.scheduleDays().find(day => day.dateKey === this.selectedDateKey())?.schedules ?? []
+  );
 
   ngOnInit(): void {
-    this.initBookingForm();
-
     // Lắng nghe tham số slug động từ URL (/musical/:slug)
     this.route.paramMap.subscribe((params) => {
       const slugParam = params.get('slug');
@@ -76,124 +63,32 @@ export class MusicalDetailComponent implements OnInit {
   }
 
   /**
-   * Khởi tạo Reactive Form với các trường và Validators nghiêm ngặt:
-   * - Họ tên: bắt buộc, min 2 ký tự
-   * - Email: bắt buộc, đúng định dạng email
-   * - Số điện thoại: bắt buộc, đúng regex 10 số Việt Nam (03, 05, 07, 08, 09)
-   * - Số lượng: bắt buộc, min 1, max 5
-   * - Suất chiếu & Hạng vé: bắt buộc
-   */
-  private initBookingForm(): void {
-    this.bookingForm = this.fb.group({
-      customerName: ['', [Validators.required, Validators.minLength(2)]],
-      customerEmail: ['', [Validators.required, Validators.email]],
-      customerPhone: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(0[3|5|7|8|9])[0-9]{8}$/)
-        ]
-      ],
-      scheduleId: ['', [Validators.required]],
-      ticketTier: ['VIP', [Validators.required]],
-      quantity: [
-        1,
-        [Validators.required, Validators.min(1), Validators.max(5)]
-      ],
-      notes: ['']
-    });
-
-    // Điền sẵn thông tin khách hàng nếu đã đăng nhập
-    if (this.musicalService.isLoggedIn()) {
-      const u = this.musicalService.currentUser();
-      this.bookingForm.patchValue({
-        customerName: u.fullName,
-        customerEmail: u.email,
-        customerPhone: u.phone
-      });
-    }
-
-    // Lắng nghe thay đổi hạng vé để cập nhật đơn giá theo thời gian thực
-    this.bookingForm.get('ticketTier')?.valueChanges.subscribe((tier) => {
-      this.updateUnitPrice(tier);
-    });
-
-    // Lắng nghe thay đổi số lượng vé để cập nhật tổng tiền
-    this.bookingForm.get('quantity')?.valueChanges.subscribe((qty) => {
-      const q = parseInt(qty, 10);
-      if (!isNaN(q) && q >= 1 && q <= 5) {
-        this.selectedQuantity.set(q);
-      }
-    });
-  }
-
-  /**
    * Tải thông tin chi tiết vở nhạc kịch từ Service
    */
   loadMusicalDetail(slug: string): void {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.selectedDateKey.set(null);
 
     this.musicalService.getMusicalBySlug(slug).subscribe({
       next: (data) => {
         this.musical.set(data);
-        if (data.schedules && data.schedules.length > 0) {
-          this.schedules.set(data.schedules);
-          // Tự động chọn suất diễn đầu tiên còn vé
-          const firstAvailable = data.schedules.find((s) => s.status === 'available');
-          if (firstAvailable) {
-            this.bookingForm.patchValue({ scheduleId: firstAvailable._id });
-          }
-        }
-        this.updateUnitPrice(this.bookingForm.get('ticketTier')?.value || 'VIP');
+        this.schedules.set(this.createScheduleOptions(data, data.schedules ?? []));
         this.isLoading.set(false);
       },
-      error: (err) => {
-        // Fallback dữ liệu tĩnh nếu backend chưa sẵn sàng để đảm bảo UI hoạt động mượt mà
+      error: () => {
         this.loadStaticFallback(slug);
       }
     });
   }
 
-  /**
-   * Cập nhật đơn giá vé theo loại vé đang chọn
-   */
-  private updateUnitPrice(tier: string): void {
-    const currentMusical = this.musical();
-    if (currentMusical && currentMusical.ticketPrices) {
-      const foundTier = currentMusical.ticketPrices.find((tp) => tp.tier === tier);
-      if (foundTier) {
-        this.selectedTierPrice.set(foundTier.price);
-        return;
-      }
-    }
-    // Mặc định fallback
-    if (tier === 'VIP') this.selectedTierPrice.set(800000);
-    else if (tier === 'Standard') this.selectedTierPrice.set(450000);
-    else this.selectedTierPrice.set(250000);
+  selectDate(dateKey: string): void {
+    this.selectedDateKey.set(dateKey);
   }
 
-  /**
-   * Getter tiện ích để truy cập nhanh các Form Controls trong HTML template
-   */
-  get f() {
-    return this.bookingForm.controls;
-  }
-
-  /**
-   * Bước 4 BPMN 2.2.3: Khi bấm Chọn Suất Diễn / Đặt Chỗ
-   * Kiểm tra trạng thái đăng nhập:
-   * - Nếu chưa đăng nhập: chuyển sang đăng ký & đăng nhập (kèm returnUrl)
-   * - Nếu đã đăng nhập: chuyển sang bước chọn ghế
-   */
-  onSelectScheduleToSeat(scheduleId: string): void {
-    if (!this.musicalService.isLoggedIn()) {
-      this.router.navigate(['/auth'], {
-        queryParams: { returnUrl: `/seat-selection/${scheduleId}` }
-      });
-    } else {
-      this.router.navigate(['/seat-selection', scheduleId]);
-    }
+  isToday(dateKey: string): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.formatDateKey(today) === dateKey;
   }
 
   openTrailer(): void {
@@ -204,102 +99,94 @@ export class MusicalDetailComponent implements OnInit {
     this.showTrailerModal.set(false);
   }
 
-  /**
-   * Xử lý gửi Form Đặt Vé Trực Tuyến lên Backend Node.js
-   */
-  onSubmitBooking(): void {
-    // Bước 4 BPMN 2.2.3: Kiểm tra đăng nhập
-    if (!this.musicalService.isLoggedIn()) {
-      this.router.navigate(['/auth'], {
-        queryParams: { returnUrl: this.router.url }
-      });
-      return;
-    }
+  private createScheduleOptions(musical: Musical, apiSchedules: Schedule[]): Schedule[] {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Đánh dấu tất cả trường là touched để hiển thị thông báo lỗi nếu form chưa hợp lệ
-    if (this.bookingForm.invalid) {
-      this.bookingForm.markAllAsTouched();
-      return;
-    }
+    const firstDateKey = this.formatDateKey(today);
+    const endDateKey = this.formatDateKey(this.scheduleEndDate);
+    const schedulesByDate = new Map<string, Schedule[]>();
 
-    const currentMusical = this.musical();
-    if (!currentMusical) return;
-
-    this.isSubmitting.set(true);
-    this.errorMessage.set(null);
-
-    const formValues = this.bookingForm.value;
-    const selectedSchedule = this.schedules().find((s) => s._id === formValues.scheduleId);
-
-    const bookingPayload: BookingRequest = {
-      musicalId: currentMusical._id,
-      musicalSlug: currentMusical.slug,
-      musicalTitle: currentMusical.title,
-      scheduleId: formValues.scheduleId,
-      performanceDate: selectedSchedule ? selectedSchedule.performanceDate : new Date(),
-      performanceTime: selectedSchedule ? selectedSchedule.time : '19:30',
-      customerName: formValues.customerName,
-      customerEmail: formValues.customerEmail,
-      customerPhone: formValues.customerPhone,
-      ticketTier: formValues.ticketTier,
-      quantity: Number(formValues.quantity),
-      notes: formValues.notes
-    };
-
-    // Gọi API qua MusicalService
-    this.musicalService.createBooking(bookingPayload).subscribe({
-      next: (response) => {
-        this.isSubmitting.set(false);
-        if (response.success && response.data) {
-          const mappedSuccess: BookingResponse = {
-            bookingCode: response.data.bookingCode,
-            customerName: response.data.customerName,
-            customerEmail: response.data.customerEmail,
-            customerPhone: response.data.customerPhone,
-            musicalTitle: response.data.musicalTitle,
-            performanceDate: String(response.data.performanceDate),
-            performanceTime: response.data.performanceTime,
-            ticketTier: formValues.ticketTier,
-            quantity: Number(formValues.quantity),
-            unitPrice: this.selectedTierPrice(),
-            totalPrice: response.data.totalPrice,
-            status: response.data.bookingStatus
-          };
-          this.bookingSuccessData.set(mappedSuccess);
-          // Reset form và thiết lập lại giá trị mặc định
-          this.bookingForm.reset({
-            quantity: 1,
-            ticketTier: 'VIP'
-          });
-        }
-      },
-      error: (err) => {
-        this.isSubmitting.set(false);
-        // Ngay cả khi offline, giả lập phản hồi thành công trực quan để người dùng trải nghiệm
-        const fallbackSuccess: BookingResponse = {
-          bookingCode: 'NK-' + Math.random().toString(36).substring(2, 7).toUpperCase(),
-          customerName: formValues.customerName,
-          customerEmail: formValues.customerEmail,
-          customerPhone: formValues.customerPhone,
-          musicalTitle: currentMusical.title,
-          performanceDate: String(bookingPayload.performanceDate || new Date().toISOString()),
-          performanceTime: bookingPayload.performanceTime || '19:30',
-          ticketTier: formValues.ticketTier,
-          quantity: Number(formValues.quantity),
-          unitPrice: this.selectedTierPrice(),
-          totalPrice: this.totalCalculatedPrice(),
-          status: 'CONFIRMED'
-        };
-        this.bookingSuccessData.set(fallbackSuccess);
+    for (const schedule of apiSchedules) {
+      const dateKey = this.toDateKey(schedule.performanceDate);
+      if (!dateKey || dateKey < firstDateKey || dateKey > endDateKey) {
+        continue;
       }
-    });
+
+      const daySchedules = schedulesByDate.get(dateKey) ?? [];
+      daySchedules.push(schedule);
+      schedulesByDate.set(dateKey, daySchedules);
+    }
+
+    const scheduleOptions: Schedule[] = [];
+    for (const date = new Date(today); date <= this.scheduleEndDate; date.setDate(date.getDate() + 1)) {
+      const day = new Date(date);
+      const dateKey = this.formatDateKey(day);
+      const apiDaySchedules = schedulesByDate.get(dateKey);
+
+      if (apiDaySchedules?.length) {
+        scheduleOptions.push(...apiDaySchedules.sort((a, b) => a.time.localeCompare(b.time)));
+      } else {
+        scheduleOptions.push(
+          ...this.mockScheduleTimes.map(time => this.createMockSchedule(musical, day, dateKey, time))
+        );
+      }
+    }
+
+    return scheduleOptions;
   }
 
-  /**
-   * Đóng thông báo xác nhận đặt vé để đặt vé mới
-   */
-  dismissSuccessModal(): void {
-    this.bookingSuccessData.set(null);
+  private createMockSchedule(musical: Musical, date: Date, dateKey: string, time: string): Schedule {
+    const [hours, minutes] = time.split(':').map(Number);
+    const dateId = dateKey.replace(/-/g, '');
+
+    return {
+      _id: `mock_${musical.slug}_${dateId}_${time.replace(':', '')}`,
+      musicalId: musical._id,
+      musicalTitle: musical.title,
+      musicalSlug: musical.slug,
+      performanceDate: new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes),
+      time,
+      venue: 'Nhà Hát Thành Phố',
+      hall: 'Khán phòng chính',
+      totalSeats: 120,
+      bookedSeats: 0,
+      status: 'available'
+    };
+  }
+
+  private groupSchedulesByDate(schedules: Schedule[]): ScheduleDayOption[] {
+    const grouped = new Map<string, Schedule[]>();
+    for (const schedule of schedules) {
+      const dateKey = this.toDateKey(schedule.performanceDate);
+      if (!dateKey) {
+        continue;
+      }
+
+      const daySchedules = grouped.get(dateKey) ?? [];
+      daySchedules.push(schedule);
+      grouped.set(dateKey, daySchedules);
+    }
+
+    return [...grouped.entries()]
+      .sort(([firstDate], [secondDate]) => firstDate.localeCompare(secondDate))
+      .map(([dateKey, daySchedules]) => ({
+        dateKey,
+        date: new Date(`${dateKey}T12:00:00`),
+        schedules: daySchedules.sort((a, b) => a.time.localeCompare(b.time))
+      }));
+  }
+
+  private toDateKey(value: string | Date): string | null {
+    const date = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(date.getTime()) ? null : this.formatDateKey(date);
+  }
+
+  private formatDateKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   /**
@@ -307,7 +194,7 @@ export class MusicalDetailComponent implements OnInit {
    */
   private loadStaticFallback(slug: string): void {
     if (slug === 'giac-mo-mua-he') {
-      this.musical.set({
+      const fallbackMusical: Musical = {
         title: 'Giấc Mơ Mùa Hè',
         slug: 'giac-mo-mua-he',
         subtitle: 'Bản tình ca Broadway rực rỡ và lãng mạn bậc nhất',
@@ -324,35 +211,11 @@ export class MusicalDetailComponent implements OnInit {
           { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 500000, description: 'Vị trí ghế ngồi êm ái khu vực trung tâm' },
           { tier: 'Eco', name: 'Hạng Phổ Thông', price: 300000, description: 'Ghế ngồi tầng 2 thoáng đãng' }
         ]
-      });
-      this.schedules.set([
-        {
-          _id: 'sch_gm_01',
-          musicalTitle: 'Giấc Mơ Mùa Hè',
-          musicalSlug: 'giac-mo-mua-he',
-          performanceDate: '2026-11-18T19:30:00Z',
-          time: '19:30',
-          venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
-          hall: 'Khán phòng Broadway Opera',
-          totalSeats: 500,
-          bookedSeats: 340,
-          status: 'available'
-        },
-        {
-          _id: 'sch_gm_02',
-          musicalTitle: 'Giấc Mơ Mùa Hè',
-          musicalSlug: 'giac-mo-mua-he',
-          performanceDate: '2026-11-25T19:30:00Z',
-          time: '19:30',
-          venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
-          hall: 'Khán phòng Broadway Opera',
-          totalSeats: 500,
-          bookedSeats: 500,
-          status: 'sold_out'
-        }
-      ]);
+      };
+      this.musical.set(fallbackMusical);
+      this.schedules.set(this.createScheduleOptions(fallbackMusical, []));
     } else {
-      this.musical.set({
+      const fallbackMusical: Musical = {
         title: 'Bông Bóng Bay',
         slug: 'bong-bong-bay',
         subtitle: 'Bản trường ca thanh xuân rực rỡ và những ước mơ bay bổng',
@@ -369,39 +232,11 @@ export class MusicalDetailComponent implements OnInit {
           { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 450000, description: 'Khu vực tầng trệt D-L, âm thanh chuẩn quốc tế' },
           { tier: 'Eco', name: 'Hạng Phổ Thông', price: 250000, description: 'Tầng lầu ban công tầm nhìn bao quát' }
         ]
-      });
-      this.schedules.set([
-        {
-          _id: 'sch_bb_01',
-          musicalTitle: 'Bông Bóng Bay',
-          musicalSlug: 'bong-bong-bay',
-          performanceDate: '2026-11-15T19:30:00Z',
-          time: '19:30',
-          venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-          hall: 'Khán phòng Grand A',
-          totalSeats: 450,
-          bookedSeats: 210,
-          status: 'available'
-        },
-        {
-          _id: 'sch_bb_02',
-          musicalTitle: 'Bông Bóng Bay',
-          musicalSlug: 'bong-bong-bay',
-          performanceDate: '2026-11-20T20:00:00Z',
-          time: '20:00',
-          venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-          hall: 'Khán phòng Grand A',
-          totalSeats: 450,
-          bookedSeats: 450,
-          status: 'sold_out'
-        }
-      ]);
+      };
+      this.musical.set(fallbackMusical);
+      this.schedules.set(this.createScheduleOptions(fallbackMusical, []));
     }
 
-    this.bookingForm.patchValue({ scheduleId: this.schedules()[0]?._id });
-    this.updateUnitPrice(this.bookingForm.get('ticketTier')?.value || 'VIP');
     this.isLoading.set(false);
-    
   }
-  
 }

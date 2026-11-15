@@ -72,4 +72,12 @@ export class MusicalListComponent implements OnInit {
     this.selectedSort.set(sortType);
     this.fetchMusicals();
   }
+
+  resetFilters(): void {
+    this.searchKeyword.set('');
+    this.selectedGenre.set('all');
+    this.selectedStatus.set('all');
+    this.selectedSort.set('newest');
+    this.fetchMusicals();
+  }
 }

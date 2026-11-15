@@ -355,22 +355,31 @@ app.post('/api/auth/register', (req, res) => {
 app.get('/api/musicals', async (req, res) => {
   try {
     const { search, genre, status, sort } = req.query;
-    let list = memMusicals;
+    let list = [...memMusicals];
 
     if (search) {
-      const q = search.toLowerCase();
-      list = list.filter(m => m.title.toLowerCase().includes(q) || m.director.toLowerCase().includes(q));
+      const q = String(search).trim().toLowerCase();
+      if (q) {
+        list = list.filter(m =>
+          [m.title, m.director, ...(Array.isArray(m.cast) ? m.cast : [])]
+            .some(value => String(value || '').toLowerCase().includes(q))
+        );
+      }
     }
     if (genre && genre !== 'all') {
-      list = list.filter(m => m.genre === genre);
+      const selectedGenre = String(genre).trim().toLowerCase();
+      list = list.filter(m => String(m.genre || '').trim().toLowerCase() === selectedGenre);
     }
     if (status && status !== 'all') {
-      list = list.filter(m => m.status === status);
+      const selectedStatus = String(status).trim().toLowerCase();
+      list = list.filter(m => String(m.status || '').trim().toLowerCase() === selectedStatus);
     }
     if (sort === 'price_asc') {
-      list.sort((a, b) => a.ticketPrices[0].price - b.ticketPrices[0].price);
+      list.sort((a, b) => (a.ticketPrices?.[0]?.price ?? Infinity) - (b.ticketPrices?.[0]?.price ?? Infinity));
     } else if (sort === 'price_desc') {
-      list.sort((a, b) => b.ticketPrices[0].price - a.ticketPrices[0].price);
+      list.sort((a, b) => (b.ticketPrices?.[0]?.price ?? -Infinity) - (a.ticketPrices?.[0]?.price ?? -Infinity));
+    } else if (sort === 'duration') {
+      list.sort((a, b) => (b.duration || 0) - (a.duration || 0));
     }
 
     res.status(200).json({ success: true, count: list.length, data: list });

@@ -7,36 +7,36 @@
   <div class="container position-relative z-2">
     <!-- Header Phân Hệ -->
     <div class="text-center mb-5">
-      <h1 class="display-5 fw-black text-gold-gradient mb-3 pt-2 lh-base">LỊCH BIỂU DIỄN NHÀ HÁT</h1>
-      <p class="text-secondary max-w-650 mx-auto small mb-0">
-        Khám phá các suất diễn nhạc kịch đỉnh cao sắp diễn ra tại Nhà hát Thành phố. Chọn suất phù hợp và tiến hành đặt giữ chỗ theo thời gian thực.
+      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">LỊCH BIỂU DIỄN NHÀ HÁT</h2>
+        <div class="showman-divider mx-auto mt-1 mb-4"></div>
+      <p class="text-white text-secondary max-w-800 mx-auto mb-0">
+        Tìm kiếm các suất diễn hấp dẫn tại Nhạc kịch Thành phố.
       </p>
-      <div class="showman-divider"></div>
     </div>
 
     <!-- BỘ LỌC THÔNG MINH MỚI (4 TIÊU CHÍ NGHIỆP VỤ) -->
-    <div class="card card-showman-glass rounded-4 p-4 mb-4 border border-secondary border-opacity-25 shadow-lg">
+    <div class="filter-panel-showman p-4 rounded-4 mb-5 border border-gold-glow">
       <!-- Hàng 1: Tìm kiếm theo tên vở & Thể loại & Khoảng ngày -->
       <div class="row g-3 align-items-end mb-3">
         <!-- 1. Thanh tìm kiếm theo tên vở -->
         <div class="col-lg-4 col-md-6">
           <label class="form-label text-gold small fw-bold mb-1">
-            <i class="bi bi-search me-1"></i> TÌM THEO TÊN VỞ DIỄN:
+            <i class="bi bi-search me-1"></i> TÌM KIẾM:
           </label>
           <div class="input-group">
-            <span class="input-group-text bg-dark border-secondary border-opacity-50 text-gold">
-              <i class="bi bi-music-note-beamed"></i>
+            <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25" style="background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 50%, #D97706 100%) !important; border-color: #F59E0B !important;">
+               <i class="bi bi-search"></i>
             </span>
             <input
               type="text"
-              class="form-control bg-dark text-white border-secondary border-opacity-50"
-              placeholder="Nhập tên vở kịch..."
+              class="form-control bg-dark-glass text-white border-secondary border-opacity-25 py-2"
+              placeholder="Nhập tên vở diễn"
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
             />
             @if (searchQuery()) {
               <button
-                class="btn btn-outline-secondary border-secondary border-opacity-50 text-gold"
+                class="btn btn-outline-secondary border-opacity-25 text-gold"
                 type="button"
                 (click)="searchQuery.set('')"
                 title="Xóa tìm kiếm"
@@ -53,7 +53,7 @@
             <i class="bi bi-tag-fill me-1"></i> THỂ LOẠI NHẠC KỊCH:
           </label>
           <select
-            class="form-select bg-dark text-white border-secondary border-opacity-50"
+            class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
             [ngModel]="selectedGenre()"
             (ngModelChange)="selectedGenre.set($event)"
           >
@@ -71,10 +71,10 @@
           <div class="row g-2">
             <div class="col-6">
               <div class="input-group input-group-sm">
-                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary small">Từ</span>
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25 text-secondary small">Từ</span>
                 <input
                   type="date"
-                  class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50 date-input-dark"
+                  class="form-control form-control-sm bg-dark-glass text-white border-secondary border-opacity-25 date-input-dark"
                   [ngModel]="startDate()"
                   (ngModelChange)="startDate.set($event)"
                 />
@@ -82,10 +82,10 @@
             </div>
             <div class="col-6">
               <div class="input-group input-group-sm">
-                <span class="input-group-text bg-dark border-secondary border-opacity-50 text-secondary small">Đến</span>
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25 text-secondary small">Đến</span>
                 <input
                   type="date"
-                  class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50 date-input-dark"
+                  class="form-control form-control-sm bg-dark-glass text-white border-secondary border-opacity-25 date-input-dark"
                   [ngModel]="endDate()"
                   (ngModelChange)="endDate.set($event)"
                 />
@@ -134,68 +134,76 @@
       </div>
     </div>
 
-    <!-- Bảng / Lưới Danh Sách Suất Diễn -->
+    <!-- Lưới Card Suất Diễn -->
     <div class="row g-4">
       @for (sched of filteredSchedules(); track sched._id) {
-        <div class="col-lg-6">
-          <div class="card card-showman-glass rounded-4 p-4 h-100 border border-gold-glow schedule-card-hover position-relative overflow-hidden">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                  <span class="badge badge-showman-gold px-3 py-1 rounded-pill small fw-bold">
-                    <i class="bi bi-clock-history me-1"></i> {{ sched.time }}
-                  </span>
-                  @if (sched.genre) {
-                    <span class="badge bg-dark border border-secondary border-opacity-50 text-gold-glow px-2 py-1 rounded-pill small">
-                      <i class="bi bi-tag me-1"></i> {{ sched.genre }}
-                    </span>
-                  }
-                </div>
-                <h4 class="text-white fw-bold mb-1">{{ sched.musicalTitle }}</h4>
-              </div>
-
-              @if (sched.status === 'sold_out') {
-                <span class="badge badge-status-soldout px-3 py-1 rounded-pill small fw-bold">
-                  <i class="bi bi-x-circle-fill me-1"></i> CHÁY VÉ
-                </span>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 card-showman-glass schedule-card-hover border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-column">
+            <div class="position-relative overflow-hidden schedule-poster-wrapper">
+              @if (sched.posterUrl) {
+                <img [src]="sched.posterUrl" [alt]="sched.musicalTitle" class="schedule-poster-img" />
               } @else {
-                <span class="badge badge-status-available px-3 py-1 rounded-pill small fw-bold">
-                  <i class="bi bi-check-circle-fill me-1"></i> CÒN VÉ
-                </span>
+                <div class="schedule-poster-fallback d-flex align-items-center justify-content-center">
+                  <i class="bi bi-music-note-beamed display-1 text-gold opacity-50"></i>
+                </div>
+              }
+              <div class="schedule-poster-overlay"></div>
+
+             <div class="position-absolute top-0 start-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+              @if (sched.status === 'sold_out') {
+                <i class="bi bi-slash-circle-fill text-ruby-glow me-1"></i> CHÁY VÉ
+              } @else {
+                <i class="bi bi-ticket-perforated-fill text-success me-1"></i> CÒN VÉ
               }
             </div>
 
-            <div class="bg-dark-glass p-3 rounded-3 border border-secondary border-opacity-25 small text-secondary mb-4">
-              <div class="mb-2">
-                <i class="bi bi-calendar3 text-gold me-2"></i>
-                <strong class="text-white">Ngày diễn:</strong> {{ sched.performanceDate | date:'EEEE, dd/MM/yyyy' }}
+              <div class="position-absolute bottom-0 start-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+                <i class="bi bi-calendar3 text-gold me-1"></i> {{ sched.performanceDate | date:'dd/MM/yyyy' }}
               </div>
-              <div class="mb-2">
-                <i class="bi bi-geo-alt-fill text-ruby-glow me-2"></i>
-                <strong class="text-white">Khán phòng:</strong> {{ sched.hall }}
+              <div class="position-absolute bottom-0 end-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+                <i class="bi bi-clock-history text-gold me-1"></i> {{ sched.time }}
               </div>
+            </div>
+
+            <div class="card-body p-4 d-flex flex-column flex-grow-1">
+              <h3 class="card-title fs-4 fw-bold text-gold-gradient mb-2 schedule-title">
+                {{ sched.musicalTitle }}
+              </h3>
+              @if (sched.subtitle) {
+                <p class="text-secondary small mb-3 schedule-subtitle">
+                  {{ sched.subtitle }}
+                </p>
+              }
+
+              <div class="small text-secondary mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+                <span class="text-white">
+                  <i class="bi bi-tag-fill me-1"></i> {{ sched.genre }}
+                </span>
+              </div>
+
+             <div class="small text-white mb-3">
               <div>
                 <i class="bi bi-people-fill text-gold me-2"></i>
-                <strong class="text-white">Tình trạng chỗ:</strong> 
-                Đã đặt {{ sched.bookedSeats }}/{{ sched.totalSeats }} ghế 
-                <span class="text-warning">({{ sched.totalSeats - sched.bookedSeats }} ghế trống)</span>
+                <strong>Chỗ trống:</strong>
+                {{ availableSeatCount(sched) }} ghế
               </div>
             </div>
 
-            <div class="d-flex gap-2 mt-auto">
-              <a [routerLink]="['/musical', sched.musicalSlug]" class="btn btn-showman-outline rounded-pill px-3 py-2 btn-sm flex-fill">
-                <i class="bi bi-info-circle me-1"></i> CHI TIẾT VỞ DIỄN
-              </a>
-
-              @if (sched.status === 'sold_out') {
-                <button class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm flex-fill text-muted" disabled>
-                  HẾT CHỖ NGỒI
-                </button>
-              } @else {
-                <a [routerLink]="['/seat-selection', sched._id]" class="btn btn-showman-ruby rounded-pill px-3 py-2 btn-sm fw-bold flex-fill shadow">
-                  <i class="bi bi-ticket-perforated me-1"></i> CHỌN GHẾ NGAY
+              <div class="d-flex gap-2 mt-auto">
+                <a [routerLink]="['/musical', sched.musicalSlug]" class="btn btn-showman-outline py-2 fw-bold schedule-action-button">
+                  <i class="bi bi-info-circle me-1"></i> CHI TIẾT
                 </a>
-              }
+
+                @if (sched.status === 'sold_out') {
+                  <button class="btn btn-showman-ruby py-2 fw-bold schedule-action-button" disabled>
+                    HẾT CHỖ
+                  </button>
+                } @else {
+                  <a [routerLink]="['/seat-selection', sched._id]" class="btn btn-showman-gold py-2 fw-bold schedule-action-button">
+                    <i class="bi bi-ticket-perforated me-1"></i> CHỌN GHẾ
+                  </a>
+                }
+              </div>
             </div>
           </div>
         </div>

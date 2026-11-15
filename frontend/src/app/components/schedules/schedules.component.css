@@ -11,12 +11,81 @@
   max-width: 650px;
 }
 
+.max-w-800 {
+  max-width: 800px;
+}
+
+.filter-panel-showman {
+  background: linear-gradient(135deg, rgba(31, 45, 72, 0.96) 0%, rgba(18, 28, 48, 0.96) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  padding: 1.25rem !important;
+  border-radius: 14px;
+}
+
 .bg-dark-glass {
-  background: rgba(7, 10, 18, 0.85);
+  background-color: rgba(7, 10, 18, 0.85);
 }
 
 .schedule-card-hover {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.schedule-poster-wrapper {
+  height: 235px;
+  flex-shrink: 0;
+}
+
+.schedule-poster-img,
+.schedule-poster-fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.schedule-poster-img {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.schedule-card-hover:hover .schedule-poster-img {
+  transform: scale(1.06);
+}
+
+.schedule-poster-fallback {
+  background: linear-gradient(135deg, #1f2d48 0%, #070a12 100%);
+}
+
+.schedule-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 10, 18, 0.95) 0%, rgba(7, 10, 18, 0.2) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.schedule-title,
+.schedule-subtitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.schedule-title {
+  -webkit-line-clamp: 1;
+}
+
+.schedule-subtitle {
+  -webkit-line-clamp: 2;
+}
+
+.schedule-action-button {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .schedule-card-hover:hover {
@@ -27,27 +96,28 @@
 
 /* Time slot multi-select chips */
 .time-slot-chip {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #CBD5E1;
-  font-size: 0.775rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94A3B8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
   font-weight: 500;
-  padding: 0.26rem 0.75rem;
+  padding: 0.28rem 0.75rem;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .time-slot-chip:hover {
-  background-color: rgba(212, 175, 55, 0.12);
-  border-color: rgba(212, 175, 55, 0.4);
-  color: #F8FAFC;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--showman-gold);
+  color: var(--showman-gold);
 }
 
 .time-slot-chip.active {
-  background: linear-gradient(135deg, #BE123C 0%, #881337 100%);
-  border-color: #D4AF37;
+  background: linear-gradient(135deg, var(--showman-gold) 0%, #D97706 100%);
+  border-color: var(--showman-gold);
   color: #FFFFFF;
-  box-shadow: 0 0 12px rgba(190, 18, 60, 0.45);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
 }
 
 .time-slot-chip.active i {
@@ -67,4 +137,12 @@
 .text-gold-glow {
   color: #D4AF37;
   text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.showman-divider {
+  width: 120px; /* Bạn có thể tăng lên 150px, 200px hoặc 250px tùy ý thích */
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
+  border-radius: 2px;
 }

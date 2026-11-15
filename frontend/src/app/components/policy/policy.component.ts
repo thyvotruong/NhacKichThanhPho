@@ -15,14 +15,14 @@
 
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 export type PolicySection = 'privacy' | 'pricing' | 'payment' | 'terms' | 'refund';
 
 @Component({
   selector: 'app-policy',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './policy.component.html',
   styleUrls: ['./policy.component.css']
 })
@@ -33,36 +33,31 @@ export class PolicyComponent implements OnInit {
   activeSection = signal<PolicySection>('privacy');
 
   // Danh sách các mục chính sách theo đúng thứ tự yêu cầu
-  readonly policyNavItems: { id: PolicySection; number: string; title: string; icon: string }[] = [
+  readonly policyNavItems: { id: PolicySection; number: string; title: string }[] = [
     {
       id: 'privacy',
       number: '01',
-      title: 'Chính sách bảo mật',
-      icon: 'bi-shield-lock-fill'
+      title: 'Chính sách bảo mật'
     },
     {
       id: 'pricing',
       number: '02',
-      title: 'Chính sách giá dịch vụ',
-      icon: 'bi-tag-fill'
+      title: 'Chính sách giá dịch vụ'
     },
     {
       id: 'payment',
       number: '03',
-      title: 'Chính sách thanh toán',
-      icon: 'bi-credit-card-2-front-fill'
+      title: 'Chính sách thanh toán'
     },
     {
       id: 'terms',
       number: '04',
-      title: 'Điều khoản & Quy định sử dụng',
-      icon: 'bi-file-earmark-ruled-fill'
+      title: 'Điều khoản & Quy định sử dụng'
     },
     {
       id: 'refund',
       number: '05',
-      title: 'Chính sách đổi/hủy vé & hoàn tiền',
-      icon: 'bi-arrow-counterclockwise'
+      title: 'Chính sách đổi/hủy vé & hoàn tiền'
     }
   ];
 
