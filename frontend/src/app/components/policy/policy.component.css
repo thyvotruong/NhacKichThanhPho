@@ -108,3 +108,11 @@
     transform: translateY(0);
   }
 }
+
+.showman-divider {
+  width: 120px; /* Bạn có thể tăng lên 150px, 200px hoặc 250px tùy ý thích */
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
+  border-radius: 2px;
+}
