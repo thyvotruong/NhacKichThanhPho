@@ -40,6 +40,9 @@ import {
 export class MusicalService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5000/api';
+  private readonly customerSessionKey = 'nhackich_customer_user';
+  private readonly staffSessionKey = 'nhackich_staff_user';
+  private readonly legacySessionKey = 'nhackich_user';
 
   // Trạng thái xác thực đăng nhập khách hàng (BPMN 2.2.2)
   isLoggedIn = signal<boolean>(false);
@@ -62,18 +65,41 @@ export class MusicalService {
 
   private restoreSession(): void {
     if (typeof window !== 'undefined' && window.localStorage) {
-      const saved = localStorage.getItem('nhackich_user');
+      const legacy = localStorage.getItem(this.legacySessionKey);
+      if (legacy) {
+        try {
+          const parsed = JSON.parse(legacy);
+          if (parsed && typeof parsed === 'object' && parsed.fullName) {
+            const key = parsed.role === 'customer' ? this.customerSessionKey : this.staffSessionKey;
+            if (!localStorage.getItem(key)) {
+              localStorage.setItem(key, legacy);
+            }
+          }
+        } catch {
+          // Remove an invalid legacy session below.
+        }
+        localStorage.removeItem(this.legacySessionKey);
+      }
+
+      const isInternalRoute = /^\/(internal|admin|ops)(\/|$)/.test(window.location.pathname);
+      const sessionKey = isInternalRoute ? this.staffSessionKey : this.customerSessionKey;
+      const saved = localStorage.getItem(sessionKey);
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (parsed && typeof parsed === 'object' && parsed.fullName) {
+          const validRole = isInternalRoute
+            ? parsed?.role && parsed.role !== 'customer'
+            : parsed?.role === 'customer';
+          if (parsed && typeof parsed === 'object' && parsed.fullName && validRole) {
+            parsed.fullName = parsed.fullName.replace(/\s*\(.*?\)/g, '').trim();
             this.currentUser.set(parsed);
             this.isLoggedIn.set(true);
+            try { localStorage.setItem(sessionKey, JSON.stringify(parsed)); } catch {}
           } else {
-            localStorage.removeItem('nhackich_user');
+            localStorage.removeItem(sessionKey);
           }
-        } catch (e) {
-          localStorage.removeItem('nhackich_user');
+        } catch {
+          localStorage.removeItem(sessionKey);
         }
       }
     }
@@ -97,10 +123,13 @@ export class MusicalService {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, req).pipe(
       map(res => {
         if (res.success && res.data?.user) {
+          if (res.data.user.role !== 'customer') {
+            throw new Error('Tài khoản này không thuộc phân hệ khách hàng.');
+          }
           this.currentUser.set(res.data.user);
           this.isLoggedIn.set(true);
           if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('nhackich_user', JSON.stringify(res.data.user));
+            localStorage.setItem(this.customerSessionKey, JSON.stringify(res.data.user));
           }
         }
         return res;
@@ -120,10 +149,13 @@ export class MusicalService {
     return this.http.post<any>(`${this.apiUrl}/auth/register`, req).pipe(
       map(res => {
         if (res.success && res.data?.user) {
+          if (res.data.user.role !== 'customer') {
+            throw new Error('Tài khoản này không thuộc phân hệ khách hàng.');
+          }
           this.currentUser.set(res.data.user);
           this.isLoggedIn.set(true);
           if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('nhackich_user', JSON.stringify(res.data.user));
+            localStorage.setItem(this.customerSessionKey, JSON.stringify(res.data.user));
           }
         }
         return res;
@@ -152,6 +184,9 @@ export class MusicalService {
   }
 
   logout(): void {
+    const sessionKey = this.currentUser().role === 'customer'
+      ? this.customerSessionKey
+      : this.staffSessionKey;
     this.isLoggedIn.set(false);
     this.currentUser.set({
       fullName: 'Khách Hàng',
@@ -161,17 +196,18 @@ export class MusicalService {
       isActive: true
     });
     if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('nhackich_user');
+      localStorage.removeItem(sessionKey);
+      localStorage.removeItem(this.legacySessionKey);
     }
   }
 
-  setRole(role: 'customer' | 'admin' | 'editor' | 'accountant' | 'ticket_checker' | 'staff') {
+  setRole(role: 'customer' | 'admin' | 'editor' | 'ticket_checker' | 'staff') {
     const rolesMap: Record<string, string> = {
-      customer: 'Nguyễn Văn An (Khách Hàng)',
-      admin: 'Trần Minh Đức (Giám đốc Điều hành)',
-      editor: 'Lê Thảo My (Ban Biên Tập)',
-      accountant: 'Nguyễn Thị Bích Ngọc (Kế Toán Trưởng)',
-      ticket_checker: 'Phạm Hùng Cường (Tổ Trưởng Soát Vé)'
+      customer: 'Nguyễn Văn An',
+      admin: 'Trần Minh Đức',
+      editor: 'Lê Thảo My',
+      ticket_checker: 'Phạm Hùng Cường',
+      staff: 'Phạm Hùng Cường'
     };
     const user: UserStaff = {
       fullName: rolesMap[role] || 'Người Dùng',
@@ -184,11 +220,11 @@ export class MusicalService {
     if (role !== 'customer') {
       this.isLoggedIn.set(true);
       if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem('nhackich_user', JSON.stringify(user));
+        localStorage.setItem(this.staffSessionKey, JSON.stringify(user));
       }
     } else {
       if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem('nhackich_user', JSON.stringify(user));
+        localStorage.setItem(this.customerSessionKey, JSON.stringify(user));
       }
     }
   }
@@ -197,7 +233,7 @@ export class MusicalService {
   // PHÂN HỆ 1: CUSTOMER PORTAL APIS
   // ==========================================
 
-  getMusicals(filters?: { search?: string; genre?: string; status?: string; sort?: string }): Observable<Musical[]> {
+  getMusicals(filters?: { search?: string; genre?: string; status?: string; sort?: string; featured?: boolean }): Observable<Musical[]> {
     let query = '';
     if (filters) {
       const params = new URLSearchParams();
@@ -205,20 +241,82 @@ export class MusicalService {
       if (filters.genre) params.append('genre', filters.genre);
       if (filters.status) params.append('status', filters.status);
       if (filters.sort) params.append('sort', filters.sort);
+      if (filters.featured !== undefined) params.append('featured', String(filters.featured));
       query = '?' + params.toString();
     }
     return this.http.get<ApiResponse<Musical[]>>(`${this.apiUrl}/musicals${query}`).pipe(
       map(res => res.data),
-      catchError(this.handleError<Musical[]>('getMusicals', []))
+      catchError(() => {
+        // Fallback đọc trực tiếp từ static JSON file /musicals.json
+        return this.http.get<Musical[]>('/musicals.json').pipe(
+          map(list => {
+            let filtered = Array.isArray(list) ? [...list] : [];
+            if (filters?.search) {
+              const q = filters.search.toLowerCase().trim();
+              filtered = filtered.filter(m =>
+                [m.title, m.director, m.subtitle, ...(Array.isArray(m.cast) ? m.cast : [])]
+                  .some(val => String(val || '').toLowerCase().includes(q))
+              );
+            }
+            if (filters?.genre && filters.genre !== 'all') {
+              const g = filters.genre.toLowerCase().trim();
+              filtered = filtered.filter(m => {
+                if (Array.isArray(m.genre)) return m.genre.some(item => item.toLowerCase().includes(g));
+                return String(m.genre || '').toLowerCase().includes(g);
+              });
+            }
+            if (filters?.status && filters.status !== 'all') {
+              filtered = filtered.filter(m => m.status === filters.status);
+            }
+            if (filters?.featured !== undefined) {
+              filtered = filtered.filter(m => Boolean(m.featured) === filters.featured);
+            }
+            if (filters?.sort === 'price_asc') {
+              filtered.sort((a, b) => {
+                const pa = Math.min(...(a.ticketPrices || []).map(p => p.price || 0));
+                const pb = Math.min(...(b.ticketPrices || []).map(p => p.price || 0));
+                return pa - pb;
+              });
+            } else if (filters?.sort === 'price_desc') {
+              filtered.sort((a, b) => {
+                const pa = Math.max(...(a.ticketPrices || []).map(p => p.price || 0));
+                const pb = Math.max(...(b.ticketPrices || []).map(p => p.price || 0));
+                return pb - pa;
+              });
+            } else if (filters?.sort === 'duration') {
+              filtered.sort((a, b) => (b.duration || 0) - (a.duration || 0));
+            }
+            return filtered;
+          }),
+          catchError(this.handleError<Musical[]>('getMusicals', []))
+        );
+      })
     );
   }
 
   getMusicalBySlug(slug: string): Observable<Musical> {
-    return this.http.get<ApiResponse<Musical>>(`${this.apiUrl}/musicals/${slug}`).pipe(
+    const cleanSlug = String(slug).toLowerCase().trim();
+    return this.http.get<ApiResponse<Musical>>(`${this.apiUrl}/musicals/${cleanSlug}`).pipe(
       map(res => res.data),
-      catchError((error: HttpErrorResponse) => {
-        return throwError(() => new Error(error.error?.message || 'Không tìm thấy vở kịch'));
+      catchError(() => {
+        // Fallback đọc trực tiếp từ static JSON file
+        return this.http.get<Musical[]>('/musicals.json').pipe(
+          map(list => {
+            const found = (list || []).find(m => m.slug.toLowerCase() === cleanSlug || m._id === slug);
+            if (!found) {
+              throw new Error('Không tìm thấy vở kịch');
+            }
+            return found;
+          })
+        );
       })
+    );
+  }
+
+  subscribeToMusicalNotifications(slug: string, email: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.apiUrl}/musicals/${encodeURIComponent(slug)}/notifications`,
+      { email }
     );
   }
 
@@ -226,7 +324,57 @@ export class MusicalService {
     const url = slug ? `${this.apiUrl}/schedules?slug=${slug}` : `${this.apiUrl}/schedules`;
     return this.http.get<ApiResponse<Schedule[]>>(url).pipe(
       map(res => res.data),
-      catchError(this.handleError<Schedule[]>('getSchedules', []))
+      catchError(() => {
+        return this.http.get<Musical[]>('/musicals.json').pipe(
+          map(musicals => {
+            const musicalMap = new Map((musicals || []).map(m => [m.slug, m]));
+            const standardDefs = [
+              { _id: 'sch_lo-lem_20261118_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-18T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 32 },
+              { _id: 'sch_loi-the-thu-9_20261119_2000', slug: 'loi-the-thu-9', dateStr: '2026-11-19T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 45 },
+              { _id: 'sch_lo-lem-chiec-giay-thuy-tinh', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-20T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 62 },
+              { _id: 'sch_giac-mo-cua-bom_20261120_2000', slug: 'giac-mo-cua-bom', dateStr: '2026-11-20T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', booked: 40 },
+              { _id: 'sch_lo-lem_20261121_1500', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-21T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 58 },
+              { _id: 'sch_tuoi-tho-du-doi', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-21T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 70 },
+              { _id: 'sch_giac-mo-cua-bom_20261122_1500', slug: 'giac-mo-cua-bom', dateStr: '2026-11-22T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 55 },
+              { _id: 'sch_quan-khu-nam-dong', slug: 'quan-khu-nam-dong', dateStr: '2026-11-22T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', booked: 48 },
+              { _id: 'sch_hon-truong-ba-da-hang-thit', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-23T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 64 },
+              { _id: 'sch_loi-the-thu-9', slug: 'loi-the-thu-9', dateStr: '2026-11-24T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 52 },
+              { _id: 'sch_giac-mo-cua-bom', slug: 'giac-mo-cua-bom', dateStr: '2026-11-25T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 42 },
+              { _id: 'sch_tuoi-tho-du-doi_20261126_1930', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-26T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 50 },
+              { _id: 'sch_lo-lem_20261127_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-27T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 66 },
+              { _id: 'sch_hon-truong-ba_20261127_2000', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-27T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', booked: 54 },
+              { _id: 'sch_giac-mo-cua-bom_20261128_1500', slug: 'giac-mo-cua-bom', dateStr: '2026-11-28T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 48 },
+              { _id: 'sch_quan-khu-nam-dong_20261128_1930', slug: 'quan-khu-nam-dong', dateStr: '2026-11-28T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 60 },
+              { _id: 'sch_tuoi-tho-du-doi_20261129_1500', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-29T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 58 },
+              { _id: 'sch_lo-lem_20261129_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-29T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 72 },
+              { _id: 'sch_loi-the-thu-9_20261130_1930', slug: 'loi-the-thu-9', dateStr: '2026-11-30T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', booked: 85 },
+              { _id: 'sch_hon-truong-ba_20261130_2000', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-30T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', booked: 80 }
+            ];
+
+            const filteredDefs = slug ? standardDefs.filter(d => d.slug === slug) : standardDefs;
+            return filteredDefs.map(def => {
+              const m = musicalMap.get(def.slug);
+              return {
+                _id: def._id,
+                musicalId: m?._id || def.slug,
+                musicalSlug: def.slug,
+                musicalTitle: m?.title || def.slug,
+                performanceDate: def.dateStr,
+                time: def.time,
+                venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
+                hall: def.hall,
+                totalSeats: 182,
+                bookedSeats: def.booked,
+                status: 'available' as const,
+                genre: m ? (Array.isArray(m.genre) ? m.genre.join(' • ') : m.genre) : '',
+                posterUrl: m?.posterUrl || `/images/musicals/${def.slug.replace(/-/g, '_')}.jpg`,
+                subtitle: m?.subtitle || m?.synopsis || ''
+              };
+            });
+          }),
+          catchError(() => of([]))
+        );
+      })
     );
   }
 
@@ -258,7 +406,7 @@ export class MusicalService {
   private memStaffUsers: UserStaff[] = [
     {
       _id: 'usr_admin_01',
-      fullName: 'Trần Minh Đức (Giám Đốc)',
+      fullName: 'Trần Minh Đức',
       email: 'admin@nhackichthanhpho.vn',
       username: 'admin',
       password: '123456',
@@ -271,7 +419,7 @@ export class MusicalService {
     },
     {
       _id: 'usr_editor_02',
-      fullName: 'Lê Thảo My (Ban Biên Tập)',
+      fullName: 'Lê Thảo My',
       email: 'editor@nhackichthanhpho.vn',
       username: 'editor',
       password: '123456',
@@ -284,7 +432,7 @@ export class MusicalService {
     },
     {
       _id: 'usr_staff_03',
-      fullName: 'Phạm Hùng Cường (Tổ Trưởng Soát Vé)',
+      fullName: 'Phạm Hùng Cường',
       email: 'staff@nhackichthanhpho.vn',
       username: 'staff',
       password: '123456',
@@ -299,14 +447,14 @@ export class MusicalService {
 
   private memClientBookings: BookingOrder[] = [
     {
-      bookingCode: 'BK-84920',
-      musicalSlug: 'bong-bong-bay',
-      musicalTitle: 'Bông Bóng Bay - Giấc Mơ Tuổi Thơ',
-      scheduleId: 'SCHED-01',
-      performanceDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
+      bookingCode: 'NK-20261115-LL82A',
+      musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
+      musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
+      scheduleId: 'sch_lo-lem-chiec-giay-thuy-tinh',
+      performanceDate: new Date('2026-11-20T19:30:00Z').toISOString(),
       performanceTime: '19:30',
-      venue: 'Nhà hát Lớn Thành phố',
-      hall: 'Khán phòng Hoàng Gia (Stalls & Grand Tier)',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
       customerName: 'Nguyễn Văn An',
       customerEmail: 'khachhang@gmail.com',
       customerPhone: '0909123456',
@@ -316,67 +464,411 @@ export class MusicalService {
       ],
       quantity: 2,
       subtotal: 1600000,
-      voucherCode: 'SHOWMAN20',
-      discountAmount: 250000,
-      totalPrice: 1350000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1600000,
       paymentMethod: 'VIETQR',
       paymentStatus: 'PAID',
       bookingStatus: 'CONFIRMED',
-      createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+      createdAt: '2026-11-15T08:19:20.000Z'
     },
     {
-      bookingCode: 'BK-99124',
-      musicalSlug: 'giac-mo-mua-he',
-      musicalTitle: 'Giấc Mơ Mùa Hè (A Midsummer Night)',
-      scheduleId: 'SCHED-02',
-      performanceDate: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(), // Còn 5 giờ (< 12h) để test BPMN 2.2.4 lỗi hủy vé
-      performanceTime: '19:00',
-      venue: 'Nhà hát Lớn Thành phố',
-      hall: 'Khán phòng Hoàng Gia (Stalls)',
-      customerName: 'Nguyễn Văn An',
-      customerEmail: 'khachhang@gmail.com',
-      customerPhone: '0909123456',
+      bookingCode: 'NK-20261115-TT44B',
+      musicalSlug: 'tuoi-tho-du-doi',
+      musicalTitle: 'Tuổi thơ dữ dội',
+      scheduleId: 'sch_tuoi-tho-du-doi',
+      performanceDate: new Date('2026-11-21T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Trần Minh Tuấn',
+      customerEmail: 'tuan.tran@gmail.com',
+      customerPhone: '0912345678',
       seats: [
-        { seatCode: 'A08', floor: 'Tầng Trệt', row: 'A', number: 8, type: 'VIP', price: 850000 }
+        { seatCode: 'A03', floor: 'Tầng Trệt', row: 'A', number: 3, type: 'VIP', price: 800000 },
+        { seatCode: 'A04', floor: 'Tầng Trệt', row: 'A', number: 4, type: 'VIP', price: 800000 },
+        { seatCode: 'A05', floor: 'Tầng Trệt', row: 'A', number: 5, type: 'VIP', price: 800000 }
       ],
-      quantity: 1,
-      subtotal: 850000,
+      quantity: 3,
+      subtotal: 2400000,
+      voucherCode: null,
       discountAmount: 0,
-      totalPrice: 850000,
+      totalPrice: 2400000,
       paymentMethod: 'VNPAY',
       paymentStatus: 'PAID',
       bookingStatus: 'CONFIRMED',
-      createdAt: new Date().toISOString()
+      createdAt: '2026-11-15T08:20:45.000Z'
     },
     {
-      bookingCode: 'BK-12093',
-      musicalSlug: 'giac-mo-mua-he',
-      musicalTitle: 'Giấc Mơ Mùa Hè (A Midsummer Night)',
-      scheduleId: 'SCHED-02',
-      performanceDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      bookingCode: 'NK-20261115-QK91C',
+      musicalSlug: 'quan-khu-nam-dong',
+      musicalTitle: 'Quân khu Nam Đồng',
+      scheduleId: 'sch_quan-khu-nam-dong',
+      performanceDate: new Date('2026-11-22T20:00:00Z').toISOString(),
       performanceTime: '20:00',
-      venue: 'Nhà hát Lớn Thành phố',
-      hall: 'Khán phòng Hoàng Gia (Stalls)',
-      customerName: 'Nguyễn Văn An',
-      customerEmail: 'khachhang@gmail.com',
-      customerPhone: '0909123456',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Broadway Opera',
+      customerName: 'Lê Hoàng Yến',
+      customerEmail: 'yen.le@outlook.com',
+      customerPhone: '0933555777',
       seats: [
-        { seatCode: 'C03', floor: 'Tầng Trệt', row: 'C', number: 3, type: 'Standard', price: 450000 }
+        { seatCode: 'D08', floor: 'Tầng Trệt', row: 'D', number: 8, type: 'Standard', price: 450000 },
+        { seatCode: 'D09', floor: 'Tầng Trệt', row: 'D', number: 9, type: 'Standard', price: 450000 }
       ],
-      quantity: 1,
-      subtotal: 450000,
+      quantity: 2,
+      subtotal: 900000,
+      voucherCode: null,
       discountAmount: 0,
-      totalPrice: 450000,
+      totalPrice: 900000,
       paymentMethod: 'MOMO',
       paymentStatus: 'PAID',
       bookingStatus: 'CHECKED_IN',
       checkInInfo: {
-        checkedInAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        checkedInBy: 'Trần Minh Tuấn (Soát vé Cửa 1)',
-        gate: 'Cửa 1 - Tầng Trệt'
+        checkedInAt: '2026-11-15T19:15:00.000Z',
+        checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)',
+        gate: 'Cửa A'
       },
-      createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString()
+      createdAt: '2026-11-15T08:22:10.000Z'
     },
+    {
+      bookingCode: 'NK-20261115-HT19D',
+      musicalSlug: 'hon-truong-ba-da-hang-thit',
+      musicalTitle: 'Hồn Trương Ba, Da Hàng Thịt',
+      scheduleId: 'sch_hon-truong-ba-da-hang-thit',
+      performanceDate: new Date('2026-11-23T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Phan Quốc Bảo',
+      customerEmail: 'bao.phan@gmail.com',
+      customerPhone: '0988776655',
+      seats: [
+        { seatCode: 'H-CP02', floor: 'Tầng Trệt', row: 'H', number: 2, type: 'Couple', price: 1250000 }
+      ],
+      quantity: 1,
+      subtotal: 1250000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1250000,
+      paymentMethod: 'VIETQR',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-15T08:25:00.000Z'
+    },
+    {
+      bookingCode: 'NK-20261116-LT38E',
+      musicalSlug: 'loi-the-thu-9',
+      musicalTitle: 'Lời thề thứ 9',
+      scheduleId: 'sch_loi-the-thu-9',
+      performanceDate: new Date('2026-11-24T20:00:00Z').toISOString(),
+      performanceTime: '20:00',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Đặng Ngọc Lan',
+      customerEmail: 'lan.dang@gmail.com',
+      customerPhone: '0903112233',
+      seats: [
+        { seatCode: 'B01', floor: 'Tầng Trệt', row: 'B', number: 1, type: 'VIP', price: 800000 },
+        { seatCode: 'B02', floor: 'Tầng Trệt', row: 'B', number: 2, type: 'VIP', price: 800000 },
+        { seatCode: 'B03', floor: 'Tầng Trệt', row: 'B', number: 3, type: 'VIP', price: 800000 },
+        { seatCode: 'B04', floor: 'Tầng Trệt', row: 'B', number: 4, type: 'VIP', price: 800000 }
+      ],
+      quantity: 4,
+      subtotal: 3200000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 3200000,
+      paymentMethod: 'BANK_CARD',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CHECKED_IN',
+      checkInInfo: {
+        checkedInAt: '2026-11-16T19:20:00.000Z',
+        checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)',
+        gate: 'Cửa VIP'
+      },
+      createdAt: '2026-11-16T08:31:20.000Z'
+    },
+    {
+      bookingCode: 'NK-20261116-GM72F',
+      musicalSlug: 'giac-mo-cua-bom',
+      musicalTitle: 'Giấc mơ của Bờm',
+      scheduleId: 'sch_giac-mo-cua-bom',
+      performanceDate: new Date('2026-11-25T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Broadway Opera',
+      customerName: 'Hoàng Hải Đăng',
+      customerEmail: 'dang.hoang@gmail.com',
+      customerPhone: '0944111222',
+      seats: [
+        { seatCode: 'E05', floor: 'Tầng Trệt', row: 'E', number: 5, type: 'Standard', price: 400000 },
+        { seatCode: 'E06', floor: 'Tầng Trệt', row: 'E', number: 6, type: 'Standard', price: 400000 }
+      ],
+      quantity: 2,
+      subtotal: 800000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 800000,
+      paymentMethod: 'VNPAY',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-16T08:34:50.000Z'
+    },
+    {
+      bookingCode: 'NK-20261116-LL63G',
+      musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
+      musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
+      scheduleId: 'sch_lo-lem-chiec-giay-thuy-tinh',
+      performanceDate: new Date('2026-11-20T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Vũ Thanh Hằng',
+      customerEmail: 'hang.vu@gmail.com',
+      customerPhone: '0977223344',
+      seats: [
+        { seatCode: 'A07', floor: 'Tầng Trệt', row: 'A', number: 7, type: 'VIP', price: 800000 },
+        { seatCode: 'A08', floor: 'Tầng Trệt', row: 'A', number: 8, type: 'VIP', price: 800000 },
+        { seatCode: 'D04', floor: 'Tầng Trệt', row: 'D', number: 4, type: 'Standard', price: 400000 }
+      ],
+      quantity: 3,
+      subtotal: 2000000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 2000000,
+      paymentMethod: 'VIETQR',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CHECKED_IN',
+      checkInInfo: {
+        checkedInAt: '2026-11-16T19:10:00.000Z',
+        checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)',
+        gate: 'Cửa A'
+      },
+      createdAt: '2026-11-16T08:38:55.000Z'
+    },
+    {
+      bookingCode: 'NK-20261116-TT55H',
+      musicalSlug: 'tuoi-tho-du-doi',
+      musicalTitle: 'Tuổi thơ dữ dội',
+      scheduleId: 'sch_tuoi-tho-du-doi',
+      performanceDate: new Date('2026-11-21T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Nguyễn Thành Long',
+      customerEmail: 'long.nguyen@gmail.com',
+      customerPhone: '0938889900',
+      seats: [
+        { seatCode: 'F01', floor: 'Tầng Trệt', row: 'F', number: 1, type: 'Standard', price: 450000 },
+        { seatCode: 'F02', floor: 'Tầng Trệt', row: 'F', number: 2, type: 'Standard', price: 450000 },
+        { seatCode: 'F03', floor: 'Tầng Trệt', row: 'F', number: 3, type: 'Standard', price: 450000 }
+      ],
+      quantity: 3,
+      subtotal: 1350000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1350000,
+      paymentMethod: 'MOMO',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-16T08:41:00.000Z'
+    },
+    {
+      bookingCode: 'NK-20261116-QK27J',
+      musicalSlug: 'quan-khu-nam-dong',
+      musicalTitle: 'Quân khu Nam Đồng',
+      scheduleId: 'sch_quan-khu-nam-dong',
+      performanceDate: new Date('2026-11-22T20:00:00Z').toISOString(),
+      performanceTime: '20:00',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Broadway Opera',
+      customerName: 'Bùi Thị Thanh Tâm',
+      customerEmail: 'tam.bui@gmail.com',
+      customerPhone: '0919998877',
+      seats: [
+        { seatCode: 'C06', floor: 'Tầng Trệt', row: 'C', number: 6, type: 'VIP', price: 800000 },
+        { seatCode: 'C07', floor: 'Tầng Trệt', row: 'C', number: 7, type: 'VIP', price: 800000 }
+      ],
+      quantity: 2,
+      subtotal: 1600000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1600000,
+      paymentMethod: 'VIETQR',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CHECKED_IN',
+      checkInInfo: {
+        checkedInAt: '2026-11-16T19:40:00.000Z',
+        checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)',
+        gate: 'Cửa B'
+      },
+      createdAt: '2026-11-16T08:45:50.000Z'
+    },
+    {
+      bookingCode: 'NK-20261117-HT84K',
+      musicalSlug: 'hon-truong-ba-da-hang-thit',
+      musicalTitle: 'Hồn Trương Ba, Da Hàng Thịt',
+      scheduleId: 'sch_hon-truong-ba-da-hang-thit',
+      performanceDate: new Date('2026-11-23T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Trịnh Đình Quang',
+      customerEmail: 'quang.trinh@gmail.com',
+      customerPhone: '0908887766',
+      seats: [
+        { seatCode: 'D10', floor: 'Tầng Trệt', row: 'D', number: 10, type: 'Standard', price: 475000 },
+        { seatCode: 'D11', floor: 'Tầng Trệt', row: 'D', number: 11, type: 'Standard', price: 475000 }
+      ],
+      quantity: 2,
+      subtotal: 950000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 950000,
+      paymentMethod: 'ZALOPAY',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-17T08:50:20.000Z'
+    },
+    {
+      bookingCode: 'NK-20261117-LT12L',
+      musicalSlug: 'loi-the-thu-9',
+      musicalTitle: 'Lời thề thứ 9',
+      scheduleId: 'sch_loi-the-thu-9',
+      performanceDate: new Date('2026-11-24T20:00:00Z').toISOString(),
+      performanceTime: '20:00',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Lý Kim Phượng',
+      customerEmail: 'phuong.ly@gmail.com',
+      customerPhone: '0902223344',
+      seats: [
+        { seatCode: 'A09', floor: 'Tầng Trệt', row: 'A', number: 9, type: 'VIP', price: 800000 },
+        { seatCode: 'A10', floor: 'Tầng Trệt', row: 'A', number: 10, type: 'VIP', price: 800000 }
+      ],
+      quantity: 2,
+      subtotal: 1600000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1600000,
+      paymentMethod: 'VNPAY',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-17T08:53:30.000Z'
+    },
+    {
+      bookingCode: 'NK-20261117-GM90M',
+      musicalSlug: 'giac-mo-cua-bom',
+      musicalTitle: 'Giấc mơ của Bờm',
+      scheduleId: 'sch_giac-mo-cua-bom',
+      performanceDate: new Date('2026-11-25T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Broadway Opera',
+      customerName: 'Tô Vĩnh Diện',
+      customerEmail: 'dien.to@gmail.com',
+      customerPhone: '0981112233',
+      seats: [
+        { seatCode: 'H-CP01', floor: 'Tầng Trệt', row: 'H', number: 1, type: 'Couple', price: 1200000 },
+        { seatCode: 'H-CP02', floor: 'Tầng Trệt', row: 'H', number: 2, type: 'Couple', price: 1200000 }
+      ],
+      quantity: 2,
+      subtotal: 2400000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 2400000,
+      paymentMethod: 'VIETQR',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CHECKED_IN',
+      checkInInfo: {
+        checkedInAt: '2026-11-17T19:10:00.000Z',
+        checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)',
+        gate: 'Cửa Sweetbox'
+      },
+      createdAt: '2026-11-17T08:57:15.000Z'
+    },
+    {
+      bookingCode: 'NK-20261117-LL18N',
+      musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
+      musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
+      scheduleId: 'sch_lo-lem-chiec-giay-thuy-tinh',
+      performanceDate: new Date('2026-11-20T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Đoàn Nhật Nam',
+      customerEmail: 'nam.doan@gmail.com',
+      customerPhone: '0973334455',
+      seats: [
+        { seatCode: 'E09', floor: 'Tầng Trệt', row: 'E', number: 9, type: 'Standard', price: 400000 },
+        { seatCode: 'E10', floor: 'Tầng Trệt', row: 'E', number: 10, type: 'Standard', price: 400000 }
+      ],
+      quantity: 2,
+      subtotal: 800000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 800000,
+      paymentMethod: 'MOMO',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-17T08:60:40.000Z'
+    },
+    {
+      bookingCode: 'NK-20261117-TT73P',
+      musicalSlug: 'tuoi-tho-du-doi',
+      musicalTitle: 'Tuổi thơ dữ dội',
+      scheduleId: 'sch_tuoi-tho-du-doi',
+      performanceDate: new Date('2026-11-21T19:30:00Z').toISOString(),
+      performanceTime: '19:30',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Grand A - Hoàng Gia',
+      customerName: 'Dương Thúy Vi',
+      customerEmail: 'vi.duong@gmail.com',
+      customerPhone: '0962223344',
+      seats: [
+        { seatCode: 'B07', floor: 'Tầng Trệt', row: 'B', number: 7, type: 'VIP', price: 900000 },
+        { seatCode: 'B08', floor: 'Tầng Trệt', row: 'B', number: 8, type: 'VIP', price: 900000 }
+      ],
+      quantity: 2,
+      subtotal: 1800000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1800000,
+      paymentMethod: 'BANK_CARD',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CHECKED_IN',
+      checkInInfo: {
+        checkedInAt: '2026-11-17T19:25:00.000Z',
+        checkedInBy: 'Phạm Hùng Cường (Soát vé Cửa A)',
+        gate: 'Cửa A'
+      },
+      createdAt: '2026-11-17T08:64:00.000Z'
+    },
+    {
+      bookingCode: 'NK-20261117-QK61Q',
+      musicalSlug: 'quan-khu-nam-dong',
+      musicalTitle: 'Quân khu Nam Đồng',
+      scheduleId: 'sch_quan-khu-nam-dong',
+      performanceDate: new Date('2026-11-22T20:00:00Z').toISOString(),
+      performanceTime: '20:00',
+      venue: 'Nhà Hát Thành Phố HCM',
+      hall: 'Khán phòng Broadway Opera',
+      customerName: 'Phạm Văn Hậu',
+      customerEmail: 'hau.pham@gmail.com',
+      customerPhone: '0907778899',
+      seats: [
+        { seatCode: 'H-CP03', floor: 'Tầng Trệt', row: 'H', number: 3, type: 'Couple', price: 1200000 }
+      ],
+      quantity: 1,
+      subtotal: 1200000,
+      voucherCode: null,
+      discountAmount: 0,
+      totalPrice: 1200000,
+      paymentMethod: 'VIETQR',
+      paymentStatus: 'PAID',
+      bookingStatus: 'CONFIRMED',
+      createdAt: '2026-11-17T08:69:50.000Z'
+    }
   ];
 
   validateVoucher(code: string, subtotal: number): Observable<ApiResponse<VoucherValidationResponse>> {
@@ -485,12 +977,18 @@ export class MusicalService {
     return this.http.get<ApiResponse<DashboardStats>>(`${this.apiUrl}/admin/dashboard`).pipe(
       map(res => res.data),
       catchError(this.handleError<DashboardStats>('getAdminDashboard', {
-        totalRevenue: 275000000,
-        totalTicketsSold: 342,
-        totalOrders: 156,
-        occupancyRate: 74,
-        activeShowsCount: 3,
-        paymentBreakdown: { VIETQR: 120000000, VNPAY: 85000000, MOMO: 45000000, ZALOPAY: 15000000, BANK_CARD: 10000000 }
+        totalRevenue: 740000000,
+        totalTicketsSold: 1270,
+        totalOrders: 485,
+        occupancyRate: 84,
+        activeShowsCount: 6,
+        paymentBreakdown: {
+          VIETQR: 322640000,
+          VNPAY: 228660000,
+          MOMO: 121360000,
+          BANK_CARD: 41440000,
+          ZALOPAY: 25900000
+        }
       }))
     );
   }
@@ -517,7 +1015,7 @@ export class MusicalService {
     if (status) q += (q ? '&' : '?') + `status=${status}`;
     return this.http.get<ApiResponse<BookingOrder[]>>(`${this.apiUrl}/admin/orders${q}`).pipe(
       map(res => res.data),
-      catchError(this.handleError<BookingOrder[]>('getAdminOrders', []))
+      catchError(this.handleError<BookingOrder[]>('getAdminOrders', this.memClientBookings))
     );
   }
 
@@ -545,7 +1043,23 @@ export class MusicalService {
   getReconciliations(): Observable<ReconciliationRecord[]> {
     return this.http.get<ApiResponse<ReconciliationRecord[]>>(`${this.apiUrl}/admin/reports/reconciliation`).pipe(
       map(res => res.data),
-      catchError(this.handleError<ReconciliationRecord[]>('getReconciliations', []))
+      catchError(this.handleError<ReconciliationRecord[]>('getReconciliations', [
+        { transactionId: 'TXN-VIETQR-20261115-08192', bookingCode: 'NK-20261115-LL82A', gateway: 'VIETQR', systemAmount: 1600000, gatewayAmount: 1600000, fee: 0, netAmount: 1600000, status: 'MATCHED', notes: 'Khớp 100% đối soát tự động Napas 24/7' },
+        { transactionId: 'TXN-VNPAY-20261115-08204', bookingCode: 'NK-20261115-TT44B', gateway: 'VNPAY', systemAmount: 2400000, gatewayAmount: 2400000, fee: 36000, netAmount: 2364000, status: 'MATCHED', notes: 'Khớp đối soát tự động VNPAY QR' },
+        { transactionId: 'TXN-MOMO-20261115-08221', bookingCode: 'NK-20261115-QK91C', gateway: 'MOMO', systemAmount: 900000, gatewayAmount: 900000, fee: 13500, netAmount: 886500, status: 'MATCHED', notes: 'Khớp đối soát ví điện tử MoMo' },
+        { transactionId: 'TXN-VIETQR-20261115-08250', bookingCode: 'NK-20261115-HT19D', gateway: 'VIETQR', systemAmount: 1250000, gatewayAmount: 1250000, fee: 0, netAmount: 1250000, status: 'MATCHED', notes: 'Khớp 100% VietQR tức thì' },
+        { transactionId: 'TXN-BANK-20261116-08312', bookingCode: 'NK-20261116-LT38E', gateway: 'BANK_CARD', systemAmount: 3200000, gatewayAmount: 3200000, fee: 64000, netAmount: 3136000, status: 'MATCHED', notes: 'Khớp cổng thẻ quốc tế Visa 3D-Secure' },
+        { transactionId: 'TXN-VNPAY-20261116-08345', bookingCode: 'NK-20261116-GM72F', gateway: 'VNPAY', systemAmount: 800000, gatewayAmount: 800000, fee: 12000, netAmount: 788000, status: 'MATCHED', notes: 'Khớp đối soát VNPAY Gateway' },
+        { transactionId: 'TXN-VIETQR-20261116-08389', bookingCode: 'NK-20261116-LL63G', gateway: 'VIETQR', systemAmount: 2000000, gatewayAmount: 2000000, fee: 0, netAmount: 2000000, status: 'MATCHED', notes: 'Khớp chuyển khoản nhanh VietQR Napas' },
+        { transactionId: 'TXN-MOMO-20261116-08410', bookingCode: 'NK-20261116-TT55H', gateway: 'MOMO', systemAmount: 1350000, gatewayAmount: 1350000, fee: 20250, netAmount: 1329750, status: 'MATCHED', notes: 'Khớp đối soát MoMo QR Gateway' },
+        { transactionId: 'TXN-VIETQR-20261116-08455', bookingCode: 'NK-20261116-QK27J', gateway: 'VIETQR', systemAmount: 1600000, gatewayAmount: 1600000, fee: 0, netAmount: 1600000, status: 'MATCHED', notes: 'Khớp giao dịch Napas VietQR 24/7' },
+        { transactionId: 'TXN-ZALO-20261117-08502', bookingCode: 'NK-20261117-HT84K', gateway: 'ZALOPAY', systemAmount: 950000, gatewayAmount: 950000, fee: 14250, netAmount: 935750, status: 'MATCHED', notes: 'Khớp đối soát ví điện tử ZaloPay' },
+        { transactionId: 'TXN-VNPAY-20261117-08533', bookingCode: 'NK-20261117-LT12L', gateway: 'VNPAY', systemAmount: 1600000, gatewayAmount: 1600000, fee: 24000, netAmount: 1576000, status: 'MATCHED', notes: 'Khớp 100% đối soát định kỳ VNPAY' },
+        { transactionId: 'TXN-VIETQR-20261117-08571', bookingCode: 'NK-20261117-GM90M', gateway: 'VIETQR', systemAmount: 2400000, gatewayAmount: 2400000, fee: 0, netAmount: 2400000, status: 'MATCHED', notes: 'Khớp lệnh VietQR chuyển khoản liên ngân hàng' },
+        { transactionId: 'TXN-MOMO-20261117-08604', bookingCode: 'NK-20261117-LL18N', gateway: 'MOMO', systemAmount: 800000, gatewayAmount: 800000, fee: 12000, netAmount: 788000, status: 'MATCHED', notes: 'Khớp đối soát giao dịch MoMo 1 chạm' },
+        { transactionId: 'TXN-BANK-20261117-08640', bookingCode: 'NK-20261117-TT73P', gateway: 'BANK_CARD', systemAmount: 1800000, gatewayAmount: 1800000, fee: 36000, netAmount: 1764000, status: 'MATCHED', notes: 'Khớp cổng Visa/Mastercard quốc tế' },
+        { transactionId: 'TXN-VIETQR-20261117-08695', bookingCode: 'NK-20261117-QK61Q', gateway: 'VIETQR', systemAmount: 1200000, gatewayAmount: 1200000, fee: 0, netAmount: 1200000, status: 'MATCHED', notes: 'Khớp 100% chuyển khoản tức thì VietQR' }
+      ]))
     );
   }
 
@@ -553,15 +1067,24 @@ export class MusicalService {
     return this.http.get<ApiResponse<UserStaff[]>>(`${this.apiUrl}/admin/users`).pipe(
       map(res => {
         if (res.data && res.data.length > 0) {
-          // Lọc chỉ lấy nhân sự nội bộ (không lấy customer)
-          return res.data.filter(u => u.role !== 'customer').map(u => ({
-            ...u,
-            role: (u.role === 'ticket_checker' ? 'staff' : u.role) as any
-          }));
+          // Lọc chỉ lấy nhân sự nội bộ (loại bỏ customer và accountant)
+          return res.data
+            .filter(u => u.role !== 'customer' && (u.role as string) !== 'accountant' && u.username !== 'ketoan')
+            .map(u => ({
+              ...u,
+              fullName: (u.fullName || '').replace(/\s*\(.*?\)/g, '').trim(),
+              role: (u.role === 'ticket_checker' ? 'staff' : u.role) as any
+            }));
         }
-        return this.memStaffUsers;
+        return this.memStaffUsers.map(u => ({
+          ...u,
+          fullName: (u.fullName || '').replace(/\s*\(.*?\)/g, '').trim()
+        }));
       }),
-      catchError(() => of(this.memStaffUsers))
+      catchError(() => of(this.memStaffUsers.map(u => ({
+        ...u,
+        fullName: (u.fullName || '').replace(/\s*\(.*?\)/g, '').trim()
+      }))))
     );
   }
 
@@ -636,12 +1159,13 @@ export class MusicalService {
         if (res.success && res.data?.user) {
           const user: UserStaff = {
             ...res.data.user,
+            fullName: (res.data.user.fullName || '').replace(/\s*\(.*?\)/g, '').trim(),
             role: res.data.user.role === 'ticket_checker' ? 'staff' : res.data.user.role
           };
           this.currentUser.set(user);
           this.isLoggedIn.set(true);
           if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('nhackich_user', JSON.stringify(user));
+            localStorage.setItem(this.staffSessionKey, JSON.stringify(user));
           }
           return { success: true, user, token: res.data.token || 'mock_staff_jwt' };
         }
@@ -676,7 +1200,7 @@ export class MusicalService {
         this.currentUser.set(authenticatedUser);
         this.isLoggedIn.set(true);
         if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('nhackich_user', JSON.stringify(authenticatedUser));
+          localStorage.setItem(this.staffSessionKey, JSON.stringify(authenticatedUser));
         }
 
         return of({
@@ -752,8 +1276,8 @@ export class MusicalService {
           totalRows: 14,
           seatsPerRow: 14,
           vipRows: ['A', 'B', 'C'],
-          standardRows: ['D', 'E', 'F', 'G', 'H', 'J'],
-          coupleRows: ['K', 'L'],
+          standardRows: ['D', 'E', 'F', 'G', 'J', 'K', 'L', 'M', 'N', 'P'],
+          coupleRows: ['H'],
           aisleColumns: [4, 11],
           status: 'active',
           description: 'Khán phòng vòm acoustic gỗ sồi hoàng gia, sân khấu xoay 360 độ hiện đại.'
@@ -883,27 +1407,30 @@ export class MusicalService {
     return this.http.get<ApiResponse<RevenueReport>>(`${this.apiUrl}/admin/reports/revenue`).pipe(
       map(res => res.data),
       catchError(() => of({
-        totalRevenue: 275000000,
-        totalTickets: 342,
-        avgOccupancy: 74.2,
+        totalRevenue: 740000000,
+        totalTickets: 1270,
+        avgOccupancy: 83.7,
         byShow: [
-          { musicalTitle: 'Bông Bóng Bay - Giấc Mơ Tuổi Thơ', revenue: 145000000, ticketsSold: 180, occupancyRate: 85 },
-          { musicalTitle: 'Giấc Mơ Mùa Hè (A Midsummer Night)', revenue: 85000000, ticketsSold: 110, occupancyRate: 68 },
-          { musicalTitle: 'Chuyện Tình Khúc Lan', revenue: 45000000, ticketsSold: 52, occupancyRate: 58 }
+          { musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh', revenue: 168500000, ticketsSold: 286, occupancyRate: 92 },
+          { musicalTitle: 'Tuổi thơ dữ dội', revenue: 142800000, ticketsSold: 242, occupancyRate: 88 },
+          { musicalTitle: 'Quân khu Nam Đồng', revenue: 126500000, ticketsSold: 215, occupancyRate: 85 },
+          { musicalTitle: 'Hồn Trương Ba, Da Hàng Thịt', revenue: 118400000, ticketsSold: 198, occupancyRate: 82 },
+          { musicalTitle: 'Lời thề thứ 9', revenue: 98600000, ticketsSold: 175, occupancyRate: 79 },
+          { musicalTitle: 'Giấc mơ của Bờm', revenue: 85200000, ticketsSold: 154, occupancyRate: 76 }
         ],
         byDate: [
-          { date: '10/11/2026', revenue: 38000000, ordersCount: 22 },
-          { date: '11/11/2026', revenue: 45000000, ordersCount: 28 },
-          { date: '12/11/2026', revenue: 52000000, ordersCount: 31 },
-          { date: '13/11/2026', revenue: 64000000, ordersCount: 39 },
-          { date: '14/11/2026', revenue: 76000000, ordersCount: 46 }
+          { date: '12/11/2026', revenue: 112000000, ordersCount: 74 },
+          { date: '13/11/2026', revenue: 135000000, ordersCount: 88 },
+          { date: '14/11/2026', revenue: 158000000, ordersCount: 104 },
+          { date: '15/11/2026', revenue: 165000000, ordersCount: 110 },
+          { date: '16/11/2026', revenue: 170000000, ordersCount: 109 }
         ],
         byGateway: [
-          { gateway: 'VietQR (Quét mã Napas 24/7)', amount: 120000000, percentage: 43.6 },
-          { gateway: 'VNPAY-QR / Ví điện tử', amount: 85000000, percentage: 30.9 },
-          { gateway: 'Ví MoMo', amount: 45000000, percentage: 16.4 },
-          { gateway: 'ZaloPay', amount: 15000000, percentage: 5.5 },
-          { gateway: 'Thẻ Quốc Tế Visa/Mastercard', amount: 10000000, percentage: 3.6 }
+          { gateway: 'VietQR (Quét mã Napas 24/7)', amount: 322640000, percentage: 43.6 },
+          { gateway: 'VNPAY-QR / Ví điện tử VNPAY', amount: 228660000, percentage: 30.9 },
+          { gateway: 'Ví Điện Tử MoMo', amount: 121360000, percentage: 16.4 },
+          { gateway: 'Thẻ Quốc Tế Visa/Mastercard', amount: 41440000, percentage: 5.6 },
+          { gateway: 'Ví ZaloPay', amount: 25900000, percentage: 3.5 }
         ]
       }))
     );

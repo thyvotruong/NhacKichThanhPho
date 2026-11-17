@@ -29,9 +29,15 @@ export class SeatMapComponent {
   readonly allowLockedSelection = input(false);
   readonly seatClick = output<Seat>();
 
+  private static readonly ROW_ORDER = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P'];
+
   readonly activeFloor = signal<Seat['floor']>('Tầng Trệt');
 
-  readonly availableFloors = computed(() => [...new Set(this.seats().map(seat => seat.floor))]);
+  readonly availableFloors = computed(() => {
+    const rawFloors = [...new Set(this.seats().map(seat => seat.floor))];
+    const floorPriority: Record<string, number> = { 'Tầng Trệt': 1, 'Tầng Lầu': 2 };
+    return rawFloors.sort((a, b) => (floorPriority[a] ?? 99) - (floorPriority[b] ?? 99));
+  });
 
   readonly visibleFloor = computed(() => {
     const floors = this.availableFloors();
@@ -40,7 +46,14 @@ export class SeatMapComponent {
 
   readonly visibleSeats = computed(() => this.seats().filter(seat => seat.floor === this.visibleFloor()));
 
-  readonly uniqueRows = computed(() => [...new Set(this.visibleSeats().map(seat => seat.row))].sort());
+  readonly uniqueRows = computed(() => {
+    const rows = [...new Set(this.visibleSeats().map(seat => seat.row))];
+    return rows.sort((a, b) => {
+      const idxA = SeatMapComponent.ROW_ORDER.indexOf(a);
+      const idxB = SeatMapComponent.ROW_ORDER.indexOf(b);
+      return (idxA !== -1 ? idxA : 999) - (idxB !== -1 ? idxB : 999);
+    });
+  });
 
   readonly seatTypeSummaries = computed<SeatTypeSummary[]>(() => {
     const seats = this.seats();

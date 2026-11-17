@@ -117,8 +117,8 @@
       <!-- Lưới Card Vở Diễn -->
       <div class="row g-4">
         @for (m of musicals(); track m.slug) {
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100 card-showman-glass musical-catalog-card border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-column">
+          <div class="col-12 col-lg-6">
+            <div class="card h-100 card-showman-glass musical-catalog-card border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-row align-items-center">
               <!-- Poster & Status Badge -->
               <div class="position-relative overflow-hidden poster-wrapper">
                 <img
@@ -148,9 +148,9 @@
               </div>
 
               <!-- Nội dung thẻ -->
-              <div class="card-body p-4 d-flex flex-column flex-grow-1 justify-content-between">
+              <div class="card-body p-3 d-flex flex-column flex-grow-1 justify-content-between catalog-card-body">
                 <div>
-                  <h3 class="card-title fs-4 fw-bold text-gold-gradient mb-2 line-clamp-1">
+                  <h3 class="card-title fs-4 fw-bold text-gold-gradient mb-2 catalog-title">
                     {{ m.title }}
                   </h3>
                   <p class="text-secondary small mb-3 line-clamp-2">
@@ -160,7 +160,7 @@
                   <div class="small text-secondary mb-3 pb-3 border-bottom border-secondary border-opacity-25">
                     <span class="text-white">
                         <i class="bi bi-tag-fill me-1"></i>
-                        <strong class="fw-semibold"></strong> {{ m.genre }}
+                        <strong class="fw-semibold"></strong> {{ formatGenre(m.genre) }}
                     </span>
                   </div>
                 </div>
@@ -170,15 +170,21 @@
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-white text-secondary small">Giá vé từ:</span>
                     <span class="fs-5 fw-bold text-gold-gradient">
-                      {{ (m.ticketPrices && m.ticketPrices.length > 0 ? m.ticketPrices[m.ticketPrices.length - 1].price : 250000) | number:'1.0-0' }} đ
+                      {{ getMinPrice(m) | number:'1.0-0' }} đ
                     </span>
                   </div>
 
                   <!-- Nút hành động -->
                   <div class="d-grid gap-2">
-                    <a [routerLink]="['/musical', m.slug]" class="btn btn-showman-gold py-2 fw-bold">
-                      <i class="bi bi-ticket-perforated me-1"></i> ĐẶT VÉ & XEM CHI TIẾT
-                    </a>
+                    @if (m.status === 'coming_soon') {
+                      <a [routerLink]="['/musical', m.slug]" class="btn btn-showman-gold py-2 fw-bold">
+                        <i class="bi bi-info-circle me-1"></i> XEM CHI TIẾT
+                      </a>
+                    } @else {
+                      <a [routerLink]="['/musical', m.slug]" class="btn btn-showman-gold py-2 fw-bold">
+                        <i class="bi bi-ticket-perforated me-1"></i> ĐẶT VÉ & XEM CHI TIẾT
+                      </a>
+                    }
                   </div>
                 </div>
               </div>

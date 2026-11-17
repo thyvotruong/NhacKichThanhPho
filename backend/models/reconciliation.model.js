@@ -55,7 +55,7 @@ const ReconciliationSchema = new mongoose.Schema(
     },
     reconciledBy: {
       type: String,
-      default: 'Kế toán hệ thống'
+      default: 'Ban Quản Trị'
     },
     notes: {
       type: String,

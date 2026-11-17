@@ -19,7 +19,7 @@ export interface Musical {
   title: string;
   slug: string;
   subtitle?: string;
-  genre: 'Broadway' | 'Cổ Điển' | 'Dân Gian Đương Đại' | 'Lãng Mạn' | 'Thiếu Nhi';
+  genre: 'Broadway' | 'Cổ Điển' | 'Dân Gian Đương Đại' | 'Lãng Mạn' | 'Thiếu Nhi' | string | string[];
   posterUrl: string;
   bannerUrl: string;
   trailerUrl?: string;
@@ -248,7 +248,7 @@ export interface UserStaff {
   phone: string;
   username?: string;
   password?: string;
-  role: 'customer' | 'admin' | 'editor' | 'accountant' | 'ticket_checker' | 'staff';
+  role: 'customer' | 'admin' | 'editor' | 'ticket_checker' | 'staff';
   department?: string;
   avatar?: string;
   isActive: boolean;

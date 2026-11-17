@@ -120,7 +120,7 @@ export class AccountComponent implements OnInit {
     };
 
     try {
-      localStorage.setItem('nhackich_user', JSON.stringify(updated));
+      localStorage.setItem('nhackich_customer_user', JSON.stringify(updated));
     } catch {
       this.profileError.set('Không thể lưu thông tin. Vui lòng kiểm tra quyền lưu trữ của trình duyệt và thử lại.');
       return;

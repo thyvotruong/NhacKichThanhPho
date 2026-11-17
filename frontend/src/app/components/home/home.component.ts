@@ -7,11 +7,13 @@
  * ============================================================
  */
 
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MusicalService } from '../../services/musical.service';
 import { Musical, Schedule, Artist } from '../../models/musical.model';
+
+type FeaturedMusical = Musical & { isDemo?: boolean };
 
 @Component({
   selector: 'app-home',
@@ -23,8 +25,11 @@ import { Musical, Schedule, Artist } from '../../models/musical.model';
 export class HomeComponent implements OnInit {
   private readonly musicalService = inject(MusicalService);
 
+  @ViewChild('featuredMusicalsTrack')
+  private featuredMusicalsTrack?: ElementRef<HTMLDivElement>;
+
   // Angular Signals quản lý trạng thái
-  musicals = signal<Musical[]>([]);
+  musicals = signal<FeaturedMusical[]>([]);
   schedules = signal<Schedule[]>([]);
   artists = signal<Artist[]>([]);
   isLoading = signal<boolean>(true);
@@ -32,31 +37,39 @@ export class HomeComponent implements OnInit {
   // Quản lý chỉ số Slide Hero Banner đang hiển thị
   activeSlideIndex = signal<number>(0);
 
-  // Danh sách các slide giới thiệu tiêu biểu
-  readonly heroSlides = [
-    {
-      title: 'Bông Bóng Bay',
-      subtitle: 'Bản trường ca thanh xuân rực rỡ và những ước mơ bay bổng',
-      slug: 'bong-bong-bay',
-      director: 'NSƯT Trần Minh Đức',
-      time: '120 Phút | Khán phòng Grand A',
-      bgImage: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80',
-      badge: 'Vở Diễn Khai Màn 2026'
-    },
-    {
-      title: 'Giấc Mơ Mùa Hè',
-      subtitle: 'Bản tình ca Broadway rực rỡ, lãng mạn và thăng hoa nghệ thuật',
-      slug: 'giac-mo-mua-he',
-      director: 'Đạo diễn Nguyễn Lê Hoàng',
-      time: '135 Phút | Broadway Opera Hall',
-      bgImage: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1920&q=80',
-      badge: 'Siêu Phẩm Broadway Việt Nam'
-    }
-  ];
+  // Các vở đang diễn được nạp động vào Hero Banner.
+  heroSlides: any[] = [];
 
   ngOnInit(): void {
     this.loadData();
     this.startHeroSlider();
+  }
+
+  getMinPrice(musical: Musical): number {
+    if (!musical.ticketPrices || musical.ticketPrices.length === 0) return 450000;
+    return Math.min(...musical.ticketPrices.map(t => t.price || 0));
+  }
+
+  formatGenre(genre: any): string {
+    if (Array.isArray(genre)) return genre.join(' • ');
+    return String(genre || '');
+  }
+
+  getUpcomingSchedules(): Schedule[] {
+    const getPerformanceTime = (schedule: Schedule): number =>
+      schedule.performanceDate instanceof Date
+        ? schedule.performanceDate.getTime()
+        : Date.parse(schedule.performanceDate);
+    const now = Date.now();
+
+    return this.schedules()
+      .filter(schedule =>
+        schedule.status === 'available' &&
+        schedule.bookedSeats < schedule.totalSeats &&
+        getPerformanceTime(schedule) >= now
+      )
+      .sort((a, b) => getPerformanceTime(a) - getPerformanceTime(b))
+      .slice(0, 4);
   }
 
   /**
@@ -70,44 +83,23 @@ export class HomeComponent implements OnInit {
       next: (data) => {
         if (data && data.length > 0) {
           this.musicals.set(data);
+
+          // Hiển thị lần lượt tất cả các vở đang diễn trên Hero Banner.
+          this.heroSlides = data.filter(m => m.status === 'now_showing').map(m => ({
+            title: m.title,
+            subtitle: m.subtitle || (m.synopsis ? m.synopsis.slice(0, 100) + '...' : ''),
+            slug: m.slug,
+            director: m.director,
+            time: `${m.duration} Phút | Khán phòng Grand A`,
+            posterUrl: m.posterUrl,
+            bgImage: m.posterUrl || m.bannerUrl,
+            badge: 'Đang Diễn'
+          }));
+          this.activeSlideIndex.set(0);
         } else {
-          // Fallback dữ liệu nội bộ
-          this.musicals.set([
-            {
-              title: 'Bông Bóng Bay',
-              slug: 'bong-bong-bay',
-              subtitle: 'Bản trường ca thanh xuân rực rỡ',
-              genre: 'Broadway',
-              status: 'now_showing',
-              posterUrl: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
-              bannerUrl: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80',
-              duration: 120,
-              director: 'NSƯT Trần Minh Đức',
-              cast: ['Lan Phương', 'Quang Tuấn', 'Khả Như', 'Huỳnh Lập'],
-              synopsis: 'Vở nhạc kịch Bông Bóng Bay là câu chuyện hoài niệm đong đầy yêu thương về tuổi thanh xuân...',
-              ticketPrices: [
-                { tier: 'VIP', name: 'VIP Hoàng Gia', price: 800000 },
-                { tier: 'Standard', name: 'Tiêu Chuẩn', price: 450000 }
-              ]
-            },
-            {
-              title: 'Giấc Mơ Mùa Hè',
-              slug: 'giac-mo-mua-he',
-              subtitle: 'Bản tình ca Broadway lãng mạn bậc nhất',
-              genre: 'Lãng Mạn',
-              status: 'now_showing',
-              posterUrl: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=800&q=80',
-              bannerUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1920&q=80',
-              duration: 135,
-              director: 'Đạo diễn Nguyễn Lê Hoàng',
-              cast: ['Hoàng Dũng', 'Bùi Lan Hương', 'Trung Quân'],
-              synopsis: 'Bản tình ca Broadway lãng mạn đầy mê hoặc với những giai điệu kinh điển...',
-              ticketPrices: [
-                { tier: 'VIP', name: 'VIP Kim Cương', price: 950000 },
-                { tier: 'Standard', name: 'Tiêu Chuẩn', price: 500000 }
-              ]
-            }
-          ]);
+          this.musicals.set([]);
+          this.heroSlides = [];
+          this.activeSlideIndex.set(0);
         }
       }
     });
@@ -120,52 +112,76 @@ export class HomeComponent implements OnInit {
         } else {
           this.schedules.set([
             {
-              _id: 'sch_01',
-              musicalSlug: 'bong-bong-bay',
-              musicalTitle: 'Bông Bóng Bay',
-              performanceDate: '2026-11-15T19:30:00Z',
+              _id: 'sch_lo-lem-chiec-giay-thuy-tinh',
+              musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
+              musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
+              performanceDate: '2026-11-20T19:30:00Z',
               time: '19:30',
               venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A',
-              totalSeats: 450,
-              bookedSeats: 210,
+              hall: 'Khán phòng Grand A - Hoàng Gia',
+              totalSeats: 110,
+              bookedSeats: 35,
               status: 'available'
             },
             {
-              _id: 'sch_02',
-              musicalSlug: 'bong-bong-bay',
-              musicalTitle: 'Bông Bóng Bay',
-              performanceDate: '2026-11-20T20:00:00Z',
+              _id: 'sch_loi-the-thu-9',
+              musicalSlug: 'loi-the-thu-9',
+              musicalTitle: 'Lời thề thứ 9',
+              performanceDate: '2026-11-22T20:00:00Z',
               time: '20:00',
               venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A',
-              totalSeats: 450,
-              bookedSeats: 450,
-              status: 'sold_out'
-            },
-            {
-              _id: 'sch_03',
-              musicalSlug: 'giac-mo-mua-he',
-              musicalTitle: 'Giấc Mơ Mùa Hè',
-              performanceDate: '2026-11-18T19:30:00Z',
-              time: '19:30',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Broadway Opera',
-              totalSeats: 500,
-              bookedSeats: 340,
+              hall: 'Khán phòng Grand A - Hoàng Gia',
+              totalSeats: 110,
+              bookedSeats: 48,
               status: 'available'
             },
             {
-              _id: 'sch_04',
-              musicalSlug: 'giac-mo-mua-he',
-              musicalTitle: 'Giấc Mơ Mùa Hè',
-              performanceDate: '2026-11-25T19:30:00Z',
+              _id: 'sch_tuoi-tho-du-doi',
+              musicalSlug: 'tuoi-tho-du-doi',
+              musicalTitle: 'Tuổi thơ dữ dội',
+              performanceDate: '2026-11-24T19:30:00Z',
               time: '19:30',
               venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
+              hall: 'Khán phòng Grand A - Hoàng Gia',
+              totalSeats: 110,
+              bookedSeats: 52,
+              status: 'available'
+            },
+            {
+              _id: 'sch_hon-truong-ba-da-hang-thit',
+              musicalSlug: 'hon-truong-ba-da-hang-thit',
+              musicalTitle: 'Hồn Trương Ba, Da Hàng Thịt',
+              performanceDate: '2026-11-26T20:00:00Z',
+              time: '20:00',
+              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
               hall: 'Khán phòng Broadway Opera',
-              totalSeats: 500,
-              bookedSeats: 500,
-              status: 'sold_out'
+              totalSeats: 110,
+              bookedSeats: 60,
+              status: 'available'
+            },
+            {
+              _id: 'sch_quan-khu-nam-dong',
+              musicalSlug: 'quan-khu-nam-dong',
+              musicalTitle: 'Quân khu Nam Đồng',
+              performanceDate: '2026-11-28T19:30:00Z',
+              time: '19:30',
+              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
+              hall: 'Khán phòng Grand A - Hoàng Gia',
+              totalSeats: 110,
+              bookedSeats: 40,
+              status: 'available'
+            },
+            {
+              _id: 'sch_giac-mo-cua-bom',
+              musicalSlug: 'giac-mo-cua-bom',
+              musicalTitle: 'Giấc mơ của Bờm',
+              performanceDate: '2026-11-30T20:00:00Z',
+              time: '20:00',
+              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
+              hall: 'Khán phòng Grand A - Hoàng Gia',
+              totalSeats: 110,
+              bookedSeats: 30,
+              status: 'available'
             }
           ]);
         }
@@ -225,17 +241,29 @@ export class HomeComponent implements OnInit {
   }
 
   nextSlide(): void {
+    if (this.heroSlides.length === 0) return;
     const next = (this.activeSlideIndex() + 1) % this.heroSlides.length;
     this.activeSlideIndex.set(next);
   }
 
   prevSlide(): void {
+    if (this.heroSlides.length === 0) return;
     const prev = (this.activeSlideIndex() - 1 + this.heroSlides.length) % this.heroSlides.length;
     this.activeSlideIndex.set(prev);
   }
 
   setSlide(index: number): void {
     this.activeSlideIndex.set(index);
+  }
+
+  scrollFeaturedMusicals(direction: -1 | 1): void {
+    const track = this.featuredMusicalsTrack?.nativeElement;
+    if (!track) return;
+
+    track.scrollBy({
+      left: direction * track.clientWidth * 0.8,
+      behavior: 'smooth'
+    });
   }
 
   scrollToSection(id: string): void {

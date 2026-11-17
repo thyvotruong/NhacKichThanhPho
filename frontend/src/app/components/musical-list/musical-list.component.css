@@ -64,24 +64,49 @@
 }
 
 .poster-wrapper {
-  height: 235px;
+  flex: 0 0 38%;
+  width: auto;
+  max-width: 220px;
+  aspect-ratio: 2 / 3;
+  background: #070A12;
 }
 
 .catalog-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  background: #070A12;
+  transform: scale(1.04);
+}
+
+.catalog-card-body {
+  min-width: 0;
+}
+
+.catalog-title {
+  overflow-wrap: anywhere;
 }
 
 .musical-catalog-card:hover .catalog-card-img {
-  transform: scale(1.06);
+  filter: brightness(1.08);
+}
+
+@media (max-width: 575.98px) {
+  .poster-wrapper {
+    flex-basis: 34%;
+    min-width: 108px;
+    max-width: 140px;
+  }
+
+  .catalog-card-body {
+    padding: 1rem !important;
+  }
 }
 
 .poster-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(7, 10, 18, 0.95) 0%, rgba(7, 10, 18, 0.2) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(7, 10, 18, 0.28) 0%, transparent 45%);
 }
 
 .line-clamp-1 {

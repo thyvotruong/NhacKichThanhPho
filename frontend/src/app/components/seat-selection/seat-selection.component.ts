@@ -87,11 +87,11 @@ loadSeatMap(scheduleId: string): void {
     error: () => {
       this.scheduleInfo.set({
         scheduleId,
-        musicalTitle: 'Bông Bóng Bay',
-        musicalSlug: 'bong-bong-bay',
-        performanceDate: '2026-11-15T19:30:00Z',
+        musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
+        musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
+        performanceDate: '2026-11-20T19:30:00+07:00',
         time: '19:30',
-        hall: 'Khán phòng Grand A'
+        hall: 'Khán phòng Grand A - Hoàng Gia'
       });
       this.seats.set(this.generateFallbackSeats(scheduleId));
     }
@@ -100,41 +100,89 @@ loadSeatMap(scheduleId: string): void {
 
 private generateFallbackSeats(scheduleId: string): any[] {
   const generated: any[] = [];
-  const stallRows = ['A', 'B', 'C', 'D', 'E', 'F'];
-  const balconyRows = ['G', 'H', 'I'];
+  const stallVipRows = ['A', 'B', 'C'];
+  const stallStdRows = ['D', 'E', 'F', 'G'];
+  const balconyRows = ['J', 'K', 'L', 'M', 'N', 'P'];
 
-  stallRows.forEach((row, rIdx) => {
-    const isVip = rIdx < 2;
-    const isCouple = rIdx === 5;
-    const totalInRow = isCouple ? 6 : 12;
-
-    for (let num = 1; num <= totalInRow; num++) {
+  // 1. TẦNG TRỆT - VIP (Hàng A, B, C: 12 ghế/hàng)
+  stallVipRows.forEach(row => {
+    for (let num = 1; num <= 12; num++) {
       let status = 'available';
-      if ((row === 'A' && (num === 5 || num === 6))) status = 'booked';
+      let lockedReason = null;
+      let lockedBy = null;
+
+      if (row === 'A' && (num === 1 || num === 2)) {
+        status = 'locked';
+        lockedReason = 'Khách mời danh dự / Ngoại giao';
+        lockedBy = 'Admin Trưởng Ban';
+      } else if (row === 'A' && num === 12) {
+        status = 'locked';
+        lockedReason = 'Kỹ thuật âm thanh sân khấu';
+        lockedBy = 'Admin Kỹ Thuật';
+      } else if (row === 'B' && (num === 5 || num === 6)) {
+        status = 'booked';
+      }
 
       generated.push({
         scheduleId,
-        seatCode: `${row}${num}`,
+        seatCode: `${row}${num < 10 ? '0' + num : num}`,
         floor: 'Tầng Trệt',
         row,
         number: num,
-        type: isCouple ? 'Couple' : isVip ? 'VIP' : 'Standard',
-        price: isCouple ? 1200000 : isVip ? 800000 : 450000,
+        type: 'VIP',
+        price: 800000,
+        status,
+        lockedReason,
+        lockedBy
+      });
+    }
+  });
+
+  // 2. TẦNG TRỆT - Standard (Hàng D, E, F, G: 14 ghế/hàng)
+  stallStdRows.forEach(row => {
+    for (let num = 1; num <= 14; num++) {
+      let status = 'available';
+      if (row === 'D' && (num === 7 || num === 8)) {
+        status = 'booked';
+      }
+      generated.push({
+        scheduleId,
+        seatCode: `${row}${num < 10 ? '0' + num : num}`,
+        floor: 'Tầng Trệt',
+        row,
+        number: num,
+        type: 'Standard',
+        price: 450000,
         status
       });
     }
   });
 
-  balconyRows.forEach((row) => {
-    for (let num = 1; num <= 10; num++) {
+  // 3. TẦNG TRỆT - Ghế Đôi Sweetbox (Hàng H: 6 ghế đôi H-CP01 - H-CP06)
+  for (let num = 1; num <= 6; num++) {
+    generated.push({
+      scheduleId,
+      seatCode: `H-CP0${num}`,
+      floor: 'Tầng Trệt',
+      row: 'H',
+      number: num,
+      type: 'Couple',
+      price: 1200000,
+      status: 'available'
+    });
+  }
+
+  // 4. TẦNG LẦU - Standard (Hàng J, K, L, M, N, P: 14 ghế/hàng)
+  balconyRows.forEach(row => {
+    for (let num = 1; num <= 14; num++) {
       generated.push({
         scheduleId,
-        seatCode: `${row}${num}`,
+        seatCode: `${row}${num < 10 ? '0' + num : num}`,
         floor: 'Tầng Lầu',
         row,
         number: num,
         type: 'Standard',
-        price: 450000,
+        price: 450000, // Đồng bộ chuẩn 450.000 đ
         status: 'available'
       });
     }

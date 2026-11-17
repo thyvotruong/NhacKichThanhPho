@@ -1,0 +1,377 @@
+[
+    {
+        "_id": "mus_001",
+        "title": "Lọ Lem - Chiếc giày thủy tinh",
+        "slug": "lo-lem-chiec-giay-thuy-tinh",
+        "subtitle": "Câu chuyện cổ tích kinh điển qua sân khấu đa tầng, âm nhạc sôi động và thế giới nhân hóa đầy tiếng cười",
+        "genre": [
+            "Cổ tích",
+            "Thiếu nhi",
+            "Gia đình"
+        ],
+        "duration": 120,
+        "ageLimit": "12+",
+        "director": "Thúy Hằng",
+        "cast": [
+            "Yến My (vai Lọ Lem) cùng các nghệ sĩ khác"
+        ],
+        "synopsis": "Vở diễn Lọ Lem – Chiếc giày thủy tinh mang đến góc nhìn mới mẻ, hiện đại về câu chuyện cổ tích kinh điển – nơi Lọ Lem không chỉ chờ đợi phép màu mà chủ động chọn lòng nhân ái, sự kiên cường và điểm tựa từ tình yêu thương sâu sắc của người mẹ. Với sân khấu đa tầng giàu tương tác, công nghệ ánh sáng mãn nhãn, âm nhạc sôi động cùng các đồ vật nhân hóa đầy tiếng cười, vở diễn là hành trình cảm xúc gắn kết cả gia đình, gieo vào lòng con trẻ niềm tin vào điều tử tế và chạm đến trái tim của những người làm cha mẹ.",
+        "posterUrl": "/images/musicals/lo_lem_chiec_giay_thuy_tinh.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "now_showing",
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 128
+    },
+    {
+        "_id": "mus_002",
+        "title": "Lời thề thứ 9",
+        "slug": "loi-the-thu-9",
+        "subtitle": "Kiệt tác chính luận vượt thời gian của Lưu Quang Vũ với góc nhìn dí dỏm, nhịp điệu hiện đại và thông điệp nhân văn sâu sắc.",
+        "genre": [
+            "Chính luận",
+            "Tâm lý"
+        ],
+        "duration": 120,
+        "ageLimit": "16+",
+        "director": "NSND Xuân Huyền",
+        "cast": [
+            "Tập thể nghệ sĩ Nhạc kịch Thành phố"
+        ],
+        "synopsis": "Vở kịch 'Lời thề thứ 9' của cố tác giả Lưu Quang Vũ phản ánh sắc sảo thực trạng thoái hóa, biến chất của một bộ phận cán bộ nhưng vẫn vẹn nguyên tính thời sự và giá trị nhân văn sau hơn ba thập kỷ. Dưới sự dàn dựng của đạo diễn NSND Xuân Huyền cùng nền nhạc mang âm hưởng thập niên 1980-1990 và tiết tấu nhanh, vở diễn khéo léo lồng ghép lăng kính hài hước, dí dỏm giúp tác phẩm chính luận trở nên gần gũi với khán giả trẻ, đồng thời đánh thức ký ức nghệ thuật của những người yêu kịch xưa.",
+        "posterUrl": "/images/musicals/loi_the_thu_9.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "now_showing",
+        "featured": true,
+        "rating": 4.8,
+        "reviewCount": 128
+    },
+    {
+        "_id": "mus_003",
+        "title": "Tuổi thơ dữ dội",
+        "slug": "tuoi-tho-du-doi",
+        "subtitle": "Chuyển thể từ kiệt tác của nhà văn Phùng Quán, tái hiện bản hùng ca về lòng dũng cảm và tình đồng đội của thế hệ thiếu niên chiến khu Huế.",
+        "genre": [
+            "Lịch sử",
+            "Thiếu nhi",
+            "Gia đình"
+        ],
+        "duration": 145,
+        "ageLimit": "7+",
+        "director": "NSƯT Lê Ánh Tuyết",
+        "cast": [
+            "Nam Anh",
+            "Tôn Sơn",
+            "Quốc Chí",
+            "Phạm Cường",
+            "Đồng Thanh Nhàn",
+            "Quang Thiện",
+            "Bách Nguyễn",
+            "Quốc Việt",
+            "Trần Phương",
+            "Minh Anh"
+        ],
+        "synopsis": "Lấy nhân vật Mừng làm trung tâm, vở nhạc kịch 'Tuổi Thơ Dữ Dội' (dựa theo truyện dài của nhà văn Phùng Quán) kể câu chuyện về cậu bé hồn nhiên nơi chiến khu Huế sớm bước vào Đội Thiếu niên Trinh sát trong những năm đầu kháng chiến chống Pháp. Cùng những người đồng đội như Quỳnh 'sơn ca', Lượm, Vịnh 'sưa', Tư Dát, Bồng Da Rắn…, Mừng đã trưởng thành giữa bom đạn, vượt qua mất mát để viết nên trang sử hào hùng bằng lòng dũng cảm và niềm tin hòa bình, đồng thời mở ra cuộc đối thoại sâu sắc với thế hệ trẻ hôm nay về lý tưởng sống và cống hiến.",
+        "posterUrl": "/images/musicals/tuoi_tho_du_doi.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "now_showing",
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 136
+    },
+    {
+        "_id": "mus_004",
+        "title": "Hồn Trương Ba, Da Hàng Thịt",
+        "slug": "hon-truong-ba-da-hang-thit",
+        "subtitle": "Kiệt tác sân khấu kinh điển của Lưu Quang Vũ dưới bàn tay dàn dựng của đạo diễn Pháp Anne Bouvier, mở ra cuộc đối thoại sâu sắc về bản ngã và phẩm giá con người.",
+        "genre": [
+            "Dân gian",
+            "Tâm lý",
+            "Bi hài kịch"
+        ],
+        "duration": 120,
+        "ageLimit": "12+",
+        "director": "Anne Bouvier",
+        "cast": [
+            "Tập thể nghệ sĩ Nhạc kịch Thành phố"
+        ],
+        "synopsis": "Từ tích truyện dân gian quen thuộc, kiệt tác 'Hồn Trương Ba, Da Hàng Thịt' của cố tác giả Lưu Quang Vũ kể về bi kịch của người làm vườn hiền lành Trương Ba bị chết oan và được tiên cờ Đế Thích cho nhập hồn vào thân xác anh hàng thịt. Cuộc giằng co nghiệt ngã giữa linh hồn thanh cao và thể xác trần tục đặt ra câu hỏi vượt thời đại về việc sống trung thực với bản thân và gìn giữ phẩm giá. Đan xen hài hước, chất thơ cùng triết lý sâu sắc, phiên bản hợp tác Việt – Pháp do đạo diễn Anne Bouvier dàn dựng cùng các nghệ sĩ Nhà hát Tuổi Trẻ Việt Nam vừa tôn vinh vẻ đẹp lời thoại Việt, vừa mở ra cuộc giao thoa nghệ thuật đầy mới mẻ.",
+        "posterUrl": "/images/musicals/hon_truong_ba_da_hang_thit.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "now_showing",
+        "featured": true,
+        "rating": 4.7,
+        "reviewCount": 120
+    },
+    {
+        "_id": "mus_005",
+        "title": "Quân khu Nam Đồng",
+        "slug": "quan-khu-nam-dong",
+        "subtitle": "Chuyển thể từ truyện dài của nhà văn Bình Ca, tái hiện bức tranh tuổi thơ dữ dội, hóm hỉnh và ấm áp tình người tại khu gia binh giữa lòng Hà Nội thời chiến.",
+        "genre": [
+            "Lịch sử",
+            "Tâm lý",
+            "Gia đình"
+        ],
+        "duration": 125,
+        "ageLimit": "Mọi lứa tuổi",
+        "director": "NSƯT Nguyễn Sĩ Tiến",
+        "cast": [
+            "NSƯT Thanh Bình",
+            "NSƯT Quang Ánh",
+            "Nguyễn Tú",
+            "Thanh Sơn",
+            "Lương Thu Trang",
+            "Thu Quỳnh",
+            "Huyền Trang",
+            "Chí Huy",
+            "Bá Anh"
+        ],
+        "synopsis": "Chuyển thể từ tác phẩm văn học đầy hoài niệm của nhà văn Bình Ca qua ngòi bút biên kịch Phạm Ngọc Tiến và dàn dựng của đạo diễn NSƯT Nguyễn Sĩ Tiến, vở kịch 'Quân khu Nam Đồng' mở ra lát cắt ký ức sống động về thế hệ con em những người lính lớn lên tại khu tập thể gia binh giữa lòng Hà Nội thời chiến. Trưởng thành giữa tiếng còi báo động và thiếu thốn nhưng chan chứa yêu thương, nhóm bạn trẻ Nam Đồng đã viết nên câu chuyện tuổi thơ vừa nghịch ngợm, hóm hỉnh vừa sâu lắng về tình bạn trong sáng, tình cảm gia đình và lòng tự hào dân tộc, như một lời tri ân gửi đến hậu phương quân đội.",
+        "posterUrl": "/images/musicals/quan_khu_nam_dong.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "now_showing",
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 130
+    },
+    {
+        "_id": "mus_006",
+        "title": "Chú bé người gỗ – Pinocchio",
+        "slug": "chu-be-nguoi-go-pinocchio",
+        "subtitle": "Phóng tác từ tác phẩm kinh điển của Carlo Collodi, kể câu chuyện trưởng thành đầy cảm xúc về sự trung thực, lòng bao dung và tình phụ tử thiêng liêng.",
+        "genre": [
+            "Cổ tích",
+            "Thiếu nhi",
+            "Gia đình"
+        ],
+        "duration": 125,
+        "ageLimit": "Mọi lứa tuổi",
+        "director": "Đào Duy Anh",
+        "cast": [
+            "Tập thể nghệ sĩ Nhạc kịch Thành phố"
+        ],
+        "synopsis": "Phóng tác từ kiệt tác của Carlo Collodi qua ngòi bút kịch bản Nguyễn Công Đức và bàn tay dàn dựng của đạo diễn Đào Duy Anh, vở kịch thiếu nhi 'Chú bé người gỗ – Pinocchio' mang đến hành trình trưởng thành giàu cảm xúc, gần gũi với đời sống hôm nay. Từ cậu bé người gỗ hồn nhiên, bướng bỉnh, Pinocchio dần học cách nói thật, biết xin lỗi và yêu thương để trở thành một 'con người' thực thụ. Khai thác tinh tế ngôn ngữ đối thoại và hình thể trên sân khấu, vở diễn không chỉ là bài học mềm nuôi dưỡng nhân cách con trẻ mà còn mở ra khoảng lặng sâu lắng về tình yêu vô điều kiện của người cha Geppetto dành cho các bậc phụ huynh.",
+        "posterUrl": "/images/musicals/chu_be_nguoi_go_pinocchio.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "coming_soon",
+        "featured": true,
+        "rating": 0,
+        "reviewCount": 0
+    },
+    {
+        "_id": "mus_007",
+        "title": "Nơi tình yêu bắt đầu",
+        "slug": "noi-tinh-yeu-bat-dau",
+        "subtitle": "Hành trình cảm xúc giữa hai thế giới cõi trần và cõi sáng, nơi tình thương, lòng bao dung và sự thứ tha chữa lành mọi nỗi đau và nuối tiếc.",
+        "genre": [
+            "Tình cảm",
+            "Tâm lý"
+        ],
+        "duration": 110,
+        "ageLimit": "13+",
+        "director": "Lý Chí Huy",
+        "cast": [
+            "Tập thể nghệ sĩ Nhạc kịch Thành phố"
+        ],
+        "synopsis": "Vở kịch 'Nơi tình yêu bắt đầu' của bộ đôi tác giả Tùng Phi – Tiến Đạt và đạo diễn Lý Chí Huy kể về chàng phóng viên trẻ nhiều ước mơ bất ngờ qua đời vì tai nạn giao thông ngay trên đường đi tỏ tình với người con gái anh thương[cite: 6]. Được đón về Cõi sáng chờ chuyển kiếp, anh chứng kiến sự giằng xé, nuối tiếc và bế tắc của những linh hồn giữa hai thế giới song song[cite: 6]. Thế nhưng, bằng quy luật của tình thương, lòng bao dung và sự thứ tha, từng tâm hồn dần được chữa lành để ánh sáng tình yêu mãi tỏa rạng vượt qua ranh giới không gian và thời gian.",
+        "posterUrl": "/images/musicals/noi_tinh_yeu_bat_dau.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "coming_soon",
+        "featured": true,
+        "rating": 0,
+        "reviewCount": 0
+    },
+    {
+        "_id": "mus_008",
+        "title": "Giấc mơ của Bờm",
+        "slug": "giac-mo-cua-bom",
+        "subtitle": "Góc nhìn mới mẻ, hóm hỉnh từ tích truyện dân gian Thằng Bờm, kết hợp âm nhạc dân gian đương đại và nghệ thuật sắp đặt đầy màu sắc.",
+        "genre": [
+            "Dân gian",
+            "Thiếu nhi",
+            "Gia đình"
+        ],
+        "duration": 100,
+        "ageLimit": "Mọi lứa tuổi",
+        "director": "NSƯT Lê Ánh Tuyết",
+        "cast": [
+            "Tập thể nghệ sĩ Nhạc kịch Thành phố"
+        ],
+        "synopsis": "Mượn tích truyện dân gian quen thuộc, vở diễn 'Giấc mơ của Bờm' của tác giả Thiên Ân và đạo diễn NSƯT Lê Ánh Tuyết kể câu chuyện đầy nhân văn về cậu bé Bờm mồ côi nghèo khó nhưng ham học và lương thiện. Với chiếc quạt mo kỷ vật cùng lời dặn dò của người mẹ trong giấc mơ, Bờm và nhóm bạn đã dùng trí thông minh để vạch trần âm mưu ăn chặn của vợ chồng Phú ông tham lam. Kết hợp hài hòa giữa kịch nói, ca hát, vũ đạo đương đại cùng âm hưởng dân gian, vở diễn gửi gắm bài học sâu sắc về lòng trung thực, tinh thần hiếu học và tình yêu thương con người.",
+        "posterUrl": "/images/musicals/giac_mo_cua_bom.jpg",
+        "bannerUrl": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80",
+        "trailerUrl": "https://www.youtube.com/embed/RclpGv8673s",
+        "ticketPrices": [
+            {
+                "tier": "VIP",
+                "name": "Hạng VIP Hoàng Gia",
+                "price": 800000,
+                "description": "Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo"
+            },
+            {
+                "tier": "Standard",
+                "name": "Hạng Tiêu Chuẩn",
+                "price": 450000,
+                "description": "Khu vực tầng trệt và tầng lầu tiêu chuẩn"
+            },
+            {
+                "tier": "Couple",
+                "name": "Hạng Ghế Đôi Sweetbox",
+                "price": 1200000,
+                "description": "Ghế đôi nệm nhung riêng tư hàng H"
+            }
+        ],
+        "status": "now_showing",
+        "featured": true,
+        "rating": 4.8,
+        "reviewCount": 128
+    }
+]

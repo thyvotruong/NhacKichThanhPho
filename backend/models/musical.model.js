@@ -13,7 +13,6 @@ const TicketTierSchema = new mongoose.Schema(
     tier: {
       type: String,
       required: [true, 'Hạng vé không được để trống'],
-      enum: ['VIP', 'Standard', 'Couple'],
       default: 'Standard'
     },
     name: {
@@ -40,6 +39,9 @@ const TicketTierSchema = new mongoose.Schema(
 
 const MusicalSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String
+    },
     title: {
       type: String,
       required: [true, 'Tên vở nhạc kịch là bắt buộc'],
@@ -58,9 +60,8 @@ const MusicalSchema = new mongoose.Schema(
       trim: true
     },
     genre: {
-      type: String,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
-      enum: ['Broadway', 'Cổ Điển', 'Dân Gian Đương Đại', 'Lãng Mạn', 'Thiếu Nhi'],
       default: 'Broadway'
     },
     posterUrl: {
@@ -99,7 +100,7 @@ const MusicalSchema = new mongoose.Schema(
     },
     synopsis: {
       type: String,
-      required: [true, 'Tóm tắt nội dung là bắt buộc']
+      default: ''
     },
     ticketPrices: {
       type: [TicketTierSchema],
@@ -117,12 +118,12 @@ const MusicalSchema = new mongoose.Schema(
     rating: {
       type: Number,
       default: 4.9,
-      min: 1,
+      min: 0,
       max: 5
     },
     reviewCount: {
       type: Number,
-      default: 128
+      default: 0
     }
   },
   {

@@ -23,16 +23,18 @@ const Reconciliation = require('./models/reconciliation.model');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nhac_kich_thanh_pho';
 
-// Hàm sinh sơ đồ ghế ngồi chi tiết cho một suất chiếu
+// Hàm sinh sơ đồ ghế ngồi chi tiết chuẩn hóa khớp 100% giữa Admin & Client
 function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCouplePrice = 1200000) {
   const seats = [];
 
-  // TẦNG TRỆT (STALLS)
-  // Hàng A, B, C: VIP
+  // ==========================================
+  // 1. TẦNG TRỆT (STALLS): Hàng A -> H
+  // ==========================================
+
+  // Hàng A, B, C: VIP (12 ghế / hàng: 01 - 12)
   ['A', 'B', 'C'].forEach(row => {
     for (let num = 1; num <= 12; num++) {
       const code = `${row}${num < 10 ? '0' + num : num}`;
-      // Cố định vài ghế demo trạng thái:
       let status = 'available';
       let lockedReason = null;
       let lockedBy = null;
@@ -63,8 +65,8 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
     }
   });
 
-  // Hàng D, E, F: Standard
-  ['D', 'E', 'F'].forEach(row => {
+  // Hàng D, E, F, G: Standard / Thường (14 ghế / hàng: 01 - 14)
+  ['D', 'E', 'F', 'G'].forEach(row => {
     for (let num = 1; num <= 14; num++) {
       const code = `${row}${num < 10 ? '0' + num : num}`;
       let status = 'available';
@@ -83,9 +85,9 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
     }
   });
 
-  // Hàng H: Ghế Đôi (Couple Sweetbox)
+  // Hàng H: Ghế Đôi (Couple Sweetbox) (6 ghế đôi: H-CP01 - H-CP06)
   for (let num = 1; num <= 6; num++) {
-    const code = `H-CP${num}`;
+    const code = `H-CP0${num}`;
     seats.push({
       seatCode: code,
       floor: 'Tầng Trệt',
@@ -97,9 +99,12 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
     });
   }
 
-  // TẦNG LẦU (BALCONY)
-  // Hàng J, K: Standard
-  ['J', 'K'].forEach(row => {
+  // ==========================================
+  // 2. TẦNG LẦU (BALCONY): Hàng J -> P
+  // ==========================================
+
+  // Hàng J, K, L, M, N, P: Standard / Thường (14 ghế / hàng: 01 - 14)
+  ['J', 'K', 'L', 'M', 'N', 'P'].forEach(row => {
     for (let num = 1; num <= 14; num++) {
       const code = `${row}${num < 10 ? '0' + num : num}`;
       seats.push({
@@ -108,7 +113,7 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
         row,
         number: num,
         type: 'Standard',
-        price: Math.round(baseStdPrice * 0.8),
+        price: baseStdPrice, // Chuẩn cố định 450,000 đ
         status: 'available'
       });
     }
@@ -117,91 +122,7 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
   return seats;
 }
 
-const sampleMusicals = [
-  {
-    title: 'Bông Bóng Bay',
-    slug: 'bong-bong-bay',
-    subtitle: 'Bản trường ca thanh xuân rực rỡ và những ước mơ bay bổng',
-    genre: 'Broadway',
-    posterUrl: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
-    bannerUrl: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80',
-    trailerUrl: 'https://www.youtube.com/embed/RclpGv8673s',
-    duration: 120,
-    ageLimit: '12+',
-    director: 'NSƯT Trần Minh Đức',
-    cast: [
-      'Lan Phương (vai Mai Nhi)',
-      'Quang Tuấn (vai Hoàng Nam)',
-      'Khả Như (vai Cúc Họa Mi)',
-      'Huỳnh Lập (vai Chú Hề Bong Bóng)',
-      'Dàn Hợp xướng & Vũ đoàn Nhà Hát Thành Phố'
-    ],
-    synopsis:
-      'Vở nhạc kịch "Bông Bóng Bay" là câu chuyện hoài niệm đong đầy cảm xúc về tuổi thanh xuân rực rỡ, nơi những đứa trẻ lớn lên cùng những quả bóng bay chở đầy hoài bão giữa lòng Sài Gòn. Giữa những thăng trầm của đời sống thị thành, tình bạn và lý tưởng nghệ thuật sẽ là sợi dây vô hình kết nối tâm hồn. Được dàn dựng theo tiêu chuẩn nhạc kịch đương đại quốc tế kết hợp âm hưởng giao hưởng tuyệt mỹ.',
-    ticketPrices: [
-      { tier: 'VIP', name: 'Hạng VIP Hoàng Gia', price: 800000, description: 'Hàng ghế A-C trung tâm, tầm nhìn cận cảnh hoàn hảo, tặng kèm đồ uống đón tiếp' },
-      { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 450000, description: 'Hàng D-G tầng trệt & tầng lầu, âm thanh vòm tiêu chuẩn quốc tế' },
-      { tier: 'Couple', name: 'Hạng Ghế Đôi Sweetbox', price: 1200000, description: 'Khu vực ghế đôi êm ái hàng H, không gian riêng tư lãng mạn' }
-    ],
-    featured: true,
-    status: 'now_showing',
-    rating: 4.9,
-    reviewCount: 142
-  },
-  {
-    title: 'Giấc Mơ Mùa Hè',
-    slug: 'giac-mo-mua-he',
-    subtitle: 'Bản tình ca Broadway lãng mạn và nồng nàn bậc nhất',
-    genre: 'Lãng mạn',
-    posterUrl: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=800&q=80',
-    bannerUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1920&q=80',
-    trailerUrl: 'https://www.youtube.com/embed/RclpGv8673s',
-    duration: 135,
-    ageLimit: '16+',
-    director: 'Đạo diễn Nguyễn Lê Hoàng',
-    cast: [
-      'Hoàng Dũng (vai Nhạc sĩ Tuấn Kiệt)',
-      'Bùi Lan Hương (vai Nàng Thơ Hạ Vy)',
-      'Trung Quân (vai Người dẫn chuyện)',
-      'Dàn nhạc Giao hưởng Sài Gòn (SPO)'
-    ],
-    synopsis:
-      'Lấy cảm hứng từ những bản tình ca bất hủ mang phong vị Broadway cổ điển, "Giấc Mơ Mùa Hè" dẫn dắt khán giả vào chuyến hành trình tìm kiếm ánh sáng nghệ thuật và tình yêu định mệnh của đôi nghệ sĩ trẻ bên bờ biển nhiệt đới. Với hơn 20 ca khúc hòa âm phối khí bởi dàn nhạc giao hưởng trực tiếp.',
-    ticketPrices: [
-      { tier: 'VIP', name: 'Hạng VIP Kim Cương', price: 950000, description: 'Hàng ghế VIP danh dự, chụp ảnh lưu niệm cùng nghệ sĩ sau đêm diễn' },
-      { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 500000, description: 'Vị trí ghế ngồi êm ái khu vực trung tâm' },
-      { tier: 'Couple', name: 'Hạng Ghế Đôi Sweetbox', price: 1350000, description: 'Ghế đôi nệm nhung sang trọng' }
-    ],
-    featured: true,
-    status: 'now_showing',
-    rating: 5.0,
-    reviewCount: 96
-  },
-  {
-    title: 'Huyền Thoại Ánh Sao',
-    slug: 'huyen-thoai-anh-sao',
-    subtitle: 'Bản anh hùng ca viễn tưởng kết hợp múa đương đại huyền ảo',
-    genre: 'Dân gian đương đại',
-    posterUrl: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&w=800&q=80',
-    bannerUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1920&q=80',
-    trailerUrl: 'https://www.youtube.com/embed/RclpGv8673s',
-    duration: 110,
-    ageLimit: '8+',
-    director: 'NSND Bạch Tuyết (Cố vấn) & Đạo diễn Vũ Hà',
-    cast: ['Vũ Luân (vai Tướng quân Thiên Hà)', 'Tú Sương (vai Công chúa Tinh Tú)', 'Đoàn Vũ kịch Đương đại TPHCM'],
-    synopsis:
-      'Một tác phẩm thể nghiệm táo bạo kết hợp giữa nghệ thuật sân khấu tuồng cổ truyền thống và nhạc kịch Broadway phương Tây. Sự hội tụ của âm thanh điện tử và nhạc cụ dân tộc tạo nên không gian vũ trụ kỳ ảo và bi tráng.',
-    ticketPrices: [
-      { tier: 'VIP', name: 'Hạng VIP Tinh Tú', price: 750000, description: 'Trải nghiệm Hologram 3D trực tiếp' },
-      { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 400000, description: 'Khu vực khán phòng trung tâm' },
-      { tier: 'Couple', name: 'Hạng Ghế Đôi', price: 1100000, description: 'Ghế đôi dành cho cặp đôi' }
-    ],
-    featured: false,
-    status: 'coming_soon',
-    rating: 4.8,
-    reviewCount: 54
-  }
-];
+const sampleMusicals = require('./musicals.json');
 
 const sampleVouchers = [
   {
@@ -243,7 +164,7 @@ const sampleVouchers = [
 
 const sampleUsers = [
   {
-    fullName: 'Trần Minh Đức (Giám đốc Điều hành)',
+    fullName: 'Trần Minh Đức',
     email: 'admin@nhackichthanhpho.vn',
     phone: '0901888999',
     role: 'admin',
@@ -251,7 +172,7 @@ const sampleUsers = [
     isActive: true
   },
   {
-    fullName: 'Lê Thảo My (Ban Biên Tập & Truyền Thông)',
+    fullName: 'Lê Thảo My',
     email: 'editor@nhackichthanhpho.vn',
     phone: '0902777888',
     role: 'editor',
@@ -259,15 +180,7 @@ const sampleUsers = [
     isActive: true
   },
   {
-    fullName: 'Nguyễn Thị Bích Ngọc (Kế Toán Trưởng)',
-    email: 'ketoan@nhackichthanhpho.vn',
-    phone: '0903666777',
-    role: 'accountant',
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80',
-    isActive: true
-  },
-  {
-    fullName: 'Phạm Hùng Cường (Tổ Trưởng Soát Vé)',
+    fullName: 'Phạm Hùng Cường',
     email: 'soatve@nhackichthanhpho.vn',
     phone: '0904555666',
     role: 'ticket_checker',
@@ -275,7 +188,7 @@ const sampleUsers = [
     isActive: true
   },
   {
-    fullName: 'Nguyễn Văn An (Khách Hàng Thân Thiết)',
+    fullName: 'Nguyễn Văn An',
     email: 'khachhang@gmail.com',
     phone: '0909123456',
     role: 'customer',
@@ -297,57 +210,189 @@ const sampleArtists = [
     role: 'Giám đốc Nghệ thuật & Tổng Đạo diễn',
     title: 'Đạo diễn Nhạc kịch Quốc tế',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80',
-    bio: 'Tốt nghiệp London, đạo diễn sáng tạo của "Bông Bóng Bay" và nhiều kiệt tác đương đại.'
+    bio: 'Tốt nghiệp London, đạo diễn sáng tạo của "Lọ Lem - Chiếc giày thủy tinh", "Lời thề thứ 9" và nhiều kiệt tác đương đại.'
   },
   {
     name: 'Đạo diễn Nguyễn Lê Hoàng',
     role: 'Giám đốc Âm nhạc & Dàn dựng Sân khấu',
     title: 'Nhạc sĩ / Chỉ huy Dàn nhạc',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
-    bio: 'Nhạc trưởng tài hoa với phong cách hòa âm phối khí Broadway sang trọng và đầy cảm xúc.'
+    bio: 'Nhạc trưởng tài hoa với phong cách hòa âm phối khí Broadway sang trọng và đầy cảm xúc cho dàn nhạc giao hưởng.'
   },
   {
     name: 'Nghệ sĩ Lan Phương',
     role: 'Ngôi sao Sân khấu & Diễn viên chính',
     title: 'Nữ Diễn viên Nhạc kịch Hàng đầu',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
-    bio: 'Hóa thân trọn vẹn trong vai Mai Nhi - linh hồn xúc động của vở nhạc kịch "Bông Bóng Bay".'
+    bio: 'Hóa thân trọn vẹn trong các vai diễn kinh điển, biểu tượng diễn xuất cảm xúc tại Nhà Hát Thành Phố.'
   }
 ];
 
 const sampleReconciliations = [
   {
-    transactionId: 'TXN-VNPAY-20261101-001',
-    bookingCode: 'NK-20261101-A7K9M',
+    transactionId: 'TXN-VIETQR-20261115-08192',
+    bookingCode: 'NK-20261115-LL82A',
+    gateway: 'VIETQR',
+    systemAmount: 1600000,
+    gatewayAmount: 1600000,
+    fee: 0,
+    netAmount: 1600000,
+    status: 'MATCHED',
+    notes: 'Khớp 100% đối soát tự động Napas 24/7'
+  },
+  {
+    transactionId: 'TXN-VNPAY-20261115-08204',
+    bookingCode: 'NK-20261115-TT44B',
+    gateway: 'VNPAY',
+    systemAmount: 2400000,
+    gatewayAmount: 2400000,
+    fee: 36000,
+    netAmount: 2364000,
+    status: 'MATCHED',
+    notes: 'Khớp đối soát tự động VNPAY QR'
+  },
+  {
+    transactionId: 'TXN-MOMO-20261115-08221',
+    bookingCode: 'NK-20261115-QK91C',
+    gateway: 'MOMO',
+    systemAmount: 900000,
+    gatewayAmount: 900000,
+    fee: 13500,
+    netAmount: 886500,
+    status: 'MATCHED',
+    notes: 'Khớp đối soát ví điện tử MoMo'
+  },
+  {
+    transactionId: 'TXN-VIETQR-20261115-08250',
+    bookingCode: 'NK-20261115-HT19D',
+    gateway: 'VIETQR',
+    systemAmount: 1250000,
+    gatewayAmount: 1250000,
+    fee: 0,
+    netAmount: 1250000,
+    status: 'MATCHED',
+    notes: 'Khớp 100% VietQR tức thì'
+  },
+  {
+    transactionId: 'TXN-BANK-20261116-08312',
+    bookingCode: 'NK-20261116-LT38E',
+    gateway: 'BANK_CARD',
+    systemAmount: 3200000,
+    gatewayAmount: 3200000,
+    fee: 64000,
+    netAmount: 3136000,
+    status: 'MATCHED',
+    notes: 'Khớp cổng thẻ quốc tế Visa 3D-Secure'
+  },
+  {
+    transactionId: 'TXN-VNPAY-20261116-08345',
+    bookingCode: 'NK-20261116-GM72F',
+    gateway: 'VNPAY',
+    systemAmount: 800000,
+    gatewayAmount: 800000,
+    fee: 12000,
+    netAmount: 788000,
+    status: 'MATCHED',
+    notes: 'Khớp đối soát VNPAY Gateway'
+  },
+  {
+    transactionId: 'TXN-VIETQR-20261116-08389',
+    bookingCode: 'NK-20261116-LL63G',
+    gateway: 'VIETQR',
+    systemAmount: 2000000,
+    gatewayAmount: 2000000,
+    fee: 0,
+    netAmount: 2000000,
+    status: 'MATCHED',
+    notes: 'Khớp chuyển khoản nhanh VietQR Napas'
+  },
+  {
+    transactionId: 'TXN-MOMO-20261116-08410',
+    bookingCode: 'NK-20261116-TT55H',
+    gateway: 'MOMO',
+    systemAmount: 1350000,
+    gatewayAmount: 1350000,
+    fee: 20250,
+    netAmount: 1329750,
+    status: 'MATCHED',
+    notes: 'Khớp đối soát MoMo QR Gateway'
+  },
+  {
+    transactionId: 'TXN-VIETQR-20261116-08455',
+    bookingCode: 'NK-20261116-QK27J',
+    gateway: 'VIETQR',
+    systemAmount: 1600000,
+    gatewayAmount: 1600000,
+    fee: 0,
+    netAmount: 1600000,
+    status: 'MATCHED',
+    notes: 'Khớp giao dịch Napas VietQR 24/7'
+  },
+  {
+    transactionId: 'TXN-ZALO-20261117-08502',
+    bookingCode: 'NK-20261117-HT84K',
+    gateway: 'ZALOPAY',
+    systemAmount: 950000,
+    gatewayAmount: 950000,
+    fee: 14250,
+    netAmount: 935750,
+    status: 'MATCHED',
+    notes: 'Khớp đối soát ví điện tử ZaloPay'
+  },
+  {
+    transactionId: 'TXN-VNPAY-20261117-08533',
+    bookingCode: 'NK-20261117-LT12L',
     gateway: 'VNPAY',
     systemAmount: 1600000,
     gatewayAmount: 1600000,
     fee: 24000,
     netAmount: 1576000,
     status: 'MATCHED',
-    notes: 'Khớp 100% đối soát tự động VNPAY'
+    notes: 'Khớp 100% đối soát định kỳ VNPAY'
   },
   {
-    transactionId: 'TXN-MOMO-20261101-002',
-    bookingCode: 'NK-20261101-B3X8L',
-    gateway: 'MOMO',
-    systemAmount: 950000,
-    gatewayAmount: 950000,
-    fee: 14250,
-    netAmount: 935750,
+    transactionId: 'TXN-VIETQR-20261117-08571',
+    bookingCode: 'NK-20261117-GM90M',
+    gateway: 'VIETQR',
+    systemAmount: 2400000,
+    gatewayAmount: 2400000,
+    fee: 0,
+    netAmount: 2400000,
     status: 'MATCHED',
-    notes: 'Khớp đối soát MoMo Gateway'
+    notes: 'Khớp lệnh VietQR chuyển khoản liên ngân hàng'
   },
   {
-    transactionId: 'TXN-VIETQR-20261101-003',
-    bookingCode: 'NK-20261101-C9W2P',
+    transactionId: 'TXN-MOMO-20261117-08604',
+    bookingCode: 'NK-20261117-LL18N',
+    gateway: 'MOMO',
+    systemAmount: 800000,
+    gatewayAmount: 800000,
+    fee: 12000,
+    netAmount: 788000,
+    status: 'MATCHED',
+    notes: 'Khớp đối soát giao dịch MoMo 1 chạm'
+  },
+  {
+    transactionId: 'TXN-BANK-20261117-08640',
+    bookingCode: 'NK-20261117-TT73P',
+    gateway: 'BANK_CARD',
+    systemAmount: 1800000,
+    gatewayAmount: 1800000,
+    fee: 36000,
+    netAmount: 1764000,
+    status: 'MATCHED',
+    notes: 'Khớp cổng Visa/Mastercard quốc tế'
+  },
+  {
+    transactionId: 'TXN-VIETQR-20261117-08695',
+    bookingCode: 'NK-20261117-QK61Q',
     gateway: 'VIETQR',
     systemAmount: 1200000,
     gatewayAmount: 1200000,
     fee: 0,
     netAmount: 1200000,
     status: 'MATCHED',
-    notes: 'Chuyển khoản VietQR 24/7 khớp hoàn toàn'
+    notes: 'Khớp 100% chuyển khoản tức thì VietQR'
   }
 ];
 
@@ -377,61 +422,193 @@ async function seedDatabase() {
     console.log('💳 Khởi tạo Dữ Liệu Đối Soát Doanh Thu...');
     await Reconciliation.insertMany(sampleReconciliations);
 
-    console.log('📅 Khởi tạo Lịch Diễn & Sơ Đồ Ghế Ngồi Chi Tiết...');
-    const schedulesToInsert = [];
-
-    const bongBongBay = createdMusicals.find(m => m.slug === 'bong-bong-bay');
-    const giacMoMuaHe = createdMusicals.find(m => m.slug === 'giac-mo-mua-he');
-
-    if (bongBongBay) {
-      schedulesToInsert.push(
-        {
-          musicalId: bongBongBay._id,
-          musicalTitle: bongBongBay.title,
-          musicalSlug: bongBongBay.slug,
-          performanceDate: new Date('2026-11-15T19:30:00Z'),
-          time: '19:30',
-          venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
-          hall: 'Khán phòng Grand A',
-          totalSeats: 110,
-          bookedSeats: 4,
-          lockedSeatsCount: 3,
-          status: 'available',
-          seats: generateSeatLayout(800000, 450000, 1200000)
-        },
-        {
-          musicalId: bongBongBay._id,
-          musicalTitle: bongBongBay.title,
-          musicalSlug: bongBongBay.slug,
-          performanceDate: new Date('2026-11-20T20:00:00Z'),
-          time: '20:00',
-          venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
-          hall: 'Khán phòng Grand A',
-          totalSeats: 110,
-          bookedSeats: 110,
-          lockedSeatsCount: 0,
-          status: 'sold_out',
-          seats: generateSeatLayout(800000, 450000, 1200000).map(s => ({ ...s, status: 'booked' }))
-        }
-      );
-    }
-
-    if (giacMoMuaHe) {
-      schedulesToInsert.push({
-        musicalId: giacMoMuaHe._id,
-        musicalTitle: giacMoMuaHe.title,
-        musicalSlug: giacMoMuaHe.slug,
-        performanceDate: new Date('2026-11-18T19:30:00Z'),
+    console.log('📅 Khởi tạo Lịch Diễn & Sơ Đồ Ghế Ngồi Chi Tiết (20 suất diễn từ 18/11 đến 30/11/2026)...');
+    const standardScheduleDefinitions = [
+      {
+        _id: 'sch_lo-lem_20261118_1930',
+        slug: 'lo-lem-chiec-giay-thuy-tinh',
+        dateStr: '2026-11-18T19:30:00+07:00',
         time: '19:30',
-        venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 32
+      },
+      {
+        _id: 'sch_loi-the-thu-9_20261119_2000',
+        slug: 'loi-the-thu-9',
+        dateStr: '2026-11-19T20:00:00+07:00',
+        time: '20:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 45
+      },
+      {
+        _id: 'sch_lo-lem-chiec-giay-thuy-tinh',
+        slug: 'lo-lem-chiec-giay-thuy-tinh',
+        dateStr: '2026-11-20T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 62
+      },
+      {
+        _id: 'sch_giac-mo-cua-bom_20261120_2000',
+        slug: 'giac-mo-cua-bom',
+        dateStr: '2026-11-20T20:00:00+07:00',
+        time: '20:00',
         hall: 'Khán phòng Broadway Opera',
-        totalSeats: 110,
-        bookedSeats: 2,
-        lockedSeatsCount: 2,
+        bookedSeats: 40
+      },
+      {
+        _id: 'sch_lo-lem_20261121_1500',
+        slug: 'lo-lem-chiec-giay-thuy-tinh',
+        dateStr: '2026-11-21T15:00:00+07:00',
+        time: '15:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 58
+      },
+      {
+        _id: 'sch_tuoi-tho-du-doi',
+        slug: 'tuoi-tho-du-doi',
+        dateStr: '2026-11-21T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 70
+      },
+      {
+        _id: 'sch_giac-mo-cua-bom_20261122_1500',
+        slug: 'giac-mo-cua-bom',
+        dateStr: '2026-11-22T15:00:00+07:00',
+        time: '15:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 55
+      },
+      {
+        _id: 'sch_quan-khu-nam-dong',
+        slug: 'quan-khu-nam-dong',
+        dateStr: '2026-11-22T20:00:00+07:00',
+        time: '20:00',
+        hall: 'Khán phòng Broadway Opera',
+        bookedSeats: 48
+      },
+      {
+        _id: 'sch_hon-truong-ba-da-hang-thit',
+        slug: 'hon-truong-ba-da-hang-thit',
+        dateStr: '2026-11-23T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 64
+      },
+      {
+        _id: 'sch_loi-the-thu-9',
+        slug: 'loi-the-thu-9',
+        dateStr: '2026-11-24T20:00:00+07:00',
+        time: '20:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 52
+      },
+      {
+        _id: 'sch_giac-mo-cua-bom',
+        slug: 'giac-mo-cua-bom',
+        dateStr: '2026-11-25T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 42
+      },
+      {
+        _id: 'sch_tuoi-tho-du-doi_20261126_1930',
+        slug: 'tuoi-tho-du-doi',
+        dateStr: '2026-11-26T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 50
+      },
+      {
+        _id: 'sch_lo-lem_20261127_1930',
+        slug: 'lo-lem-chiec-giay-thuy-tinh',
+        dateStr: '2026-11-27T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 66
+      },
+      {
+        _id: 'sch_hon-truong-ba_20261127_2000',
+        slug: 'hon-truong-ba-da-hang-thit',
+        dateStr: '2026-11-27T20:00:00+07:00',
+        time: '20:00',
+        hall: 'Khán phòng Broadway Opera',
+        bookedSeats: 54
+      },
+      {
+        _id: 'sch_giac-mo-cua-bom_20261128_1500',
+        slug: 'giac-mo-cua-bom',
+        dateStr: '2026-11-28T15:00:00+07:00',
+        time: '15:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 48
+      },
+      {
+        _id: 'sch_quan-khu-nam-dong_20261128_1930',
+        slug: 'quan-khu-nam-dong',
+        dateStr: '2026-11-28T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 60
+      },
+      {
+        _id: 'sch_tuoi-tho-du-doi_20261129_1500',
+        slug: 'tuoi-tho-du-doi',
+        dateStr: '2026-11-29T15:00:00+07:00',
+        time: '15:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 58
+      },
+      {
+        _id: 'sch_lo-lem_20261129_1930',
+        slug: 'lo-lem-chiec-giay-thuy-tinh',
+        dateStr: '2026-11-29T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 72
+      },
+      {
+        _id: 'sch_loi-the-thu-9_20261130_1930',
+        slug: 'loi-the-thu-9',
+        dateStr: '2026-11-30T19:30:00+07:00',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia',
+        bookedSeats: 85
+      },
+      {
+        _id: 'sch_hon-truong-ba_20261130_2000',
+        slug: 'hon-truong-ba-da-hang-thit',
+        dateStr: '2026-11-30T20:00:00+07:00',
+        time: '20:00',
+        hall: 'Khán phòng Broadway Opera',
+        bookedSeats: 80
+      }
+    ];
+
+    const musicalMap = new Map(createdMusicals.map(m => [m.slug, m]));
+    const schedulesToInsert = standardScheduleDefinitions.map(def => {
+      const m = musicalMap.get(def.slug);
+      const layout = generateSeatLayout(800000, 450000, 1200000);
+      return {
+        _id: def._id,
+        musicalId: m ? m._id : def.slug,
+        musicalTitle: m ? m.title : def.slug,
+        musicalSlug: def.slug,
+        genre: m ? (Array.isArray(m.genre) ? m.genre.join(' • ') : m.genre) : '',
+        posterUrl: m ? m.posterUrl : `/images/musicals/${def.slug.replace(/-/g, '_')}.jpg`,
+        subtitle: m ? (m.subtitle || m.synopsis) : '',
+        performanceDate: new Date(def.dateStr),
+        time: def.time,
+        venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
+        hall: def.hall,
+        totalSeats: layout.length,
+        bookedSeats: def.bookedSeats,
+        lockedSeatsCount: 3,
         status: 'available',
-        seats: generateSeatLayout(950000, 500000, 1350000)
-      });
-    }
+        seats: layout
+      };
+    });
 
     const createdSchedules = await Schedule.insertMany(schedulesToInsert);
 

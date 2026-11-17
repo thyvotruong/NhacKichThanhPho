@@ -33,8 +33,12 @@
 }
 
 .schedule-poster-wrapper {
-  height: 235px;
+  flex: 0 0 38%;
+  width: auto;
+  max-width: 220px;
+  aspect-ratio: 2 / 3;
   flex-shrink: 0;
+  background: #070A12;
 }
 
 .schedule-poster-img,
@@ -45,25 +49,29 @@
 
 .schedule-poster-img {
   object-fit: cover;
-  transition: transform 0.5s ease;
+  background: #070A12;
+  transform: scale(1.04);
 }
 
 .schedule-card-hover:hover .schedule-poster-img {
-  transform: scale(1.06);
+  filter: brightness(1.08);
 }
 
 .schedule-poster-fallback {
   background: linear-gradient(135deg, #1f2d48 0%, #070a12 100%);
 }
 
+.schedule-card-body {
+  min-width: 0;
+}
+
 .schedule-poster-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(7, 10, 18, 0.95) 0%, rgba(7, 10, 18, 0.2) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(7, 10, 18, 0.28) 0%, transparent 45%);
   pointer-events: none;
 }
 
-.schedule-title,
 .schedule-subtitle {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -71,7 +79,7 @@
 }
 
 .schedule-title {
-  -webkit-line-clamp: 1;
+  overflow-wrap: anywhere;
 }
 
 .schedule-subtitle {
@@ -92,6 +100,23 @@
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.25);
   border-color: rgba(212, 175, 55, 0.6) !important;
+}
+
+@media (max-width: 575.98px) {
+  .schedule-poster-wrapper {
+    flex-basis: 34%;
+    width: auto;
+    min-width: 108px;
+    max-width: 140px;
+  }
+
+  .schedule-card-body {
+    padding: 1rem !important;
+  }
+
+  .schedule-action-button {
+    font-size: 0.72rem;
+  }
 }
 
 /* Time slot multi-select chips */

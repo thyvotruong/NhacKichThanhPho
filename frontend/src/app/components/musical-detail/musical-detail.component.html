@@ -46,7 +46,7 @@
             <div class="detail-info-list mb-4">
               <div class="detail-info-row">
                 <i class="bi bi-tags-fill" aria-hidden="true"></i>
-                <span>{{ m.genre }}</span>
+                <span>{{ formatGenre(m.genre) }}</span>
               </div>
               <div class="detail-info-row">
                 <i class="bi bi-clock" aria-hidden="true"></i>
@@ -66,75 +66,143 @@
               <i class="bi bi-card-text text-gold me-2"></i> NỘI DUNG
             </h4>
             <p class="text-white synopsis-text mb-0">{{ m.synopsis }}</p>
+
+            <!-- Bảng giá vé niêm yết -->
+            @if (m.ticketPrices && m.ticketPrices.length > 0) {
+              <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <h4 class="text-white fw-bold fs-5 text-uppercase mb-3">
+                  <i class="bi bi-ticket-perforated-fill text-gold me-2"></i> BẢNG GIÁ VÉ NIÊM YẾT
+                </h4>
+                <div class="row g-2">
+                  @for (tier of m.ticketPrices; track tier.name) {
+                    <div class="col-sm-4">
+                      <div class="p-3 rounded-3 bg-dark-glass border border-secondary border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                          <span class="badge text-uppercase mb-1" [class.bg-warning]="tier.tier === 'VIP'" [class.text-dark]="tier.tier === 'VIP'" [class.bg-secondary]="tier.tier !== 'VIP'" style="font-size: 0.7rem;">
+                            {{ tier.tier }}
+                          </span>
+                          <div class="text-white small fw-bold">{{ tier.name }}</div>
+                          @if (tier.description) {
+                            <div class="text-secondary mt-1" style="font-size: 0.75rem;">{{ tier.description }}</div>
+                          }
+                        </div>
+                        <div class="text-gold fw-bold fs-6 mt-2">
+                          {{ tier.price | number:'1.0-0' }} đ
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
         </div>
       </section>
 
-      <!-- Phần 2: Chọn ngày diễn -->
-      <section class="detail-flow-section p-4 p-lg-5 rounded-4">
-        <div class="mb-4">
-        
-          <h2 class="detail-section-title text-gold-gradient fw-bold mb-2">CHỌN NGÀY DIỄN</h2>
-          
-        </div>
-
-        <div class="row g-3">
-          @for (day of visibleScheduleDays(); track day.dateKey) {
-            <div class="col-6 col-md-3">
-              <button
-                type="button"
-                class="schedule-date-card"
-                [class.selected]="selectedDateKey() === day.dateKey"
-                [attr.aria-pressed]="selectedDateKey() === day.dateKey"
-                (click)="selectDate(day.dateKey)"
-              >
-                @if (isToday(day.dateKey)) {
-                  <span class="schedule-date-weekday">HÔM NAY</span>
-                } @else {
-                  <span class="schedule-date-weekday">{{ day.date | date:'EEE' | uppercase }}</span>
-                }
-                <span class="schedule-date-number">{{ day.date | date:'dd' }}</span>
-                <span class="schedule-date-month">{{ day.date | date:'MMMM yyyy' | uppercase }}</span>
-                <span class="schedule-date-count">{{ day.schedules.length }} suất diễn</span>
-              </button>
-            </div>
-          } @empty {
-            <div class="col-12">
-              <p class="text-secondary mb-0">Hiện không có ngày diễn trong khoảng thời gian này.</p>
-            </div>
+      @if (m.status === 'coming_soon') {
+        <section class="detail-flow-section p-4 p-lg-5 rounded-4">
+          <h2 class="detail-section-title text-gold-gradient fw-bold mb-2">NHẬN THÔNG BÁO LỊCH DIỄN</h2>
+          <p class="text-secondary mb-4">
+            Để lại email để nhà hát thông báo khi lịch diễn của vở này được công bố.
+          </p>
+          <form
+            class="d-flex flex-column flex-sm-row gap-3"
+            (submit)="subscribeToScheduleNotifications($event, notificationEmail.value)"
+          >
+            <label class="visually-hidden" for="scheduleNotificationEmail">Địa chỉ email</label>
+            <input
+              #notificationEmail
+              id="scheduleNotificationEmail"
+              type="email"
+              class="form-control bg-dark-glass text-white border-gold-glow"
+              placeholder="Nhập địa chỉ email của bạn"
+              autocomplete="email"
+              required
+              [disabled]="isSubmittingNotification()"
+            />
+            <button
+              type="submit"
+              class="btn btn-showman-gold fw-bold flex-shrink-0"
+              [disabled]="isSubmittingNotification()"
+            >
+              @if (isSubmittingNotification()) {
+                <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                ĐANG ĐĂNG KÝ...
+              } @else {
+                <i class="bi bi-envelope me-2"></i> NHẬN THÔNG BÁO
+              }
+            </button>
+          </form>
+          @if (notificationMessage()) {
+            <p class="text-success mt-3 mb-0" role="status">{{ notificationMessage() }}</p>
           }
-        </div>
-      </section>
-
-      <!-- Phần 3: Chọn giờ diễn, chỉ hiển thị sau khi chọn ngày -->
-      @if (selectedDateKey()) {
+          @if (notificationError()) {
+            <p class="text-danger mt-3 mb-0" role="alert">{{ notificationError() }}</p>
+          }
+        </section>
+      } @else {
+        <!-- Phần 2: Chọn ngày diễn -->
         <section class="detail-flow-section p-4 p-lg-5 rounded-4">
           <div class="mb-4">
-           
-            <h2 class="detail-section-title text-gold-gradient fw-bold mb-2">CHỌN KHUNG GIỜ</h2>
-            
+            <h2 class="detail-section-title text-gold-gradient fw-bold mb-2">CHỌN NGÀY DIỄN</h2>
           </div>
 
-          <div class="d-flex flex-wrap gap-3">
-            @for (schedule of selectedDateSchedules(); track schedule._id) {
-              <div class="time-slot-option" [class.unavailable]="schedule.status !== 'available'">
-                <div class="d-flex align-items-center justify-content-between gap-2">
-                  <span class="time-slot-time">{{ schedule.time }}</span>
-                  <span class="time-slot-status">
-                    {{ schedule.status === 'available' ? 'CÒN VÉ' : schedule.status === 'sold_out' ? 'CHÁY VÉ' : 'ĐÃ HỦY' }}
-                  </span>
-                </div>
-                @if (schedule.status === 'available') {
-                  <a [routerLink]="['/seat-selection', schedule._id]" class="btn btn-showman-gold rounded-pill px-3 py-2 fw-bold">
-                    <i class="bi bi-grid-3x3-gap-fill me-1"></i> CHỌN GHẾ NGỒI
-                  </a>
-                }
+          <div class="row g-3">
+            @for (day of visibleScheduleDays(); track day.dateKey) {
+              <div class="col-6 col-md-3">
+                <button
+                  type="button"
+                  class="schedule-date-card"
+                  [class.selected]="selectedDateKey() === day.dateKey"
+                  [attr.aria-pressed]="selectedDateKey() === day.dateKey"
+                  (click)="selectDate(day.dateKey)"
+                >
+                  @if (isToday(day.dateKey)) {
+                    <span class="schedule-date-weekday">HÔM NAY</span>
+                  } @else {
+                    <span class="schedule-date-weekday">{{ day.date | date:'EEE' | uppercase }}</span>
+                  }
+                  <span class="schedule-date-number">{{ day.date | date:'dd' }}</span>
+                  <span class="schedule-date-month">{{ day.date | date:'MMMM yyyy' | uppercase }}</span>
+                  <span class="schedule-date-count">{{ day.schedules.length }} suất diễn</span>
+                </button>
               </div>
             } @empty {
-              <p class="text-secondary mb-0">Ngày này chưa có khung giờ diễn.</p>
+              <div class="col-12">
+                <p class="text-secondary mb-0">Hiện không có ngày diễn trong khoảng thời gian này.</p>
+              </div>
             }
           </div>
         </section>
+
+        <!-- Phần 3: Chọn giờ diễn, chỉ hiển thị sau khi chọn ngày -->
+        @if (selectedDateKey()) {
+          <section class="detail-flow-section p-4 p-lg-5 rounded-4">
+            <div class="mb-4">
+              <h2 class="detail-section-title text-gold-gradient fw-bold mb-2">CHỌN KHUNG GIỜ</h2>
+            </div>
+
+            <div class="d-flex flex-wrap gap-3">
+              @for (schedule of selectedDateSchedules(); track schedule._id) {
+                <div class="time-slot-option" [class.unavailable]="schedule.status !== 'available'">
+                  <div class="d-flex align-items-center justify-content-between gap-2">
+                    <span class="time-slot-time">{{ schedule.time }}</span>
+                    <span class="time-slot-status">
+                      {{ schedule.status === 'available' ? 'CÒN VÉ' : schedule.status === 'sold_out' ? 'CHÁY VÉ' : 'ĐÃ HỦY' }}
+                    </span>
+                  </div>
+                  @if (schedule.status === 'available') {
+                    <a [routerLink]="['/seat-selection', schedule._id]" class="btn btn-showman-gold rounded-pill px-3 py-2 fw-bold">
+                      <i class="bi bi-grid-3x3-gap-fill me-1"></i> CHỌN GHẾ NGỒI
+                    </a>
+                  }
+                </div>
+              } @empty {
+                <p class="text-secondary mb-0">Ngày này chưa có khung giờ diễn.</p>
+              }
+            </div>
+          </section>
+        }
       }
     </div>
   </main>
@@ -154,7 +222,7 @@
           <div class="modal-body p-0">
             <div class="ratio ratio-16x9">
               <iframe
-                [src]="trailerUrl"
+                [src]="trailerUrl()"
                 title="Trailer Vở Nhạc Kịch"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen

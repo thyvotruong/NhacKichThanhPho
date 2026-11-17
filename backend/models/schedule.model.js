@@ -11,9 +11,11 @@ const { SeatSchema } = require('./seat.model');
 
 const ScheduleSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String
+    },
     musicalId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Musical',
+      type: mongoose.Schema.Types.Mixed,
       required: [true, 'Mã vở nhạc kịch là bắt buộc']
     },
     musicalTitle: {
@@ -23,6 +25,15 @@ const ScheduleSchema = new mongoose.Schema(
     musicalSlug: {
       type: String,
       required: true
+    },
+    genre: {
+      type: String
+    },
+    posterUrl: {
+      type: String
+    },
+    subtitle: {
+      type: String
     },
     performanceDate: {
       type: Date,

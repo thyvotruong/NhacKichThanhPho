@@ -3,7 +3,7 @@
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL WEBSITE) - BACKEND
  * File: models/user.model.js
  * Chức năng: Mongoose Schema cho Người dùng & Nhân sự nội bộ RBAC
- * Roles: 'customer', 'admin', 'editor', 'accountant', 'ticket_checker'
+ * Roles: 'customer', 'admin', 'editor', 'ticket_checker', 'staff'
  * ============================================================
  */
 
@@ -11,6 +11,9 @@ const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String
+    },
     fullName: {
       type: String,
       required: true,
@@ -34,7 +37,7 @@ const UserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['customer', 'admin', 'editor', 'accountant', 'ticket_checker'],
+      enum: ['customer', 'admin', 'editor', 'staff', 'ticket_checker'],
       default: 'customer'
     },
     avatar: {

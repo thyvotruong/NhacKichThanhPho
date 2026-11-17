@@ -134,13 +134,13 @@
                 <i class="bi bi-ticket-perforated-fill text-gold fs-5"></i>
                 <span>ĐẶT VÉ NGAY</span>
               </a>
-              <button
-                (click)="scrollToSection('schedules-section')"
+              <a
+                routerLink="/schedules"
                 class="btn btn-showman-outline px-4 py-2.5 rounded-pill d-inline-flex align-items-center gap-2 fw-semibold shadow"
               >
                 <i class="bi bi-calendar3 text-gold"></i>
                 <span>XEM LỊCH DIỄN</span>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -149,7 +149,7 @@
             <div class="position-relative" style="width: 375px; height: 500px; border-radius: 18px; padding: 8px; background: rgba(14, 22, 41, 0.85); backdrop-filter: blur(10px); border: 2px solid rgba(245, 158, 11, 0.5); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(190, 18, 60, 0.35);">
               <div class="poster-ambient-backlight"></div>
               <img
-                [src]="slide.bgImage"
+                [src]="slide.posterUrl || slide.bgImage"
                 [alt]="slide.title"
                 class="img-fluid rounded-4 object-fit-cover w-100 h-100 position-relative z-2 border border-gold-glow"
               />
@@ -170,81 +170,6 @@
   </button>
 </section>
 <!-- ============================================================
-     PHÂN HỆ CÁC VỞ NHẠC KỊCH TIÊU BIỂU (MUSICAL CARDS)
-     ============================================================ -->
-<section id="musicals-section" class="py-5 position-relative">
-  <div class="container py-4">
-    <div class="text-center mb-5">
-      <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">CÁC VỞ NHẠC KỊCH TIÊU BIỂU</h2>
-      <div class="showman-divider mx-auto mt-1 mb-4"></div>
-      <p class="text-white text-secondary max-w-800 mx-auto">
-        Những tác phẩm được dàn dựng kỳ công với âm thanh giao hưởng trực tiếp, vũ đạo bùng nổ và ánh sáng sân khấu huyền ảo.
-      </p>
-    </div>
-
-    <!-- Danh sách thẻ vở diễn Glassmorphism -->
-    <div class="row g-4">
-      @for (musical of musicals(); track musical.slug) {
-        <div class="col-lg-6">
-          <div class="card card-showman-glass h-100 rounded-4 overflow-hidden">
-            <div class="row g-0 h-100">
-              <div class="col-md-5 position-relative overflow-hidden">
-                <img
-                  [src]="musical.posterUrl"
-                  [alt]="musical.title"
-                  class="img-fluid h-100 w-100 object-fit-cover card-poster-img"
-                  loading="lazy"
-                />
-                <span class="position-absolute top-0 start-0 m-3 badge badge-showman-ruby shadow">
-                  <i class="bi bi-clock me-1 text-gold"></i> {{ musical.duration }} PHÚT
-                </span>
-              </div>
-              <div class="col-md-7 d-flex flex-column justify-content-between p-4">
-                <div>
-                  <h3 class="fw-bold text-white fs-4 mb-1">
-                    {{ musical.title }}
-                  </h3>
-                  <p class="text-ruby-glow small fw-semibold mb-2 fst-italic">
-                    {{ musical.subtitle }}
-                  </p>
-                  <p class="text-secondary small mb-3 line-clamp-3 leading-relaxed">
-                    {{ musical.synopsis }}
-                  </p>
-
-                  <div class="d-flex flex-column gap-1 mb-3 pt-2 border-top border-secondary border-opacity-25 text-secondary small">
-                    <div>
-                      <i class="bi bi-person-fill text-gold me-1"></i> <strong>Đạo diễn:</strong>
-                      <span class="text-white ms-1">{{ musical.director }}</span>
-                    </div>
-                    <div>
-                      <i class="bi bi-tag-fill text-ruby-glow me-1"></i> <strong>Giá vé từ:</strong>
-                      <span class="text-gold-gradient fw-bold ms-1 fs-6">
-                        {{ (musical.ticketPrices[0]?.price || 450000) | number:'1.0-0' }} VNĐ
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Nút điều hướng Slug Routing -->
-                <div class="pt-2">
-                  <a
-                    [routerLink]="['/musical', musical.slug]"
-                    class="btn btn-showman-ruby w-100 rounded-pill py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
-                  >
-                    <span>XEM CHI TIẾT & ĐẶT VÉ</span>
-                    <i class="bi bi-arrow-right text-gold"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
      PHÂN HỆ LỊCH DIỄN NỔI BẬT (UPCOMING SCHEDULES)
      ============================================================ -->
 <section id="schedules-section" class="py-5 position-relative schedules-bg-ambient" style="border-top: 1px solid rgba(245, 158, 11, 0.3); border-bottom: 1px solid rgba(245, 158, 11, 0.3);">
@@ -260,8 +185,8 @@
 
     <!-- Lưới lịch chiếu Card Theatrical -->
     <div class="row g-4 justify-content-center">
-      @for (schedule of schedules(); track schedule._id) {
-        <div class="col-lg-6 col-xl-3 col-md-6">
+      @for (schedule of getUpcomingSchedules(); track schedule._id) {
+        <div class="col-12 col-sm-6 col-xl-3">
           <!-- Thay card-showman-glass bằng style nền sáng hơn, sang trọng hơn -->
           <div class="card rounded-4 h-100 border border-gold-glow shadow-lg" style="background: linear-gradient(135deg, rgba(40, 30, 45, 0.95) 0%, rgba(20, 15, 25, 0.98) 100%);">
             <div class="card-body d-flex flex-column justify-content-between p-4">
@@ -333,7 +258,7 @@
         </div>
       } @empty {
         <div class="col-12 text-center py-5">
-          <p class="text-secondary fs-5">Hiện chưa có lịch diễn mới được công bố. Vui lòng quay lại sau!</p>
+          <p class="text-secondary fs-5">Hiện chưa có lịch diễn sắp tới còn vé. Vui lòng quay lại sau!</p>
         </div>
       }
     </div>

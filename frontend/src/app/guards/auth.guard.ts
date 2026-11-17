@@ -15,7 +15,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const musicalService = inject(MusicalService);
   const router = inject(Router);
 
-  if (musicalService.isLoggedIn()) {
+  if (musicalService.isLoggedIn() && musicalService.currentUser().role === 'customer') {
     return true;
   }
 

@@ -22,14 +22,16 @@ const BookedSeatSchema = new mongoose.Schema(
 
 const BookingSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String
+    },
     bookingCode: {
       type: String,
       unique: true,
       index: true
     },
     musicalId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Musical',
+      type: mongoose.Schema.Types.Mixed,
       required: true
     },
     musicalTitle: {
@@ -41,8 +43,7 @@ const BookingSchema = new mongoose.Schema(
       required: true
     },
     scheduleId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Schedule',
+      type: mongoose.Schema.Types.Mixed,
       required: true
     },
     performanceDate: {

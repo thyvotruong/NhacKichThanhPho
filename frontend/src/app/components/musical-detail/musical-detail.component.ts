@@ -8,6 +8,7 @@
 
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MusicalService } from '../../services/musical.service';
@@ -30,9 +31,6 @@ export class MusicalDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly musicalService = inject(MusicalService);
   private readonly sanitizer = inject(DomSanitizer);
-  readonly trailerUrl: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-    'https://www.youtube.com/embed/KzhS5r5l54g?autoplay=1'
-  );
 
   // Angular Signals quản lý trạng thái giao diện
   slug = signal<string>('');
@@ -41,6 +39,20 @@ export class MusicalDetailComponent implements OnInit {
   isLoading = signal<boolean>(true);
   showTrailerModal = signal<boolean>(false);
   selectedDateKey = signal<string | null>(null);
+  isSubmittingNotification = signal<boolean>(false);
+  notificationMessage = signal<string>('');
+  notificationError = signal<string>('');
+
+  readonly trailerUrl = computed<SafeResourceUrl>(() => {
+    const raw = this.musical()?.trailerUrl || 'https://www.youtube.com/embed/RclpGv8673s';
+    const embedUrl = raw.includes('?') ? `${raw}&autoplay=1` : `${raw}?autoplay=1`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  });
+
+  formatGenre(genre: any): string {
+    if (Array.isArray(genre)) return genre.join(' • ');
+    return String(genre || '');
+  }
 
   private readonly mockScheduleTimes = ['15:00', '19:30', '20:00'];
   private readonly scheduleEndDate = new Date(2026, 10, 30);
@@ -68,15 +80,47 @@ export class MusicalDetailComponent implements OnInit {
   loadMusicalDetail(slug: string): void {
     this.isLoading.set(true);
     this.selectedDateKey.set(null);
+    this.notificationMessage.set('');
+    this.notificationError.set('');
 
     this.musicalService.getMusicalBySlug(slug).subscribe({
       next: (data) => {
         this.musical.set(data);
-        this.schedules.set(this.createScheduleOptions(data, data.schedules ?? []));
+        this.schedules.set(
+          data.status === 'coming_soon'
+            ? []
+            : this.createScheduleOptions(data, data.schedules ?? [])
+        );
         this.isLoading.set(false);
       },
       error: () => {
         this.loadStaticFallback(slug);
+      }
+    });
+  }
+
+  subscribeToScheduleNotifications(event: Event, email: string): void {
+    event.preventDefault();
+    const musical = this.musical();
+    const cleanEmail = email.trim();
+
+    if (!musical || musical.status !== 'coming_soon' || this.isSubmittingNotification()) return;
+    if (!cleanEmail) {
+      this.notificationError.set('Vui lòng nhập địa chỉ email hợp lệ.');
+      return;
+    }
+
+    this.isSubmittingNotification.set(true);
+    this.notificationMessage.set('');
+    this.notificationError.set('');
+    this.musicalService.subscribeToMusicalNotifications(musical.slug, cleanEmail).subscribe({
+      next: (response) => {
+        this.notificationMessage.set(response.message);
+        this.isSubmittingNotification.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.notificationError.set(error.error?.message || 'Không thể đăng ký nhận thông báo lúc này.');
+        this.isSubmittingNotification.set(false);
       }
     });
   }
@@ -190,53 +234,25 @@ export class MusicalDetailComponent implements OnInit {
   }
 
   /**
-   * Dữ liệu Fallback dự phòng trong trường hợp offline
+   * Dữ liệu Fallback dự phòng đọc trực tiếp từ static JSON file
    */
   private loadStaticFallback(slug: string): void {
-    if (slug === 'giac-mo-mua-he') {
-      const fallbackMusical: Musical = {
-        title: 'Giấc Mơ Mùa Hè',
-        slug: 'giac-mo-mua-he',
-        subtitle: 'Bản tình ca Broadway rực rỡ và lãng mạn bậc nhất',
-        genre: 'Lãng Mạn',
-        status: 'now_showing',
-        posterUrl: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=800&q=80',
-        bannerUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1920&q=80',
-        duration: 135,
-        director: 'Đạo diễn Nguyễn Lê Hoàng',
-        cast: ['Hoàng Dũng', 'Bùi Lan Hương', 'Trung Quân', 'Dàn nhạc Giao hưởng Sài Gòn'],
-        synopsis: 'Lấy cảm hứng từ những bản tình ca bất hủ mang phong vị Broadway cổ điển, "Giấc Mơ Mùa Hè" dẫn dắt khán giả vào chuyến hành trình tìm kiếm ánh sáng nghệ thuật và tình yêu định mệnh của đôi nghệ sĩ trẻ...',
-        ticketPrices: [
-          { tier: 'VIP', name: 'Hạng VIP Kim Cương', price: 950000, description: 'Hàng ghế VIP danh dự, chụp ảnh lưu niệm cùng nghệ sĩ' },
-          { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 500000, description: 'Vị trí ghế ngồi êm ái khu vực trung tâm' },
-          { tier: 'Eco', name: 'Hạng Phổ Thông', price: 300000, description: 'Ghế ngồi tầng 2 thoáng đãng' }
-        ]
-      };
-      this.musical.set(fallbackMusical);
-      this.schedules.set(this.createScheduleOptions(fallbackMusical, []));
-    } else {
-      const fallbackMusical: Musical = {
-        title: 'Bông Bóng Bay',
-        slug: 'bong-bong-bay',
-        subtitle: 'Bản trường ca thanh xuân rực rỡ và những ước mơ bay bổng',
-        genre: 'Broadway',
-        status: 'now_showing',
-        posterUrl: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
-        bannerUrl: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1920&q=80',
-        duration: 120,
-        director: 'NSƯT Trần Minh Đức',
-        cast: ['Lan Phương', 'Quang Tuấn', 'Khả Như', 'Huỳnh Lập', 'Vũ đoàn Nhà Hát'],
-        synopsis: 'Vở nhạc kịch Bông Bóng Bay là câu chuyện hoài niệm đong đầy cảm xúc về tuổi thanh xuân rực rỡ, nơi những đứa trẻ lớn lên cùng những quả bóng bay chở đầy hoài bão giữa lòng Sài Gòn. Giữa những thăng trầm thị thành, tình bạn và ước mơ thuở ban đầu vẫn vẹn nguyên...',
-        ticketPrices: [
-          { tier: 'VIP', name: 'Hạng VIP Hoàng Gia', price: 800000, description: 'Vị trí trung tâm A-C, tặng đồ uống và kỷ yếu' },
-          { tier: 'Standard', name: 'Hạng Tiêu Chuẩn', price: 450000, description: 'Khu vực tầng trệt D-L, âm thanh chuẩn quốc tế' },
-          { tier: 'Eco', name: 'Hạng Phổ Thông', price: 250000, description: 'Tầng lầu ban công tầm nhìn bao quát' }
-        ]
-      };
-      this.musical.set(fallbackMusical);
-      this.schedules.set(this.createScheduleOptions(fallbackMusical, []));
-    }
-
-    this.isLoading.set(false);
+    fetch('/musicals.json')
+      .then(res => res.json())
+      .then((musicals: Musical[]) => {
+        const found = (musicals || []).find(m => m.slug === slug || m._id === slug) || musicals[0];
+        if (found) {
+          this.musical.set(found);
+          this.schedules.set(
+            found.status === 'coming_soon'
+              ? []
+              : this.createScheduleOptions(found, [])
+          );
+        }
+        this.isLoading.set(false);
+      })
+      .catch(() => {
+        this.isLoading.set(false);
+      });
   }
 }

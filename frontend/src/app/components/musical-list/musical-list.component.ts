@@ -32,10 +32,20 @@ export class MusicalListComponent implements OnInit {
   selectedStatus = signal<string>('all');
   selectedSort = signal<string>('newest');
 
-  readonly genres = ['Tất cả', 'Broadway', 'Cổ điển', 'Dân gian đương đại', 'Lãng mạn', 'Thiếu nhi'];
+  readonly genres = ['Tất cả', 'Thiếu nhi', 'Gia đình', 'Lịch sử', 'Dân gian', 'Tâm lý', 'Chính luận', 'Cổ tích', 'Bi hài kịch'];
 
   ngOnInit(): void {
     this.fetchMusicals();
+  }
+
+  getMinPrice(musical: Musical): number {
+    if (!musical.ticketPrices || musical.ticketPrices.length === 0) return 450000;
+    return Math.min(...musical.ticketPrices.map(t => t.price || 0));
+  }
+
+  formatGenre(genre: any): string {
+    if (Array.isArray(genre)) return genre.join(' • ');
+    return String(genre || '');
   }
 
   fetchMusicals(): void {

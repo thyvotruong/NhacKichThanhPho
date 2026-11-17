@@ -343,8 +343,12 @@ export class AdminComponent implements OnInit {
     }, 4000);
   }
 
-  switchRole(role: 'admin' | 'editor' | 'accountant' | 'ticket_checker' | 'customer'): void {
-    this.musicalService.setRole(role);
+  cleanStaffName(name: string): string {
+    return (name || '').replace(/\s*\(.*?\)/g, '').trim();
+  }
+
+  switchRole(role: 'admin' | 'editor' | 'ticket_checker' | 'staff' | 'customer'): void {
+    this.musicalService.setRole(role as any);
     this.showToast(`Đã chuyển đổi sang vai trò: ${role.toUpperCase()}`, 'info');
   }
 
@@ -371,13 +375,39 @@ export class AdminComponent implements OnInit {
     let list = this.musicals();
     const q = this.musicalSearch().toLowerCase().trim();
     if (q) {
-      list = list.filter(m => m.title.toLowerCase().includes(q) || m.director.toLowerCase().includes(q));
+      list = list.filter(m =>
+        m.title.toLowerCase().includes(q) ||
+        m.director.toLowerCase().includes(q) ||
+        this.formatCast(m.cast).toLowerCase().includes(q)
+      );
     }
     const g = this.musicalGenreFilter();
     if (g && g !== 'ALL') {
-      list = list.filter(m => m.genre === g);
+      const gLower = g.toLowerCase();
+      list = list.filter(m => {
+        if (Array.isArray(m.genre)) {
+          return m.genre.some(item => item.toLowerCase().includes(gLower));
+        }
+        return String(m.genre || '').toLowerCase().includes(gLower);
+      });
     }
     return list;
+  }
+
+  formatGenre(genre: string | string[]): string {
+    if (Array.isArray(genre)) return genre.join(' • ');
+    return genre || 'Kịch nghệ';
+  }
+
+  formatCast(cast: string | string[]): string {
+    if (Array.isArray(cast)) return cast.join(', ');
+    return cast || '';
+  }
+
+  getMinPrice(m: Musical): number {
+    if (!m.ticketPrices || m.ticketPrices.length === 0) return 300000;
+    const prices = m.ticketPrices.map(p => p.price).filter(p => typeof p === 'number' && p > 0);
+    return prices.length > 0 ? Math.min(...prices) : 300000;
   }
 
   openCreateMusicalModal(): void {
@@ -480,11 +510,22 @@ export class AdminComponent implements OnInit {
   }
 
   toggleMusicalStatus(musical: Musical): void {
-    const nextStatus = musical.status === 'now_showing' ? 'archived' : 'now_showing';
+    let nextStatus: 'now_showing' | 'coming_soon' | 'archived';
+    let label = '';
+    if (musical.status === 'now_showing') {
+      nextStatus = 'coming_soon';
+      label = 'Sắp Chiếu';
+    } else if (musical.status === 'coming_soon') {
+      nextStatus = 'archived';
+      label = 'Lưu Trữ';
+    } else {
+      nextStatus = 'now_showing';
+      label = 'Đang Chiếu';
+    }
     this.musicalService.updateMusical(musical.slug, { status: nextStatus }).subscribe({
       next: () => {
         musical.status = nextStatus;
-        this.showToast(`Đã đổi trạng thái vở kịch "${musical.title}" sang: ${nextStatus === 'now_showing' ? 'Đang Chiếu' : 'Lưu Trữ'}`);
+        this.showToast(`Đã đổi trạng thái vở kịch "${musical.title}" sang: ${label}`);
       }
     });
   }
@@ -616,8 +657,8 @@ export class AdminComponent implements OnInit {
       totalRows: 14,
       seatsPerRow: 14,
       vipRows: 'A, B, C',
-      standardRows: 'D, E, F, G, H, J',
-      coupleRows: 'K, L',
+      standardRows: 'D, E, F, G, J, K, L, M, N, P',
+      coupleRows: 'H',
       aisleColumns: '4, 11',
       status: 'active',
       description: 'Khán phòng thiết kế âm học vòm hiện đại tiêu chuẩn châu Âu.'
@@ -701,8 +742,8 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  // Helper sinh preview các hàng ghế mô phỏng cho sơ đồ khán phòng
-  getAuditoriumPreviewRows(): { row: string; type: string }[] {
+  // Helper sinh preview các hàng ghế mô phỏng cho sơ đồ khán phòng chuẩn hóa
+  getAuditoriumPreviewRows(): { row: string; type: string; floor: string; isCouple: boolean }[] {
     const aud = this.selectedAuditorium();
     if (!aud) return [];
     const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P'].slice(0, aud.totalRows);
@@ -710,8 +751,16 @@ export class AdminComponent implements OnInit {
       let type = 'Standard';
       if (aud.vipRows.includes(r)) type = 'VIP';
       else if (aud.coupleRows.includes(r)) type = 'Couple';
-      return { row: r, type };
+      const floor = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].includes(r) ? 'Tầng Trệt' : 'Tầng Lầu';
+      return { row: r, type, floor, isCouple: type === 'Couple' };
     });
+  }
+
+  getRowColList(row: string): number[] {
+    if (['A', 'B', 'C'].includes(row)) {
+      return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    }
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   }
 
   // --- 5. SCHEDULES ---

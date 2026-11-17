@@ -137,8 +137,8 @@
     <!-- Lưới Card Suất Diễn -->
     <div class="row g-4">
       @for (sched of filteredSchedules(); track sched._id) {
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100 card-showman-glass schedule-card-hover border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-column">
+        <div class="col-12 col-lg-6">
+          <div class="card h-100 card-showman-glass schedule-card-hover border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-row align-items-center">
             <div class="position-relative overflow-hidden schedule-poster-wrapper">
               @if (sched.posterUrl) {
                 <img [src]="sched.posterUrl" [alt]="sched.musicalTitle" class="schedule-poster-img" />
@@ -165,7 +165,7 @@
               </div>
             </div>
 
-            <div class="card-body p-4 d-flex flex-column flex-grow-1">
+            <div class="card-body p-3 d-flex flex-column flex-grow-1 schedule-card-body">
               <h3 class="card-title fs-4 fw-bold text-gold-gradient mb-2 schedule-title">
                 {{ sched.musicalTitle }}
               </h3>
