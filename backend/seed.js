@@ -165,30 +165,41 @@ const sampleVouchers = [
 const sampleUsers = [
   {
     fullName: 'Trần Minh Đức',
+    username: 'admin',
+    password: 'Admin@gr06',
     email: 'admin@nhackichthanhpho.vn',
     phone: '0901888999',
     role: 'admin',
+    department: 'Ban Giám Đốc Điều Hành',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80',
     isActive: true
   },
   {
     fullName: 'Lê Thảo My',
+    username: 'editor',
+    password: 'Editor@gr06',
     email: 'editor@nhackichthanhpho.vn',
     phone: '0902777888',
     role: 'editor',
+    department: 'Ban Biên Tập Sân Khấu & Truyền Thông',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
     isActive: true
   },
   {
     fullName: 'Phạm Hùng Cường',
-    email: 'soatve@nhackichthanhpho.vn',
+    username: 'staff',
+    password: 'Staff@gr06',
+    email: 'staff@nhackichthanhpho.vn',
     phone: '0904555666',
-    role: 'ticket_checker',
+    role: 'staff',
+    department: 'Tổ Trực Soát Vé Cửa Rạp',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
     isActive: true
   },
   {
     fullName: 'Nguyễn Văn An',
+    username: 'khachhang',
+    password: 'Customer@gr06',
     email: 'khachhang@gmail.com',
     phone: '0909123456',
     role: 'customer',

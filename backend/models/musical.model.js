@@ -71,7 +71,7 @@ const MusicalSchema = new mongoose.Schema(
     },
     bannerUrl: {
       type: String,
-      required: true,
+      default: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1600&q=80',
       trim: true
     },
     trailerUrl: {

@@ -19,8 +19,8 @@
     <!-- Lưới Nghệ Sĩ -->
     <div class="row g-4">
       @for (artist of artists(); track artist.name) {
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-showman-glass rounded-4 p-4 h-100 border border-gold-glow artist-card-hover text-center d-flex flex-column align-items-center position-relative overflow-hidden">
+        <div class="col-md-6 col-lg-6">
+          <div class="card card-showman-glass rounded-4 p-3 h-100 border border-gold-glow artist-card-hover text-center d-flex flex-column align-items-center position-relative overflow-hidden">
             <!-- Avatar Nghệ Sĩ có khung hào quang vàng -->
             <div class="artist-avatar-wrapper mb-3 mx-auto position-relative">
               <img [src]="artist.avatar" [alt]="artist.name" class="rounded-circle artist-img shadow-lg">

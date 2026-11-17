@@ -27,6 +27,7 @@ const Booking = require('./models/booking.model');
 const Voucher = require('./models/voucher.model');
 const User = require('./models/user.model');
 const Reconciliation = require('./models/reconciliation.model');
+const Artist = require('./models/artist.model');
 const MusicalNotificationSubscription = require('./models/musical-notification-subscription.model');
 const {
   sampleMusicals,
@@ -46,8 +47,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 let isMongoConnected = false;
 
@@ -69,7 +70,7 @@ let memUsers = [
     fullName: 'Trần Minh Đức',
     email: 'admin@nhackichthanhpho.vn',
     username: 'admin',
-    password: '123456',
+    password: 'Admin@gr06',
     phone: '0901888999',
     role: 'admin',
     department: 'Ban Giám Đốc Điều Hành',
@@ -82,10 +83,10 @@ let memUsers = [
     fullName: 'Lê Thảo My',
     email: 'editor@nhackichthanhpho.vn',
     username: 'editor',
-    password: '123456',
+    password: 'Editor@gr06',
     phone: '0902777888',
     role: 'editor',
-    department: 'Ban Biên Tập Sân Khấu',
+    department: 'Ban Biên Tập Sân Khấu & Truyền Thông',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
     isActive: true,
     createdAt: new Date()
@@ -95,7 +96,7 @@ let memUsers = [
     fullName: 'Phạm Hùng Cường',
     email: 'staff@nhackichthanhpho.vn',
     username: 'staff',
-    password: '123456',
+    password: 'Staff@gr06',
     phone: '0904555666',
     role: 'staff',
     department: 'Tổ Trực Soát Vé Cửa Rạp',
@@ -108,7 +109,7 @@ let memUsers = [
     fullName: 'Nguyễn Văn An',
     email: 'khachhang@gmail.com',
     username: 'khachhang',
-    password: '123456',
+    password: 'Customer@gr06',
     phone: '0909123456',
     role: 'customer',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
@@ -837,12 +838,10 @@ mongoose
       });
 
       // 3. Đồng bộ toàn bộ 8 vở kịch mới từ musicals.json vào MongoDB
-      for (const musical of memMusicals) {
-        await Musical.findOneAndUpdate(
-          { slug: musical.slug },
-          { $set: { ...musical } },
-          { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
+      if (await Musical.countDocuments() === 0) {
+        for (const musical of memMusicals) {
+          await Musical.create(musical);
+        }
       }
 
       // 4. Đồng bộ 20 suất diễn chuẩn phủ kín từ 18/11 đến 30/11/2026 vào MongoDB an toàn
@@ -872,6 +871,20 @@ mongoose
           { username: 'ketoan' }
         ]
       });
+
+      // 7. Đồng bộ tài khoản nhân sự nội bộ (Admin, Editor, Staff) vào MongoDB
+      for (const u of memUsers) {
+        await User.findOneAndUpdate(
+          { $or: [{ username: u.username }, { email: u.email }] },
+          { $set: { ...u } },
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+      }
+
+      // 8. Đồng bộ danh sách nghệ sĩ vào MongoDB
+      if (await Artist.countDocuments() === 0) {
+        await Artist.insertMany(memArtists);
+      }
 
       console.log('✅ Đã xóa sạch toàn bộ vở cũ và đồng bộ thành công 8 vở kịch cùng dữ liệu quản trị mới vào MongoDB!');
     } catch (seedErr) {
@@ -1069,8 +1082,8 @@ app.get('/api/musicals', async (req, res) => {
           });
         }
       } catch (dbErr) {
-        console.warn('⚠️ Lỗi truy vấn MongoDB, chuyển sang Mock fallback:', dbErr.message);
-        list = null;
+        console.error('MongoDB query musicals error:', dbErr.message);
+        return res.status(500).json({ success: false, message: 'Không thể tải danh sách vở kịch từ cơ sở dữ liệu.' });
       }
     }
 
@@ -1555,8 +1568,17 @@ app.post('/api/bookings/:bookingCode/cancel', (req, res) => {
 /**
  * GET /api/artists - Danh sách nghệ sĩ tiêu biểu
  */
-app.get('/api/artists', (req, res) => {
-  res.status(200).json({ success: true, data: sampleArtists });
+app.get('/api/artists', async (req, res) => {
+  if (isMongoConnected) {
+    try {
+      const dbArtists = await Artist.find({}).sort({ createdAt: 1 }).lean();
+      return res.status(200).json({ success: true, count: dbArtists.length, data: dbArtists });
+    } catch (e) {
+      console.error('MongoDB query artists error:', e.message);
+      return res.status(500).json({ success: false, message: 'Không thể tải danh sách nghệ sĩ từ cơ sở dữ liệu.' });
+    }
+  }
+  res.status(200).json({ success: true, count: memArtists.length, data: memArtists });
 });
 
 // ============================================================
@@ -1867,79 +1889,233 @@ app.get('/api/admin/musicals', async (req, res) => {
   if (isMongoConnected) {
     try {
       const dbMusicals = await Musical.find({}).sort({ createdAt: -1 }).lean();
-      if (dbMusicals && dbMusicals.length > 0) {
-        return res.status(200).json({ success: true, count: dbMusicals.length, data: dbMusicals });
-      }
-    } catch (e) {}
+      return res.status(200).json({ success: true, count: dbMusicals.length, data: dbMusicals });
+    } catch (e) {
+      console.error('MongoDB query admin musicals error:', e.message);
+      return res.status(500).json({ success: false, message: 'Không thể tải danh sách vở kịch từ cơ sở dữ liệu.' });
+    }
   }
   res.status(200).json({ success: true, count: memMusicals.length, data: memMusicals });
 });
 
-app.post('/api/admin/musicals', (req, res) => {
-  const newMusical = {
-    _id: 'm_' + Date.now(),
-    ...req.body,
-    createdAt: new Date()
-  };
-  memMusicals.unshift(newMusical);
-  res.status(201).json({ success: true, data: newMusical });
-});
+// Musicals CRUD Handlers
+const handleCreateMusical = async (req, res) => {
+  try {
+    if (!isMongoConnected) {
+      return res.status(503).json({ success: false, message: 'MongoDB chưa kết nối; không thể lưu vở kịch.' });
+    }
 
-app.put('/api/admin/musicals/:slug', (req, res) => {
-  const { slug } = req.params;
-  const idx = memMusicals.findIndex(m => m.slug === slug);
-  if (idx !== -1) {
-    memMusicals[idx] = { ...memMusicals[idx], ...req.body };
-    return res.status(200).json({ success: true, data: memMusicals[idx] });
+    const newMusical = {
+      ...req.body,
+      _id: req.body._id || ('m_' + Date.now()),
+      createdAt: new Date()
+    };
+    const savedMusical = await Musical.create(newMusical);
+    const result = savedMusical.toObject();
+    memMusicals.unshift(result);
+    res.status(201).json({ success: true, data: result });
+  } catch (err) {
+    const status = err.name === 'ValidationError' ? 400 : err.code === 11000 ? 409 : 500;
+    res.status(status).json({ success: false, message: err.message });
   }
-  res.status(404).json({ success: false, message: 'Không tìm thấy vở kịch' });
-});
+};
 
-app.delete('/api/admin/musicals/:slug', (req, res) => {
-  const { slug } = req.params;
-  memMusicals = memMusicals.filter(m => m.slug !== slug);
-  res.status(200).json({ success: true, message: 'Đã xóa vở kịch' });
-});
+const handleUpdateMusical = async (req, res) => {
+  try {
+    if (!isMongoConnected) {
+      return res.status(503).json({ success: false, message: 'MongoDB chưa kết nối; không thể lưu vở kịch.' });
+    }
 
-app.patch('/api/admin/musicals/:slug/toggle', (req, res) => {
-  const { slug } = req.params;
-  const item = memMusicals.find(m => m.slug === slug);
-  if (item) {
-    item.status = item.status === 'now_showing' ? 'archived' : 'now_showing';
-    return res.status(200).json({ success: true, data: item });
+    const rawSlug = req.params.slug || req.params.id;
+    const cleanSlug = decodeURIComponent(rawSlug).toLowerCase().trim();
+    const updatedData = await Musical.findOneAndUpdate(
+      { $or: [{ slug: cleanSlug }, { _id: rawSlug }, { slug: rawSlug }] },
+      { $set: req.body },
+      { new: true, runValidators: true }
+    ).lean();
+
+    if (!updatedData) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy vở kịch để cập nhật' });
+    }
+
+    const idx = memMusicals.findIndex(m => m.slug === cleanSlug || m._id === rawSlug || m.slug === rawSlug);
+    if (idx !== -1) memMusicals[idx] = { ...memMusicals[idx], ...updatedData };
+
+    return res.status(200).json({ success: true, data: updatedData, message: 'Đã cập nhật vở kịch thành công' });
+  } catch (err) {
+    const status = err.name === 'ValidationError' || err.name === 'CastError'
+      ? 400
+      : err.code === 11000 ? 409 : 500;
+    res.status(status).json({ success: false, message: err.message });
   }
-  res.status(404).json({ success: false, message: 'Không tìm thấy vở kịch' });
-});
+};
 
-// Artists CRUD
-app.get('/api/admin/artists', (req, res) => {
-  res.status(200).json({ success: true, data: memArtists });
-});
-
-app.post('/api/admin/artists', (req, res) => {
-  const newArtist = {
-    _id: 'art_' + Date.now(),
-    ...req.body
-  };
-  memArtists.unshift(newArtist);
-  res.status(201).json({ success: true, data: newArtist });
-});
-
-app.put('/api/admin/artists/:id', (req, res) => {
-  const { id } = req.params;
-  const idx = memArtists.findIndex(a => a._id === id || a.name === id);
-  if (idx !== -1) {
-    memArtists[idx] = { ...memArtists[idx], ...req.body };
-    return res.status(200).json({ success: true, data: memArtists[idx] });
+const handleDeleteMusical = async (req, res) => {
+  try {
+    const rawSlug = req.params.slug || req.params.id;
+    const cleanSlug = decodeURIComponent(rawSlug).toLowerCase().trim();
+    if (isMongoConnected) {
+      try {
+        await Musical.deleteOne({ $or: [{ slug: cleanSlug }, { _id: rawSlug }, { slug: rawSlug }] });
+      } catch (dbErr) {
+        console.warn('MongoDB delete musical error:', dbErr.message);
+      }
+    }
+    memMusicals = memMusicals.filter(m => m.slug !== cleanSlug && m._id !== rawSlug && m.slug !== rawSlug);
+    res.status(200).json({ success: true, message: 'Đã xóa vở kịch thành công' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
-  res.status(404).json({ success: false, message: 'Không tìm thấy nghệ sĩ' });
+};
+
+app.post('/api/admin/musicals', handleCreateMusical);
+app.post('/api/musicals', handleCreateMusical);
+
+app.put('/api/admin/musicals/:slug', handleUpdateMusical);
+app.put('/api/musicals/:id', handleUpdateMusical);
+app.put('/api/musicals/:slug', handleUpdateMusical);
+
+app.delete('/api/admin/musicals/:slug', handleDeleteMusical);
+app.delete('/api/musicals/:id', handleDeleteMusical);
+
+app.patch('/api/admin/musicals/:slug/toggle', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const cleanSlug = decodeURIComponent(slug).toLowerCase().trim();
+    let item = memMusicals.find(m => m.slug === cleanSlug || m._id === slug);
+    const nextStatus = (item?.status === 'now_showing') ? 'coming_soon' : (item?.status === 'coming_soon' ? 'archived' : 'now_showing');
+    if (item) item.status = nextStatus;
+
+    if (isMongoConnected) {
+      try {
+        await Musical.updateOne(
+          { $or: [{ slug: cleanSlug }, { _id: slug }] },
+          { $set: { status: nextStatus } }
+        );
+      } catch (dbErr) {
+        console.warn('MongoDB toggle musical error:', dbErr.message);
+      }
+    }
+    if (item) {
+      return res.status(200).json({ success: true, data: item });
+    }
+    res.status(404).json({ success: false, message: 'Không tìm thấy vở kịch' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
 });
 
-app.delete('/api/admin/artists/:id', (req, res) => {
-  const { id } = req.params;
-  memArtists = memArtists.filter(a => a._id !== id && a.name !== id);
-  res.status(200).json({ success: true, message: 'Đã xóa nghệ sĩ' });
-});
+// Artists CRUD Handlers
+const handleGetArtists = async (req, res) => {
+  if (isMongoConnected) {
+    try {
+      const dbArtists = await Artist.find({}).sort({ createdAt: 1 }).lean();
+      return res.status(200).json({ success: true, count: dbArtists.length, data: dbArtists });
+    } catch (e) {
+      console.error('MongoDB query admin artists error:', e.message);
+      return res.status(500).json({ success: false, message: 'Không thể tải danh sách nghệ sĩ từ cơ sở dữ liệu.' });
+    }
+  }
+  res.status(200).json({ success: true, count: memArtists.length, data: memArtists });
+};
+
+const handleCreateArtist = async (req, res) => {
+  try {
+    if (!isMongoConnected) {
+      return res.status(503).json({ success: false, message: 'MongoDB chưa kết nối; không thể lưu nghệ sĩ.' });
+    }
+
+    const newArtist = {
+      ...req.body,
+      createdAt: new Date()
+    };
+    const savedArtist = await Artist.create(newArtist);
+    const result = savedArtist.toObject();
+    memArtists.unshift(result);
+    res.status(201).json({ success: true, data: result });
+  } catch (err) {
+    const status = err.name === 'ValidationError' ? 400 : err.code === 11000 ? 409 : 500;
+    res.status(status).json({ success: false, message: err.message });
+  }
+};
+
+const handleUpdateArtist = async (req, res) => {
+  try {
+    if (!isMongoConnected) {
+      return res.status(503).json({ success: false, message: 'MongoDB chưa kết nối; không thể lưu nghệ sĩ.' });
+    }
+
+    const rawId = req.params.id;
+    const cleanId = decodeURIComponent(rawId).trim();
+    const updated = await Artist.findOneAndUpdate(
+      {
+        $or: [
+          { _id: cleanId },
+          { name: cleanId },
+          { name: new RegExp('^' + cleanId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') }
+        ]
+      },
+      { $set: req.body },
+      { new: true, runValidators: true }
+    ).lean();
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy nghệ sĩ' });
+    }
+
+    const idx = memArtists.findIndex(a =>
+      String(a._id) === cleanId ||
+      a.name === cleanId ||
+      a.name.toLowerCase() === cleanId.toLowerCase()
+    );
+    if (idx !== -1) memArtists[idx] = { ...memArtists[idx], ...updated };
+
+    return res.status(200).json({ success: true, data: updated, message: 'Đã cập nhật hồ sơ nghệ sĩ thành công' });
+  } catch (err) {
+    const status = err.name === 'ValidationError' || err.name === 'CastError'
+      ? 400
+      : err.code === 11000 ? 409 : 500;
+    res.status(status).json({ success: false, message: err.message });
+  }
+};
+
+const handleDeleteArtist = async (req, res) => {
+  try {
+    const rawId = req.params.id;
+    const cleanId = decodeURIComponent(rawId).trim();
+    if (isMongoConnected) {
+      try {
+        await Artist.deleteOne({
+          $or: [
+            { _id: cleanId },
+            { name: cleanId },
+            { name: new RegExp('^' + cleanId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') }
+          ]
+        });
+      } catch (dbErr) {
+        console.warn('MongoDB delete artist error:', dbErr.message);
+      }
+    }
+    memArtists = memArtists.filter(a =>
+      a._id !== cleanId &&
+      a.name !== cleanId &&
+      a.name.toLowerCase() !== cleanId.toLowerCase()
+    );
+    res.status(200).json({ success: true, message: 'Đã xóa nghệ sĩ thành công' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+app.get('/api/admin/artists', handleGetArtists);
+app.post('/api/admin/artists', handleCreateArtist);
+app.post('/api/artists', handleCreateArtist);
+
+app.put('/api/admin/artists/:id', handleUpdateArtist);
+app.put('/api/artists/:id', handleUpdateArtist);
+
+app.delete('/api/admin/artists/:id', handleDeleteArtist);
+app.delete('/api/artists/:id', handleDeleteArtist);
 
 // Auditoriums CRUD
 app.get('/api/admin/auditoriums', (req, res) => {
@@ -2010,64 +2186,142 @@ app.patch('/api/admin/schedules/:id/cancel', (req, res) => {
 });
 
 // Users Staff CRUD
-app.post('/api/admin/users', (req, res) => {
-  const newUser = {
-    _id: 'usr_' + Date.now(),
-    ...req.body,
-    createdAt: new Date()
-  };
-  memUsers.unshift(newUser);
-  res.status(201).json({ success: true, data: newUser });
+app.post('/api/admin/users', async (req, res) => {
+  try {
+    const newUser = {
+      _id: req.body._id || ('usr_' + Date.now()),
+      ...req.body,
+      createdAt: new Date()
+    };
+    if (isMongoConnected) {
+      try {
+        await User.findOneAndUpdate(
+          { $or: [{ email: newUser.email }, { username: newUser.username }] },
+          { $set: newUser },
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+      } catch (dbErr) {
+        console.warn('MongoDB create user error:', dbErr.message);
+      }
+    }
+    memUsers.unshift(newUser);
+    res.status(201).json({ success: true, data: newUser });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
 });
 
-app.put('/api/admin/users/:id', (req, res) => {
-  const { id } = req.params;
-  const idx = memUsers.findIndex(u => u._id === id || u.email === id);
-  if (idx !== -1) {
-    memUsers[idx] = { ...memUsers[idx], ...req.body };
-    return res.status(200).json({ success: true, data: memUsers[idx] });
+app.put('/api/admin/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let updated = null;
+    if (isMongoConnected) {
+      try {
+        const dbDoc = await User.findOneAndUpdate(
+          { $or: [{ _id: id }, { email: id }, { username: id }] },
+          { $set: req.body },
+          { new: true, runValidators: false }
+        ).lean();
+        if (dbDoc) updated = dbDoc;
+      } catch (dbErr) {
+        console.warn('MongoDB update user error:', dbErr.message);
+      }
+    }
+    const idx = memUsers.findIndex(u => u._id === id || u.email === id || u.username === id);
+    if (idx !== -1) {
+      memUsers[idx] = { ...memUsers[idx], ...req.body };
+      if (!updated) updated = memUsers[idx];
+    }
+    if (updated) {
+      return res.status(200).json({ success: true, data: updated, message: 'Đã cập nhật nhân sự thành công' });
+    }
+    res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
-  res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên' });
 });
 
-app.patch('/api/admin/users/:id/toggle', (req, res) => {
-  const { id } = req.params;
-  const user = memUsers.find(u => u._id === id || u.email === id);
-  if (user) {
-    user.isActive = !user.isActive;
-    return res.status(200).json({ success: true, data: user });
+app.patch('/api/admin/users/:id/toggle', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = memUsers.find(u => u._id === id || u.email === id || u.username === id);
+    if (user) {
+      user.isActive = !user.isActive;
+      if (isMongoConnected) {
+        try {
+          await User.updateOne(
+            { $or: [{ _id: id }, { email: id }, { username: id }] },
+            { $set: { isActive: user.isActive } }
+          );
+        } catch (dbErr) {
+          console.warn('MongoDB toggle user error:', dbErr.message);
+        }
+      }
+      return res.status(200).json({ success: true, data: user });
+    }
+    res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
-  res.status(404).json({ success: false, message: 'Không tìm thấy nhân viên' });
 });
 
 // Xóa tài khoản nhân viên (Admin Only)
-app.delete('/api/admin/users/:id', (req, res) => {
-  const { id } = req.params;
-  const target = memUsers.find(u => u._id === id || u.email === id || u.username === id);
-  if (!target) {
-    return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản nhân viên' });
+app.delete('/api/admin/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const target = memUsers.find(u => u._id === id || u.email === id || u.username === id);
+    if (!target) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản nhân viên' });
+    }
+    if (target.role === 'admin' && target.username === 'admin') {
+      return res.status(400).json({ success: false, message: 'Không thể xóa tài khoản Quản trị viên tối cao hệ thống' });
+    }
+    if (isMongoConnected) {
+      try {
+        await User.deleteOne({ $or: [{ _id: id }, { email: id }, { username: id }] });
+      } catch (dbErr) {
+        console.warn('MongoDB delete user error:', dbErr.message);
+      }
+    }
+    memUsers = memUsers.filter(u => u._id !== id && u.email !== id && u.username !== id);
+    res.status(200).json({ success: true, message: 'Đã xóa tài khoản nhân viên thành công' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
-  if (target.role === 'admin' && target.username === 'admin') {
-    return res.status(400).json({ success: false, message: 'Không thể xóa tài khoản Quản trị viên tối cao hệ thống' });
-  }
-  memUsers = memUsers.filter(u => u._id !== id && u.email !== id && u.username !== id);
-  res.status(200).json({ success: true, message: 'Đã xóa tài khoản nhân viên thành công' });
 });
 
 // API Đăng nhập nội bộ dành riêng cho Cán bộ (/internal)
-app.post('/api/auth/staff-login', (req, res) => {
+app.post('/api/auth/staff-login', async (req, res) => {
   const { identifier, password } = req.body;
   if (!identifier || !password) {
     return res.status(400).json({ success: false, message: 'Vui lòng nhập Tên đăng nhập / Email và Mật khẩu' });
   }
 
   const clean = identifier.trim().toLowerCase();
-  const user = memUsers.find(u =>
-    (u.email && u.email.toLowerCase() === clean) ||
-    (u.username && u.username.toLowerCase() === clean) ||
-    (u.phone && u.phone === clean) ||
-    (u._id && u._id.toLowerCase() === clean)
-  );
+  let user = null;
+
+  if (isMongoConnected) {
+    try {
+      user = await User.findOne({
+        $or: [
+          { email: clean },
+          { username: clean },
+          { phone: clean }
+        ]
+      }).lean();
+    } catch (dbErr) {
+      console.warn('MongoDB staff-login query error, fallback to memUsers:', dbErr.message);
+    }
+  }
+
+  if (!user) {
+    user = memUsers.find(u =>
+      (u.email && u.email.toLowerCase() === clean) ||
+      (u.username && u.username.toLowerCase() === clean) ||
+      (u.phone && u.phone === clean) ||
+      (u._id && u._id.toLowerCase() === clean)
+    );
+  }
 
   if (!user || user.role === 'customer') {
     return res.status(401).json({
@@ -2083,8 +2337,8 @@ app.post('/api/auth/staff-login', (req, res) => {
     });
   }
 
-  const validPassword = user.password || '123456';
-  if (password !== validPassword && password !== '123456') {
+  const validPassword = user.password;
+  if (password !== validPassword) {
     return res.status(401).json({
       success: false,
       message: 'Mật khẩu bảo mật không chính xác!'

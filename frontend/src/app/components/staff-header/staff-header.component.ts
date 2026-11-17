@@ -79,71 +79,6 @@ import { MusicalService } from '../../services/musical.service';
                 </div>
               </div>
 
-              <!-- Switch Role Dropdown (Clean, Only Internal Roles) -->
-              <div class="dropdown">
-                <button
-                  class="btn staff-action-btn dropdown-toggle"
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  title="Chuyển đổi vai trò nội bộ"
-                >
-                  Đổi vai trò
-                </button>
-                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end staff-dropdown p-2 shadow-2xl">
-                  <li>
-                    <div class="dropdown-header text-gold-gradient fw-bold text-uppercase px-2 py-1.5 border-bottom border-gold-glow pb-2 mb-2">
-                      Phân Quyền Nội Bộ
-                    </div>
-                  </li>
-                  <li>
-                    <button
-                      class="dropdown-item role-item d-flex align-items-center justify-content-between p-2 rounded-2 mb-1"
-                      [class.active-role]="currentUser().role === 'admin'"
-                      (click)="onSwitchRole('admin')"
-                    >
-                      <div class="text-start">
-                        <div class="fw-bold text-white">Giám Đốc (Admin)</div>
-                        <div class="role-desc">Toàn quyền hệ thống & thống kê</div>
-                      </div>
-                      @if (currentUser().role === 'admin') {
-                        <span class="badge bg-gold text-dark fw-bold ms-2">Đang chọn</span>
-                      }
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      class="dropdown-item role-item d-flex align-items-center justify-content-between p-2 rounded-2 mb-1"
-                      [class.active-role]="currentUser().role === 'editor'"
-                      (click)="onSwitchRole('editor')"
-                    >
-                      <div class="text-start">
-                        <div class="fw-bold text-white">Biên Tập Viên (Editor)</div>
-                        <div class="role-desc">Biên tập kịch, nghệ sĩ, tin tức</div>
-                      </div>
-                      @if (currentUser().role === 'editor') {
-                        <span class="badge bg-gold text-dark fw-bold ms-2">Đang chọn</span>
-                      }
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      class="dropdown-item role-item d-flex align-items-center justify-content-between p-2 rounded-2"
-                      [class.active-role]="currentUser().role === 'staff' || currentUser().role === 'ticket_checker'"
-                      (click)="onSwitchRole('staff')"
-                    >
-                      <div class="text-start">
-                        <div class="fw-bold text-white">Nhân Viên Soát Vé (Staff)</div>
-                        <div class="role-desc">Quét mã QR & kiểm soát cửa rạp</div>
-                      </div>
-                      @if (currentUser().role === 'staff' || currentUser().role === 'ticket_checker') {
-                        <span class="badge bg-gold text-dark fw-bold ms-2">Đang chọn</span>
-                      }
-                    </button>
-                  </li>
-                </ul>
-              </div>
-
               <!-- Logout Button -->
               <button type="button" class="staff-logout-btn" (click)="onLogout()">
                 Đăng xuất
@@ -262,7 +197,6 @@ import { MusicalService } from '../../services/musical.service';
       color: #86EFAC;
       border: 1px solid rgba(34, 197, 94, 0.4);
     }
-    .staff-action-btn,
     .staff-logout-btn {
       min-height: 38px;
       padding: 0.45rem 0.95rem;
@@ -271,17 +205,6 @@ import { MusicalService } from '../../services/musical.service';
       font-weight: 600;
       white-space: nowrap;
       transition: all 0.2s ease;
-    }
-    .staff-action-btn {
-      border: 1.5px solid rgba(245, 158, 11, 0.4);
-      background: rgba(245, 158, 11, 0.1);
-      color: #FDE68A;
-    }
-    .staff-action-btn:hover {
-      border-color: rgba(245, 158, 11, 0.8);
-      background: rgba(245, 158, 11, 0.2);
-      color: #FFFFFF;
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
     }
     .staff-logout-btn {
       border: 1px solid rgba(203, 213, 225, 0.25);
@@ -293,38 +216,6 @@ import { MusicalService } from '../../services/musical.service';
       background: rgba(244, 63, 94, 0.15);
       color: #FDA4AF;
       box-shadow: 0 0 12px rgba(244, 63, 94, 0.2);
-    }
-    .staff-dropdown {
-      min-width: 270px;
-      margin-top: 0.6rem !important;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      border-radius: 0.75rem;
-      background: rgba(14, 22, 41, 0.98);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(20px);
-    }
-    .role-item {
-      background: transparent;
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    .role-item:hover {
-      background: rgba(245, 158, 11, 0.12);
-    }
-    .role-item.active-role {
-      background: rgba(245, 158, 11, 0.18);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-    }
-    .role-desc {
-      font-size: 0.75rem;
-      color: #94A3B8;
-      line-height: 1.2;
-    }
-    .border-gold-glow {
-      border-color: rgba(245, 158, 11, 0.25) !important;
-    }
-    .bg-gold {
-      background-color: #F59E0B !important;
     }
     .text-gold-spark {
       color: #FDE68A;
@@ -370,17 +261,6 @@ export class StaffHeaderComponent {
     const name = this.currentUser()?.fullName || '';
     return name.replace(/\s*\(.*?\)/g, '').trim();
   });
-
-  onSwitchRole(role: 'admin' | 'editor' | 'staff'): void {
-    this.musicalService.setRole(role);
-    if (role === 'editor') {
-      this.router.navigate(['/admin', 'musicals']);
-    } else if (role === 'staff') {
-      this.router.navigate(['/ops', 'check-in']);
-    } else if (role === 'admin') {
-      this.router.navigate(['/admin', 'dashboard']);
-    }
-  }
 
   onLogout(): void {
     this.musicalService.logout();

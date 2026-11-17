@@ -213,6 +213,11 @@ p, span, a, button, input, select, textarea, label {
   font-family: var(--font-main) !important;
 }
 
+input, textarea {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
 /* ============================================================
    HIỆU ỨNG CHỮ DÁT VÀNG & ĐỎ RUBY PHÁT SÁNG
    ============================================================ */

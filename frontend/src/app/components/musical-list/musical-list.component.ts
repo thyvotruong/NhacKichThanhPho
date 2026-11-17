@@ -2,14 +2,15 @@
  * ============================================================
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL SPA) - ANGULAR FRONTEND
  * File: components/musical-list/musical-list.component.ts
- * Chức năng: Danh mục vở kịch với Tìm kiếm, Lọc thể loại & Sắp xếp
+ * Chức năng: Danh mục vở kịch với Tìm kiếm & Bộ lọc
  * ============================================================
  */
 
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { MusicalService } from '../../services/musical.service';
 import { Musical } from '../../models/musical.model';
 
@@ -20,8 +21,9 @@ import { Musical } from '../../models/musical.model';
   templateUrl: './musical-list.component.html',
   styleUrls: ['./musical-list.component.css']
 })
-export class MusicalListComponent implements OnInit {
+export class MusicalListComponent implements OnInit, OnDestroy {
   private readonly musicalService = inject(MusicalService);
+  private sub?: Subscription;
 
   musicals = signal<Musical[]>([]);
   isLoading = signal<boolean>(true);
@@ -30,12 +32,28 @@ export class MusicalListComponent implements OnInit {
   searchKeyword = signal<string>('');
   selectedGenre = signal<string>('all');
   selectedStatus = signal<string>('all');
-  selectedSort = signal<string>('newest');
 
-  readonly genres = ['Tất cả', 'Thiếu nhi', 'Gia đình', 'Lịch sử', 'Dân gian', 'Tâm lý', 'Chính luận', 'Cổ tích', 'Bi hài kịch'];
+  readonly genres = [
+    { value: 'all', label: 'Tất cả thể loại' },
+    { value: 'Thiếu nhi', label: 'Thiếu nhi' },
+    { value: 'Gia đình', label: 'Gia đình' },
+    { value: 'Lịch sử', label: 'Lịch sử' },
+    { value: 'Dân gian', label: 'Dân gian' },
+    { value: 'Tâm lý', label: 'Tâm lý' },
+    { value: 'Chính luận', label: 'Chính luận' },
+    { value: 'Cổ tích', label: 'Cổ tích' },
+    { value: 'Bi hài kịch', label: 'Bi hài kịch' }
+  ];
 
   ngOnInit(): void {
     this.fetchMusicals();
+    this.sub = this.musicalService.musicalsChanged$.subscribe(() => {
+      this.fetchMusicals();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
   }
 
   getMinPrice(musical: Musical): number {
@@ -52,9 +70,8 @@ export class MusicalListComponent implements OnInit {
     this.isLoading.set(true);
     this.musicalService.getMusicals({
       search: this.searchKeyword(),
-      genre: this.selectedGenre() === 'Tất cả' ? 'all' : this.selectedGenre(),
-      status: this.selectedStatus(),
-      sort: this.selectedSort()
+      genre: this.selectedGenre(),
+      status: this.selectedStatus()
     }).subscribe({
       next: (data) => {
         this.musicals.set(data || []);
@@ -69,7 +86,7 @@ export class MusicalListComponent implements OnInit {
   }
 
   setGenre(g: string): void {
-    this.selectedGenre.set(g);
+    this.selectedGenre.set(g === 'Tất cả' ? 'all' : g);
     this.fetchMusicals();
   }
 
@@ -78,16 +95,10 @@ export class MusicalListComponent implements OnInit {
     this.fetchMusicals();
   }
 
-  setSort(sortType: string): void {
-    this.selectedSort.set(sortType);
-    this.fetchMusicals();
-  }
-
   resetFilters(): void {
     this.searchKeyword.set('');
     this.selectedGenre.set('all');
     this.selectedStatus.set('all');
-    this.selectedSort.set('newest');
     this.fetchMusicals();
   }
 }

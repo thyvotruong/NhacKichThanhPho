@@ -27,31 +27,6 @@
   border-radius: 14px;
 }
 
-.genre-filter-btn {
-  background: rgba(255, 255, 255, 0.05);
-  color: #94A3B8;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.28rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: all 0.25s ease;
-}
-
-.genre-filter-btn:hover {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--showman-gold);
-  border-color: var(--showman-gold);
-}
-
-.genre-filter-btn.active {
-  background: linear-gradient(135deg, var(--showman-gold) 0%, #D97706 100%);
-  color: #FFFFFF !important; /* Đổi màu chữ thành trắng sáng, không bị chìm */
-  border-color: var(--showman-gold);
-  font-weight: 700;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
-}
-
 .musical-catalog-card {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   background: rgba(14, 22, 41, 0.7);

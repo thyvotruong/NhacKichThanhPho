@@ -19,6 +19,14 @@ const UserSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    username: {
+      type: String,
+      trim: true
+    },
+    department: {
+      type: String,
+      trim: true
+    },
     email: {
       type: String,
       required: true,

@@ -2,9 +2,7 @@
  * ============================================================
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL SPA) - ANGULAR FRONTEND
  * File: components/about/about.component.ts
- * Chức năng: Phân hệ Giới Thiệu "Về chúng tôi" (/about)
- * - Lịch sử hình thành nhà hát, Sứ mệnh, Tầm nhìn, Giá trị cốt lõi
- * - 4 Khung ảnh đại diện (Avatar cards) cho 4 nhân sự chủ chốt
+ * Chức năng: Giới thiệu dự án, sứ mệnh, tầm nhìn và đội ngũ phát triển
  * ============================================================
  */
 
@@ -14,8 +12,10 @@ import { RouterLink } from '@angular/router';
 
 export interface KeyLeader {
   name: string;
+  initials: string;
+  image: string;
+  imageFailed: boolean;
   role: string;
-  avatarUrl: string;
   bio: string;
   experience: string;
 }
@@ -28,59 +28,61 @@ export interface KeyLeader {
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent {
-  // 4 Nhân sự chủ chốt của Nhà Hát Nhạc Kịch Thành Phố
   readonly keyLeaders: KeyLeader[] = [
     {
-      name: 'NSƯT Trần Minh Đức',
-      role: 'Giám Đốc Nghệ Thuật & Tổng Đạo Diễn',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-      bio: 'Hơn 25 năm cống hiến cho sân khấu kịch nói và nhạc kịch hàn lâm, người định hình ngôn ngữ biểu diễn tráng lệ và dẫn dắt các vở diễn khai màn mùa diễn.',
-      experience: '25+ năm kinh nghiệm • Đạo diễn của năm 2024'
+      name: 'Trương Võ Trường Thy',
+      initials: 'TT',
+      image: '/images/about/truong-thy.jpg',
+      imageFailed: false,
+      role: 'TRƯỞNG NHÓM & QUẢN LÝ DỰ ÁN (PROJECT LEAD)',
+      bio: 'Định hướng sản phẩm, điều phối tiến độ và kiểm thử chất lượng để hệ thống vận hành ổn định, đồng bộ.',
+      experience: 'Quản lý dự án & Điều phối hệ thống'
     },
     {
-      name: 'Nhạc sĩ Lê Quang Vũ',
-      role: 'Giám Đốc Âm Nhạc & Nhạc Trưởng',
-      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-      bio: 'Tốt nghiệp Nhạc viện Tchaikovsky, chỉ huy dàn nhạc giao hưởng trực tiếp với 45 nghệ sĩ biểu diễn live 100% trong từng đêm diễn.',
-      experience: 'Chỉ huy trưởng Dàn nhạc Giao hưởng Sân khấu'
+      name: 'Đinh Thùy Như',
+      initials: 'ĐN',
+      image: '/images/about/thuy-nhu.jpg',
+      imageFailed: false,
+      role: 'THIẾT KẾ GIAO DIỆN & TRẢI NGHIỆM (UI/UX DESIGNER)',
+      bio: 'Xây dựng ngôn ngữ thiết kế sân khấu hiện đại, tối ưu tương tác và sơ đồ chọn ghế trực quan.',
+      experience: 'Thiết kế UI/UX & thương hiệu'
     },
     {
-      name: 'Biên đạo Hoàng Yến Chi',
-      role: 'Giám Đốc Sáng Tạo & Biên Đạo Múa',
-      avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
-      bio: 'Tu nghiệp chuyên sâu tại Broadway Dance Center (New York), người kiến tạo những đại cảnh vũ đạo bùng nổ, giàu nhịp điệu và cảm xúc thăng hoa.',
-      experience: 'Biên đạo trưởng 12 vở nhạc kịch kinh điển'
+      name: 'Nguyễn La Thanh Thảo',
+      initials: 'NT',
+      image: '/images/about/thanh-thao.jpg',
+      imageFailed: false,
+      role: 'PHÁT TRIỂN GIAO DIỆN & TƯƠNG TÁC (FRONTEND DEVELOPER)',
+      bio: 'Phát triển giao diện và tương tác mượt mà, tối ưu trải nghiệm trên nhiều thiết bị.',
+      experience: 'Phát triển giao diện & Trải nghiệm web'
     },
     {
-      name: 'ThS. Nguyễn Quốc Thái',
-      role: 'Giám Đốc Điều Hành & Trải Nghiệm Khán Giả',
-      avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
-      bio: 'Chuyên gia quản trị nghệ thuật biểu diễn, tiên phong số hóa hệ thống vé điện tử QR Code không chạm và chuẩn hóa dịch vụ tiếp đón hoàng gia.',
-      experience: 'Thạc sĩ Quản trị Nghệ thuật Sân khấu'
+      name: 'Bùi Ngọc Minh Vy',
+      initials: 'MV',
+      image: '/images/about/minh-vy.png',
+      imageFailed: false,
+      role: 'PHÁT TRIỂN HỆ THỐNG & DỮ LIỆU (BACKEND & CONTENT DEVELOPER)',
+      bio: 'Xây dựng cơ sở dữ liệu, logic đặt vé thời gian thực và biên tập nội dung chính xác, giàu cảm xúc.',
+      experience: 'Hệ thống dữ liệu & Quản trị nội dung'
     }
   ];
 
-  // Các giá trị cốt lõi
   readonly coreValues = [
     {
-      icon: 'bi-gem',
-      title: 'Đẳng Cấp Nghệ Thuật',
-      desc: 'Mỗi tác phẩm là sự kết tinh hoàn mỹ giữa âm thanh giao hưởng trực tiếp, vũ đạo chuẩn mực và công nghệ sân khấu hiện đại.'
+      title: 'Trải Nghiệm Mượt Mà',
+      desc: 'Theo dõi sơ đồ rạp và hoàn tất đặt vé trên mọi thiết bị chỉ trong vài bước.'
     },
     {
-      icon: 'bi-fire',
-      title: 'Đam Mê Sáng Tạo',
-      desc: 'Không ngừng thử nghiệm và làm mới các tác phẩm kinh điển thế giới cùng những câu chuyện đậm đà bản sắc văn hóa Việt Nam.'
+      title: 'Đổi Mới & Sáng Tạo',
+      desc: 'Ứng dụng tư duy thiết kế và công nghệ web hiện đại để làm mới cách tiếp cận sân khấu.'
     },
     {
-      icon: 'bi-heart-fill',
       title: 'Khán Giả Là Trung Tâm',
-      desc: 'Tạo dựng không gian thưởng thức văn minh, dịch vụ tiếp đón hoàng gia và trải nghiệm nghệ thuật trọn vẹn cho từng vị khách.'
+      desc: 'Phát triển tính năng theo nhu cầu thực tế, ưu tiên sự thuận tiện và hài lòng của khán giả.'
     },
     {
-      icon: 'bi-shield-check',
-      title: 'Chính Trực & Bản Quyền',
-      desc: 'Tôn trọng bản quyền tác giả quốc tế, gìn giữ đạo đức nghề nghiệp và tính nguyên bản trong từng giai điệu, lời thoại.'
+      title: 'Minh Bạch & Tin Cậy',
+      desc: 'Cung cấp lịch diễn, giá vé chính xác và bảo mật dữ liệu giao dịch.'
     }
   ];
 }

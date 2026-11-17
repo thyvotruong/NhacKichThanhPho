@@ -13,14 +13,16 @@
         <div class="card-showman-glass p-4 p-md-5 rounded-4 border border-gold-glow shadow-2xl">
           <!-- Header Emblem -->
           <div class="text-center mb-4">
-            
-            
-            <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-3 lh-base">
+            <h2 class="text-gold-gradient display-2 fw-bold mt-2 mb-2 lh-base">
               NHẠC KỊCH THÀNH PHỐ
             </h2>
-            <p class="text-white text-secondary mb-0">
-              Hệ thống xác thực dành cho nhân viên nội bộ
+            <p class="text-white text-secondary mb-3 small text-uppercase tracking-wider">
+              CỔNG ĐĂNG NHẬP & XÁC THỰC NHÂN SỰ NỘI BỘ
             </p>
+            <div class=" text-white alert alert-warning bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded-3 py-2 px-3 small text-gold mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              Nếu  là khách hàng, vui lòng quay lại trang chủ để tiếp tục trải nghiệm dịch vụ.
+            </div>
           </div>
 
           <!-- Thông báo lỗi hoặc cảnh báo quyền hạn từ Route Guard -->
@@ -105,46 +107,10 @@
             </div>
           </form>
 
-          <!-- Bộ Chọn Nhanh Thử Nghiệm Phân Quyền (Testing Quick Fill) -->
-          <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 text-center">
-            <span class="text-secondary small fw-bold d-block mb-2">
-              <i class="bi bi-code-square text-gold me-1"></i> TÀI KHOẢN MẪU KIỂM THỬ PHÂN QUYỀN RBAC:
-            </span>
-            <div class="d-flex flex-wrap gap-2 justify-content-center">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-warning py-1 px-2 small"
-                (click)="fillQuickCredential('admin')"
-                title="Quản trị viên tối cao: Toàn quyền"
-              >
-                <i class="bi bi-shield-fill text-gold me-1"></i> Admin
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-info py-1 px-2 small"
-                (click)="fillQuickCredential('editor')"
-                title="Biên tập viên: Quản lý Vở kịch & Nghệ sĩ"
-              >
-                <i class="bi bi-pencil-fill text-info me-1"></i> Biên Tập Viên
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-success py-1 px-2 small"
-                (click)="fillQuickCredential('staff')"
-                title="Nhân viên soát vé: Cổng soát vé"
-              >
-                <i class="bi bi-upc-scan text-success me-1"></i> Soát Vé (Staff)
-              </button>
-            </div>
-            <div class="text-secondary mt-2" style="font-size: 0.75rem;">
-              Mật khẩu mặc định: <strong class="text-gold">123456</strong>
-            </div>
-          </div>
-
           <!-- Quay về trang Client -->
           <div class="text-center mt-4">
-            <a routerLink="/" class="text-secondary text-decoration-none hover-gold transition-all">
-              <i class="bi bi-arrow-left me-1"></i> Quay về Trang Khách hàng
+            <a routerLink="/" class="text-white text-decoration-none hover-gold transition-all">
+              <i class="bi bi-arrow-left me-1"></i> Quay về Trang chủ
             </a>
           </div>
         </div>

@@ -7,9 +7,10 @@
  * ============================================================
  */
 
-import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MusicalService } from '../../services/musical.service';
 import { Musical, Schedule, Artist } from '../../models/musical.model';
 
@@ -22,8 +23,9 @@ type FeaturedMusical = Musical & { isDemo?: boolean };
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   private readonly musicalService = inject(MusicalService);
+  private subscriptions: Subscription[] = [];
 
   @ViewChild('featuredMusicalsTrack')
   private featuredMusicalsTrack?: ElementRef<HTMLDivElement>;
@@ -43,6 +45,14 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadData();
     this.startHeroSlider();
+    this.subscriptions.push(
+      this.musicalService.musicalsChanged$.subscribe(() => this.loadData()),
+      this.musicalService.artistsChanged$.subscribe(() => this.loadData())
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   getMinPrice(musical: Musical): number {

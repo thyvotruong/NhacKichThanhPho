@@ -11,7 +11,7 @@
 
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, map, of, throwError } from 'rxjs';
+import { Observable, Subject, catchError, map, of, tap, throwError } from 'rxjs';
 import {
   Musical,
   Schedule,
@@ -43,6 +43,10 @@ export class MusicalService {
   private readonly customerSessionKey = 'nhackich_customer_user';
   private readonly staffSessionKey = 'nhackich_staff_user';
   private readonly legacySessionKey = 'nhackich_user';
+
+  // Subjects đồng bộ trạng thái thời gian thực giữa Admin Portal & Customer Portal
+  readonly musicalsChanged$ = new Subject<void>();
+  readonly artistsChanged$ = new Subject<void>();
 
   // Trạng thái xác thực đăng nhập khách hàng (BPMN 2.2.2)
   isLoggedIn = signal<boolean>(false);
@@ -409,7 +413,7 @@ export class MusicalService {
       fullName: 'Trần Minh Đức',
       email: 'admin@nhackichthanhpho.vn',
       username: 'admin',
-      password: '123456',
+      password: 'Admin@gr06',
       phone: '0901888999',
       role: 'admin',
       department: 'Ban Giám Đốc Điều Hành',
@@ -422,7 +426,7 @@ export class MusicalService {
       fullName: 'Lê Thảo My',
       email: 'editor@nhackichthanhpho.vn',
       username: 'editor',
-      password: '123456',
+      password: 'Editor@gr06',
       phone: '0902777888',
       role: 'editor',
       department: 'Ban Biên Tập Sân Khấu & Truyền Thông',
@@ -435,7 +439,7 @@ export class MusicalService {
       fullName: 'Phạm Hùng Cường',
       email: 'staff@nhackichthanhpho.vn',
       username: 'staff',
-      password: '123456',
+      password: 'Staff@gr06',
       phone: '0904555666',
       role: 'staff',
       department: 'Tổ Trực Soát Vé Cửa Rạp',
@@ -1110,45 +1114,25 @@ export class MusicalService {
   createMusical(musical: Partial<Musical>): Observable<Musical> {
     return this.http.post<ApiResponse<Musical>>(`${this.apiUrl}/admin/musicals`, musical).pipe(
       map(res => res.data),
-      catchError(() => {
-        const newMusical: Musical = {
-          _id: 'm_' + Date.now(),
-          title: musical.title || 'Vở Nhạc Kịch Mới',
-          slug: musical.slug || ('musical-' + Date.now()),
-          subtitle: musical.subtitle || '',
-          genre: musical.genre || 'Broadway',
-          posterUrl: musical.posterUrl || 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=800&q=80',
-          bannerUrl: musical.bannerUrl || 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?auto=format&fit=crop&w=1600&q=80',
-          trailerUrl: musical.trailerUrl || '',
-          duration: musical.duration || 120,
-          ageLimit: musical.ageLimit || '13+',
-          director: musical.director || 'NSƯT Trần Minh Đức',
-          cast: musical.cast || ['NSƯT Kim Tử Long', 'Nghệ sĩ Thanh Ngân'],
-          synopsis: musical.synopsis || 'Nội dung tóm tắt của vở kịch đặc sắc...',
-          ticketPrices: musical.ticketPrices || [
-            { tier: 'VIP', name: 'Ghế VIP', price: 800000 },
-            { tier: 'Standard', name: 'Ghế Thường', price: 450000 },
-            { tier: 'Couple', name: 'Ghế Đôi', price: 1200000 }
-          ],
-          featured: !!musical.featured,
-          status: musical.status || 'now_showing'
-        };
-        return of(newMusical);
-      })
+      tap(() => this.musicalsChanged$.next())
     );
   }
 
   updateMusical(slug: string, musical: Partial<Musical>): Observable<Musical> {
-    return this.http.put<ApiResponse<Musical>>(`${this.apiUrl}/admin/musicals/${slug}`, musical).pipe(
+    return this.http.put<ApiResponse<Musical>>(`${this.apiUrl}/admin/musicals/${encodeURIComponent(slug)}`, musical).pipe(
       map(res => res.data),
-      catchError(() => of({ ...musical, slug } as Musical))
+      tap(() => this.musicalsChanged$.next())
     );
   }
 
   toggleMusicalStatus(slug: string): Observable<any> {
     return this.http.patch<ApiResponse<any>>(`${this.apiUrl}/admin/musicals/${slug}/toggle`, {}).pipe(
       map(res => res.data),
-      catchError(() => of({ slug, status: 'toggled' }))
+      tap(() => this.musicalsChanged$.next()),
+      catchError(() => {
+        this.musicalsChanged$.next();
+        return of({ slug, status: 'toggled' });
+      })
     );
   }
 
@@ -1188,8 +1172,8 @@ export class MusicalService {
           return throwError(() => new Error('Tài khoản nhân sự của bạn đã bị khóa. Vui lòng liên hệ Admin!'));
         }
 
-        const validPass = found.password || '123456';
-        if (password !== validPass && password !== '123456') {
+        const validPass = found.password;
+        if (password !== validPass) {
           return throwError(() => new Error('Mật khẩu bảo mật không chính xác.'));
         }
 
@@ -1225,40 +1209,36 @@ export class MusicalService {
   deleteMusical(slug: string): Observable<boolean> {
     return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/admin/musicals/${slug}`).pipe(
       map(res => res.success),
-      catchError(() => of(true))
+      tap(() => this.musicalsChanged$.next()),
+      catchError(() => {
+        this.musicalsChanged$.next();
+        return of(true);
+      })
     );
   }
 
   createArtist(artist: Partial<Artist>): Observable<Artist> {
     return this.http.post<ApiResponse<Artist>>(`${this.apiUrl}/admin/artists`, artist).pipe(
       map(res => res.data),
-      catchError(() => {
-        const newArt: Artist = {
-          _id: 'art_' + Date.now(),
-          name: artist.name || 'Nghệ Sĩ Mới',
-          role: artist.role || 'Diễn Viên Chính',
-          title: artist.title || 'Nghệ Sĩ Ưu Tú',
-          avatar: artist.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
-          bio: artist.bio || 'Tiểu sử cống hiến cho sân khấu kịch nghệ thuật...',
-          featuredMusicals: artist.featuredMusicals || ['Bông Bóng Bay - Giấc Mơ Tuổi Thơ'],
-          status: 'active'
-        };
-        return of(newArt);
-      })
+      tap(() => this.artistsChanged$.next())
     );
   }
 
   updateArtist(nameOrId: string, artist: Partial<Artist>): Observable<Artist> {
     return this.http.put<ApiResponse<Artist>>(`${this.apiUrl}/admin/artists/${encodeURIComponent(nameOrId)}`, artist).pipe(
       map(res => res.data),
-      catchError(() => of({ ...artist, name: artist.name || nameOrId } as Artist))
+      tap(() => this.artistsChanged$.next())
     );
   }
 
   deleteArtist(nameOrId: string): Observable<boolean> {
     return this.http.delete<ApiResponse<any>>(`${this.apiUrl}/admin/artists/${encodeURIComponent(nameOrId)}`).pipe(
       map(res => res.success),
-      catchError(() => of(true))
+      tap(() => this.artistsChanged$.next()),
+      catchError(() => {
+        this.artistsChanged$.next();
+        return of(true);
+      })
     );
   }
 

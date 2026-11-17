@@ -384,7 +384,7 @@
                       <img [src]="m.posterUrl" [alt]="m.title" class="table-poster-thumb" />
                     </td>
                     <td>
-                      <div class="fw-bold text-white fs-6">{{ m.title }}</div>
+                      <div class="admin-record-title fw-bold text-white fs-6">{{ m.title }}</div>
                       <div class="text-secondary small">{{ m.slug }}</div>
                       @if (m.featured) {
                         <span class="badge bg-warning text-dark small fw-bold mt-0.5">★ Tiêu biểu</span>
@@ -480,10 +480,9 @@
                   <div class="position-relative mx-auto mb-2">
                     <img [src]="a.avatar" [alt]="a.name" class="artist-avatar-thumb" />
                   </div>
-                  <h6 class="text-white fw-bold mb-0.5">{{ a.name }}</h6>
-                  <div class="text-gold small fw-bold mb-0.5">{{ a.title }}</div>
+                  <h6 class="admin-record-title text-white fw-bold mb-0.5">{{ a.name }}</h6>
                   <div class="text-secondary small mb-2">{{ a.role }}</div>
-                  <p class="text-secondary small line-clamp-2 flex-grow-1 mb-2" style="font-size: 0.78rem;">
+                  <p class="text-secondary small line-clamp-2 flex-grow-1 mb-2">
                     {{ a.bio }}
                   </p>
                   <div class="d-flex justify-content-center gap-2 pt-2 border-top border-secondary border-opacity-25">
@@ -521,15 +520,15 @@
               <div class="d-flex flex-column gap-3">
                 @for (aud of auditoriums(); track aud.code) {
                   <div
-                    class="p-3 rounded-3 border cursor-pointer transition-all"
+                    class="auditorium-list-card p-3 rounded-3 border cursor-pointer transition-all"
                     [class.border-warning]="selectedAuditorium()?.code === aud.code"
-                    [class.bg-gold-subtle]="selectedAuditorium()?.code === aud.code"
+                    [class.auditorium-selected]="selectedAuditorium()?.code === aud.code"
                     [class.border-secondary]="selectedAuditorium()?.code !== aud.code"
                     [class.border-opacity-25]="selectedAuditorium()?.code !== aud.code"
                     (click)="selectedAuditorium.set(aud)"
                   >
                     <div class="d-flex justify-content-between align-items-start mb-1">
-                      <span class="text-white fw-bold fs-6">{{ aud.name }}</span>
+                      <span class="admin-record-title text-white fw-bold">{{ aud.name }}</span>
                       <span class="badge" [class.bg-success]="aud.status === 'active'" [class.bg-warning]="aud.status !== 'active'">
                         {{ aud.status === 'active' ? 'Hoạt động' : 'Bảo dưỡng' }}
                       </span>
@@ -1194,7 +1193,7 @@
                         <img [src]="u.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'" class="rounded-circle border border-gold" style="width: 32px; height: 32px;" />
                         <div>
                           <div class="fw-bold text-white small">{{ cleanStaffName(u.fullName) }}</div>
-                          <div class="text-secondary" style="font-size: 0.72rem;">{{ u.phone }}</div>
+                          <div class="text-secondary x-small">{{ u.phone }}</div>
                         </div>
                       </div>
                     </td>
@@ -1296,14 +1295,146 @@
               <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="cast" />
             </div>
 
+            <!-- Cụm điều khiển 2 trong 1: Ảnh Poster -->
             <div class="col-12">
-              <label class="form-label text-secondary small fw-bold">Link Ảnh Poster (URL):</label>
-              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="posterUrl" />
+              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                <label class="form-label text-gold small fw-bold mb-0">
+                  <i class="bi bi-image-fill me-1"></i> LINK ẢNH POSTER VỞ KỊCH: <span class="text-danger">*</span>
+                </label>
+                <div class="d-flex gap-2">
+                  <label class="btn btn-sm btn-outline-warning py-0.5 px-2 small mb-0 cursor-pointer" title="Chọn file ảnh từ máy tính (PNG, JPG, WEBP)">
+                    <i class="bi bi-upload me-1"></i> Tải lên từ máy
+                    <input type="file" accept="image/*" class="d-none" (change)="onFileUpload($event, 'musical', 'posterUrl')" />
+                  </label>
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 small text-light" (click)="pasteClipboardToField('musical', 'posterUrl')" title="Dán link từ bộ nhớ tạm">
+                    <i class="bi bi-clipboard-plus me-1 text-gold"></i> Dán link
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-link-45deg"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="posterUrl"
+                  placeholder="Dán link URL https://... hoặc /images/musicals/... hoặc bấm Tải lên từ máy"
+                />
+                @if (musicalForm.get('posterUrl')?.value) {
+                  <button type="button" class="btn btn-outline-danger border-secondary border-opacity-25" (click)="clearImageField('musical', 'posterUrl')" title="Xóa ảnh">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                }
+              </div>
+
+              <!-- Xem trước ảnh Poster -->
+              @if (musicalForm.get('posterUrl')?.value) {
+                <div class="d-flex align-items-center gap-3 mt-2 p-2 rounded-3 bg-dark-glass border border-secondary border-opacity-25">
+                  <img
+                    [src]="musicalForm.get('posterUrl')?.value"
+                    alt="Poster preview"
+                    class="rounded border border-gold"
+                    style="width: 52px; height: 72px; object-fit: cover;"
+                    (error)="handleImageError($event)"
+                  />
+                  <div class="small flex-grow-1 overflow-hidden">
+                    <div class="text-gold fw-bold">Xem trước ảnh Poster:</div>
+                    <div class="text-secondary x-small text-truncate">
+                      {{ musicalForm.get('posterUrl')?.value?.startsWith('data:') ? 'Ảnh tải lên từ thiết bị (Base64)' : musicalForm.get('posterUrl')?.value }}
+                    </div>
+                  </div>
+                  <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 small flex-shrink-0">
+                    <i class="bi bi-check-circle me-1"></i> Đã nạp ảnh
+                  </span>
+                </div>
+              }
             </div>
 
+            <!-- Cụm điều khiển 2 trong 1: Ảnh Banner Ngang -->
             <div class="col-12">
-              <label class="form-label text-secondary small fw-bold">Link Trailer YouTube:</label>
-              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="trailerUrl" />
+              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                <label class="form-label text-gold small fw-bold mb-0">
+                  <i class="bi bi-card-image me-1"></i> LINK ẢNH BANNER NGANG (HERO / COVER):
+                </label>
+                <div class="d-flex gap-2">
+                  <label class="btn btn-sm btn-outline-warning py-0.5 px-2 small mb-0 cursor-pointer" title="Chọn file banner từ máy tính">
+                    <i class="bi bi-upload me-1"></i> Tải lên từ máy
+                    <input type="file" accept="image/*" class="d-none" (change)="onFileUpload($event, 'musical', 'bannerUrl')" />
+                  </label>
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 small text-light" (click)="pasteClipboardToField('musical', 'bannerUrl')" title="Dán link từ bộ nhớ tạm">
+                    <i class="bi bi-clipboard-plus me-1 text-gold"></i> Dán link
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-link-45deg"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="bannerUrl"
+                  placeholder="Dán link URL banner ngang hoặc bấm Tải lên từ máy"
+                />
+                @if (musicalForm.get('bannerUrl')?.value) {
+                  <button type="button" class="btn btn-outline-danger border-secondary border-opacity-25" (click)="clearImageField('musical', 'bannerUrl')" title="Xóa ảnh">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                }
+              </div>
+
+              <!-- Xem trước ảnh Banner -->
+              @if (musicalForm.get('bannerUrl')?.value) {
+                <div class="d-flex align-items-center gap-3 mt-2 p-2 rounded-3 bg-dark-glass border border-secondary border-opacity-25">
+                  <img
+                    [src]="musicalForm.get('bannerUrl')?.value"
+                    alt="Banner preview"
+                    class="rounded border border-gold"
+                    style="width: 120px; height: 50px; object-fit: cover;"
+                    (error)="handleImageError($event)"
+                  />
+                  <div class="small flex-grow-1 overflow-hidden">
+                    <div class="text-gold fw-bold">Xem trước ảnh Banner:</div>
+                    <div class="text-secondary x-small text-truncate">
+                      {{ musicalForm.get('bannerUrl')?.value?.startsWith('data:') ? 'Ảnh tải lên từ thiết bị (Base64)' : musicalForm.get('bannerUrl')?.value }}
+                    </div>
+                  </div>
+                  <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 small flex-shrink-0">
+                    <i class="bi bi-check-circle me-1"></i> Đã nạp ảnh
+                  </span>
+                </div>
+              }
+            </div>
+
+            <!-- Ô nhập: Link Trailer YouTube -->
+            <div class="col-12">
+              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                <label class="form-label text-gold small fw-bold mb-0">
+                  <i class="bi bi-youtube text-danger me-1"></i> LINK TRAILER YOUTUBE (URL):
+                </label>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 small text-light" (click)="pasteClipboardToField('musical', 'trailerUrl')" title="Dán link từ bộ nhớ tạm">
+                    <i class="bi bi-clipboard-plus me-1 text-gold"></i> Dán link
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-danger border-secondary border-opacity-25">
+                  <i class="bi bi-play-circle-fill"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="trailerUrl"
+                  placeholder="VD: https://www.youtube.com/watch?v=..."
+                />
+                @if (musicalForm.get('trailerUrl')?.value) {
+                  <button type="button" class="btn btn-outline-danger border-secondary border-opacity-25" (click)="clearImageField('musical', 'trailerUrl')" title="Xóa link">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                }
+              </div>
             </div>
 
             <div class="col-12">
@@ -1349,13 +1480,9 @@
 
         <form [formGroup]="artistForm" (ngSubmit)="saveArtist()">
           <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12">
               <label class="form-label text-secondary small fw-bold">Họ và tên nghệ sĩ:</label>
               <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="name" />
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-secondary small fw-bold">Danh hiệu:</label>
-              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="title" placeholder="VD: NSND / NSƯT" />
             </div>
 
             <div class="col-12">
@@ -1363,9 +1490,60 @@
               <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="role" placeholder="VD: Giám đốc Nghệ thuật & Tổng Đạo diễn" />
             </div>
 
+            <!-- Cụm điều khiển 2 trong 1: Ảnh đại diện Avatar Nghệ sĩ -->
             <div class="col-12">
-              <label class="form-label text-secondary small fw-bold">Link Ảnh đại diện Avatar (URL):</label>
-              <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="avatar" />
+              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                <label class="form-label text-gold small fw-bold mb-0">
+                  <i class="bi bi-person-bounding-box me-1"></i> ẢNH ĐẠI DIỆN NGHỆ SĨ (AVATAR): <span class="text-danger">*</span>
+                </label>
+                <div class="d-flex gap-2">
+                  <label class="btn btn-sm btn-outline-warning py-0.5 px-2 small mb-0 cursor-pointer" title="Chọn file ảnh từ máy tính (PNG, JPG, WEBP)">
+                    <i class="bi bi-upload me-1"></i> Tải lên từ máy
+                    <input type="file" accept="image/*" class="d-none" (change)="onFileUpload($event, 'artist', 'avatar')" />
+                  </label>
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 small text-light" (click)="pasteClipboardToField('artist', 'avatar')" title="Dán link từ bộ nhớ tạm">
+                    <i class="bi bi-clipboard-plus me-1 text-gold"></i> Dán link
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-link-45deg"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="avatar"
+                  placeholder="Dán link URL https://... hoặc bấm Tải lên từ máy"
+                />
+                @if (artistForm.get('avatar')?.value) {
+                  <button type="button" class="btn btn-outline-danger border-secondary border-opacity-25" (click)="clearImageField('artist', 'avatar')" title="Xóa ảnh">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                }
+              </div>
+
+              <!-- Xem trước Avatar Nghệ sĩ -->
+              @if (artistForm.get('avatar')?.value) {
+                <div class="d-flex align-items-center gap-3 mt-2 p-2 rounded-3 bg-dark-glass border border-secondary border-opacity-25">
+                  <img
+                    [src]="artistForm.get('avatar')?.value"
+                    alt="Artist avatar preview"
+                    class="rounded-circle border border-gold"
+                    style="width: 52px; height: 52px; object-fit: cover;"
+                    (error)="handleImageError($event)"
+                  />
+                  <div class="small flex-grow-1 overflow-hidden">
+                    <div class="text-gold fw-bold">Xem trước ảnh Đại diện:</div>
+                    <div class="text-secondary x-small text-truncate">
+                      {{ artistForm.get('avatar')?.value?.startsWith('data:') ? 'Ảnh tải lên từ thiết bị (Base64)' : artistForm.get('avatar')?.value }}
+                    </div>
+                  </div>
+                  <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 small flex-shrink-0">
+                    <i class="bi bi-check-circle me-1"></i> Đã nạp ảnh
+                  </span>
+                </div>
+              }
             </div>
 
             <div class="col-12">
@@ -1663,6 +1841,62 @@
             <div class="col-12">
               <label class="form-label text-secondary small fw-bold">Phòng ban phụ trách:</label>
               <input type="text" class="form-control bg-dark-glass text-white border-secondary border-opacity-25" formControlName="department" placeholder="VD: Tổ Trực Soát Vé Cửa Rạp / Ban Biên Tập Nghệ Thuật" />
+            </div>
+
+            <!-- Cụm điều khiển 2 trong 1: Ảnh đại diện Nhân viên RBAC -->
+            <div class="col-12">
+              <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
+                <label class="form-label text-gold small fw-bold mb-0">
+                  <i class="bi bi-person-circle me-1"></i> ẢNH ĐẠI DIỆN NHÂN SỰ (AVATAR):
+                </label>
+                <div class="d-flex gap-2">
+                  <label class="btn btn-sm btn-outline-warning py-0.5 px-2 small mb-0 cursor-pointer" title="Chọn file ảnh từ máy tính">
+                    <i class="bi bi-upload me-1"></i> Tải lên từ máy
+                    <input type="file" accept="image/*" class="d-none" (change)="onFileUpload($event, 'staff', 'avatar')" />
+                  </label>
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-0.5 px-2 small text-light" (click)="pasteClipboardToField('staff', 'avatar')" title="Dán link từ bộ nhớ tạm">
+                    <i class="bi bi-clipboard-plus me-1 text-gold"></i> Dán link
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                  <i class="bi bi-link-45deg"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  formControlName="avatar"
+                  placeholder="Dán link URL hoặc bấm Tải lên từ máy"
+                />
+                @if (staffForm.get('avatar')?.value) {
+                  <button type="button" class="btn btn-outline-danger border-secondary border-opacity-25" (click)="clearImageField('staff', 'avatar')" title="Xóa ảnh">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                }
+              </div>
+
+              <!-- Xem trước Avatar Nhân sự -->
+              @if (staffForm.get('avatar')?.value) {
+                <div class="d-flex align-items-center gap-3 mt-2 p-2 rounded-3 bg-dark-glass border border-secondary border-opacity-25">
+                  <img
+                    [src]="staffForm.get('avatar')?.value"
+                    alt="Staff avatar preview"
+                    class="rounded-circle border border-gold"
+                    style="width: 44px; height: 44px; object-fit: cover;"
+                    (error)="handleImageError($event)"
+                  />
+                  <div class="small flex-grow-1 overflow-hidden">
+                    <div class="text-gold fw-bold">Xem trước ảnh đại diện nhân sự:</div>
+                    <div class="text-secondary x-small text-truncate">
+                      {{ staffForm.get('avatar')?.value?.startsWith('data:') ? 'Ảnh tải lên từ thiết bị (Base64)' : staffForm.get('avatar')?.value }}
+                    </div>
+                  </div>
+                  <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 small flex-shrink-0">
+                    <i class="bi bi-check-circle me-1"></i> Đã nạp ảnh
+                  </span>
+                </div>
+              }
             </div>
           </div>
 

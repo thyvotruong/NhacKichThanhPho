@@ -235,7 +235,6 @@ export class AdminComponent implements OnInit {
     this.artistForm = this.fb.group({
       name: ['', Validators.required],
       role: ['', Validators.required],
-      title: ['', Validators.required],
       avatar: ['', Validators.required],
       bio: ['', Validators.required],
       featuredMusicals: [''],
@@ -491,11 +490,17 @@ export class AdminComponent implements OnInit {
     };
 
     if (this.isEditingMusical() && this.selectedMusical()) {
-      this.musicalService.updateMusical(this.selectedMusical()!.slug, payload).subscribe({
+      const oldSlug = this.selectedMusical()!.slug;
+      const oldId = this.selectedMusical()!._id;
+      this.musicalService.updateMusical(oldSlug, payload).subscribe({
         next: (updated) => {
-          this.musicals.update(list => list.map(m => m.slug === updated.slug ? { ...m, ...updated } : m));
+          this.musicals.update(list => list.map(m => (m.slug === oldSlug || (oldId && m._id === oldId) || m.slug === updated.slug) ? { ...m, ...updated } : m));
           this.showMusicalModal.set(false);
           this.showToast(`Đã cập nhật thành công vở kịch "${val.title}"!`);
+          this.loadMusicals();
+        },
+        error: (err) => {
+          this.showToast('Lỗi khi cập nhật vở kịch: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
         }
       });
     } else {
@@ -504,6 +509,10 @@ export class AdminComponent implements OnInit {
           this.musicals.update(list => [created, ...list]);
           this.showMusicalModal.set(false);
           this.showToast(`Đã thêm thành công vở kịch mới: "${created.title}"!`);
+          this.loadMusicals();
+        },
+        error: (err) => {
+          this.showToast('Lỗi khi thêm vở kịch mới: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
         }
       });
     }
@@ -526,6 +535,10 @@ export class AdminComponent implements OnInit {
       next: () => {
         musical.status = nextStatus;
         this.showToast(`Đã đổi trạng thái vở kịch "${musical.title}" sang: ${label}`);
+        this.loadMusicals();
+      },
+      error: (err) => {
+        this.showToast('Lỗi khi đổi trạng thái: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
       }
     });
   }
@@ -536,8 +549,96 @@ export class AdminComponent implements OnInit {
         next: () => {
           this.musicals.update(list => list.filter(m => m.slug !== musical.slug));
           this.showToast(`Đã xóa vở kịch "${musical.title}"`);
+          this.loadMusicals();
+        },
+        error: (err) => {
+          this.showToast('Lỗi khi xóa vở kịch: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
         }
       });
+    }
+  }
+
+  // --- TIỆN ÍCH QUẢN LÝ ẢNH & CLIPBOARD (2 TRONG 1: DÁN URL HOẶC UPLOAD TỪ THIẾT BỊ) ---
+  onFileUpload(event: Event, formType: 'musical' | 'artist' | 'staff', fieldName: string): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      this.showToast('Vui lòng chọn định dạng file hình ảnh (JPG, PNG, WEBP, v.v.)', 'danger');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.showToast('Dung lượng ảnh vượt quá 5MB. Vui lòng chọn ảnh nhẹ hơn để tối ưu tốc độ.', 'danger');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Url = reader.result as string;
+      if (formType === 'musical') {
+        this.musicalForm.patchValue({ [fieldName]: base64Url });
+        this.musicalForm.get(fieldName)?.markAsDirty();
+      } else if (formType === 'artist') {
+        this.artistForm.patchValue({ [fieldName]: base64Url });
+        this.artistForm.get(fieldName)?.markAsDirty();
+      } else if (formType === 'staff') {
+        this.staffForm.patchValue({ [fieldName]: base64Url });
+        this.staffForm.get(fieldName)?.markAsDirty();
+      }
+      this.showToast(`Đã tải lên ảnh "${file.name}" thành công!`);
+      input.value = '';
+    };
+    reader.onerror = () => {
+      this.showToast('Đã xảy ra lỗi khi đọc file hình ảnh từ thiết bị', 'danger');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async pasteClipboardToField(formType: 'musical' | 'artist' | 'staff', fieldName: string): Promise<void> {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text && text.trim()) {
+          const cleanText = text.trim();
+          if (formType === 'musical') {
+            this.musicalForm.patchValue({ [fieldName]: cleanText });
+            this.musicalForm.get(fieldName)?.markAsDirty();
+          } else if (formType === 'artist') {
+            this.artistForm.patchValue({ [fieldName]: cleanText });
+            this.artistForm.get(fieldName)?.markAsDirty();
+          } else if (formType === 'staff') {
+            this.staffForm.patchValue({ [fieldName]: cleanText });
+            this.staffForm.get(fieldName)?.markAsDirty();
+          }
+          this.showToast('Đã dán liên kết từ bộ nhớ tạm (Clipboard)!');
+          return;
+        }
+      }
+      this.showToast('Bộ nhớ tạm đang trống hoặc chưa cấp quyền. Vui lòng nhấn Ctrl+V hoặc nhấp chuột phải chọn "Dán".', 'info');
+    } catch {
+      this.showToast('Vui lòng nhấn phím Ctrl+V hoặc nhấp chuột phải chọn "Dán" vào ô nhập.', 'info');
+    }
+  }
+
+  clearImageField(formType: 'musical' | 'artist' | 'staff', fieldName: string): void {
+    if (formType === 'musical') {
+      this.musicalForm.patchValue({ [fieldName]: '' });
+      this.musicalForm.get(fieldName)?.markAsDirty();
+    } else if (formType === 'artist') {
+      this.artistForm.patchValue({ [fieldName]: '' });
+      this.artistForm.get(fieldName)?.markAsDirty();
+    } else if (formType === 'staff') {
+      this.staffForm.patchValue({ [fieldName]: '' });
+      this.staffForm.get(fieldName)?.markAsDirty();
+    }
+  }
+
+  handleImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=400&q=80';
     }
   }
 
@@ -552,7 +653,7 @@ export class AdminComponent implements OnInit {
     let list = this.artists();
     const q = this.artistSearch().toLowerCase().trim();
     if (q) {
-      list = list.filter(a => a.name.toLowerCase().includes(q) || a.role.toLowerCase().includes(q) || a.title.toLowerCase().includes(q));
+      list = list.filter(a => a.name.toLowerCase().includes(q) || a.role.toLowerCase().includes(q));
     }
     return list;
   }
@@ -563,7 +664,6 @@ export class AdminComponent implements OnInit {
     this.artistForm.reset({
       name: '',
       role: 'Diễn Viên Chính',
-      title: 'Nghệ Sĩ Ưu Tú',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
       bio: 'Nhiều năm cống hiến cho sân khấu kịch hàn lâm và đoạt nhiều huy chương vàng sân khấu toàn quốc.',
       featuredMusicals: 'Bông Bóng Bay - Giấc Mơ Tuổi Thơ',
@@ -578,7 +678,6 @@ export class AdminComponent implements OnInit {
     this.artistForm.patchValue({
       name: artist.name,
       role: artist.role,
-      title: artist.title,
       avatar: artist.avatar,
       bio: artist.bio,
       featuredMusicals: Array.isArray(artist.featuredMusicals) ? artist.featuredMusicals.join(', ') : '',
@@ -597,19 +696,26 @@ export class AdminComponent implements OnInit {
     const payload: Partial<Artist> = {
       name: val.name,
       role: val.role,
-      title: val.title,
       avatar: val.avatar,
       bio: val.bio,
       featuredMusicals: feats,
       status: val.status
     };
 
-    if (this.isEditingArtist() && this.selectedArtist()) {
-      this.musicalService.updateArtist(this.selectedArtist()!.name, payload).subscribe({
+    const targetArtist = this.selectedArtist();
+    if (this.isEditingArtist() && targetArtist) {
+      const oldName = targetArtist.name;
+      const oldId = targetArtist._id;
+      const identifier = oldId || oldName;
+      this.musicalService.updateArtist(identifier, payload).subscribe({
         next: (updated) => {
-          this.artists.update(list => list.map(a => a.name === updated.name ? { ...a, ...updated } : a));
+          this.artists.update(list => list.map(a => ((oldId && a._id === oldId) || a.name === oldName || a.name === updated.name) ? { ...a, ...updated } : a));
           this.showArtistModal.set(false);
           this.showToast(`Đã cập nhật hồ sơ nghệ sĩ: ${val.name}`);
+          this.loadArtists();
+        },
+        error: (err) => {
+          this.showToast('Lỗi khi cập nhật nghệ sĩ: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
         }
       });
     } else {
@@ -618,6 +724,10 @@ export class AdminComponent implements OnInit {
           this.artists.update(list => [created, ...list]);
           this.showArtistModal.set(false);
           this.showToast(`Đã thêm nghệ sĩ mới: ${created.name}`);
+          this.loadArtists();
+        },
+        error: (err) => {
+          this.showToast('Lỗi khi thêm nghệ sĩ: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
         }
       });
     }
@@ -625,10 +735,15 @@ export class AdminComponent implements OnInit {
 
   deleteArtist(artist: Artist): void {
     if (confirm(`Bạn có chắc muốn xóa nghệ sĩ "${artist.name}"?`)) {
-      this.musicalService.deleteArtist(artist.name).subscribe({
+      const identifier = artist._id || artist.name;
+      this.musicalService.deleteArtist(identifier).subscribe({
         next: () => {
-          this.artists.update(list => list.filter(a => a.name !== artist.name));
+          this.artists.update(list => list.filter(a => a.name !== artist.name && (!artist._id || a._id !== artist._id)));
           this.showToast(`Đã xóa nghệ sĩ ${artist.name}`);
+          this.loadArtists();
+        },
+        error: (err) => {
+          this.showToast('Lỗi khi xóa nghệ sĩ: ' + (err?.error?.message || err?.message || 'Vui lòng thử lại'), 'danger');
         }
       });
     }

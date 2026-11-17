@@ -19,7 +19,7 @@
     </div>
     <!-- Thanh Tìm Kiếm & Bộ Lọc Nâng Cao -->
     <div class="filter-panel-showman p-4 rounded-4 mb-5 border border-gold-glow">
-      <div class="row g-3 align-items-end mb-4">
+      <div class="row g-3 align-items-end">
         <!-- Ô tìm kiếm -->
         <div class="col-lg-5">
           <label class="form-label text-gold small fw-bold mb-1">
@@ -60,39 +60,21 @@
           </select>
         </div>
 
-        <!-- Sắp xếp -->
+        <!-- Lọc theo Thể loại -->
         <div class="col-md-4 col-lg-4">
           <label class="form-label text-gold small fw-bold mb-1">
-            <i class="bi bi-arrow-down-up me-1"></i> SẮP XẾP:
+            <i class="bi bi-tag-fill me-1"></i> THỂ LOẠI VỞ DIỄN:
           </label>
           <select
             class="form-select bg-dark-glass text-white border-secondary border-opacity-25 py-2"
-            [ngModel]="selectedSort()"
-            (ngModelChange)="setSort($event)"
+            [ngModel]="selectedGenre()"
+            (ngModelChange)="setGenre($event)"
           >
-            <option value="newest">Mới nhất</option>
-            <option value="price_asc">Giá vé tăng dần</option>
-            <option value="price_desc">Giá vé giảm dần</option>
-            <option value="duration">Thời lượng dài nhất</option>
+            @for (genre of genres; track genre.value) {
+              <option [value]="genre.value">{{ genre.label }}</option>
+            }
           </select>
         </div>
-      </div>
-
-      <!-- Lọc Thể Loại (Pill buttons) -->
-      <div class="d-flex align-items-center flex-wrap gap-2 pt-3 border-top border-secondary border-opacity-25">
-        <span class="text-gold fw-bold small me-2 text-uppercase">
-          <i class="bi bi-tag-fill me-1"></i> Thể Loại:
-        </span>
-        @for (genre of genres; track genre) {
-          <button
-            type="button"
-            class="btn btn-sm genre-filter-btn"
-            [class.active]="(selectedGenre() === 'all' && genre === 'Tất cả') || selectedGenre() === genre"
-            (click)="setGenre(genre)"
-          >
-            {{ genre }}
-          </button>
-        }
       </div>
     </div>
 

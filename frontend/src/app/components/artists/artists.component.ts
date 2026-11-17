@@ -7,9 +7,10 @@
  * ============================================================
  */
 
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MusicalService } from '../../services/musical.service';
 import { Artist } from '../../models/musical.model';
 
@@ -20,13 +21,25 @@ import { Artist } from '../../models/musical.model';
   templateUrl: './artists.component.html',
   styleUrls: ['./artists.component.css']
 })
-export class ArtistsComponent implements OnInit {
+export class ArtistsComponent implements OnInit, OnDestroy {
   private readonly musicalService = inject(MusicalService);
+  private sub?: Subscription;
 
   artists = signal<Artist[]>([]);
   isLoading = signal<boolean>(true);
 
   ngOnInit(): void {
+    this.loadArtists();
+    this.sub = this.musicalService.artistsChanged$.subscribe(() => {
+      this.loadArtists();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sub?.unsubscribe();
+  }
+
+  loadArtists(): void {
     this.musicalService.getArtists().subscribe({
       next: (data) => {
         if (data && data.length > 0) {

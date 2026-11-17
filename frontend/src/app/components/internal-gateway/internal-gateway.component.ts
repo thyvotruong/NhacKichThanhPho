@@ -26,9 +26,9 @@ export class InternalGatewayComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  // Form Fields
-  identifier = signal<string>('admin');
-  password = signal<string>('123456');
+  // Form Fields - Khởi tạo rỗng, không điền sẵn
+  identifier = signal<string>('');
+  password = signal<string>('');
   showPassword = signal<boolean>(false);
   isSubmitting = signal<boolean>(false);
 
@@ -61,12 +61,6 @@ export class InternalGatewayComponent implements OnInit {
 
   toggleShowPassword(): void {
     this.showPassword.update(v => !v);
-  }
-
-  fillQuickCredential(type: 'admin' | 'editor' | 'staff'): void {
-    this.identifier.set(type);
-    this.password.set('123456');
-    this.errorMessage.set(null);
   }
 
   onSubmit(): void {
