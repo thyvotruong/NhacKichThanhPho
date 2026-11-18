@@ -1234,19 +1234,27 @@
                     <th>Cổng Thanh Toán</th>
                     <th>Tiền Hệ Thống</th>
                     <th>Cổng Báo Nhận</th>
-                    <th>Phí Cổng</th>
                     <th>Trạng Thái Đối Soát</th>
                   </tr>
                 </thead>
                 <tbody>
-                  @for (rec of reconciliations(); track rec.transactionId) {
+                  @for (rec of filteredReconciliations(); track rec.transactionId) {
                     <tr>
                       <td class="font-monospace text-gold small">{{ rec.transactionId }}</td>
-                      <td class="text-white">{{ rec.bookingCode }}</td>
-                      <td><span class="badge bg-dark border border-secondary">{{ rec.gateway }}</span></td>
+                      <td class="text-white font-monospace">{{ rec.bookingCode }}</td>
+                      <td>
+                        <span class="badge px-2 py-1"
+                              [class.bg-warning]="rec.gateway === 'VIETQR'"
+                              [class.text-dark]="rec.gateway === 'VIETQR'"
+                              [class.bg-primary]="rec.gateway === 'VNPAY'"
+                              [class.bg-danger]="rec.gateway === 'MOMO'"
+                              [class.bg-info]="rec.gateway === 'ZALOPAY'"
+                              [class.text-dark]="rec.gateway === 'ZALOPAY'">
+                          {{ rec.gateway === 'VIETQR' ? 'VietQR' : (rec.gateway === 'VNPAY' ? 'VNPAY' : (rec.gateway === 'MOMO' ? 'MoMo' : 'ZaloPay')) }}
+                        </span>
+                      </td>
                       <td class="text-white fw-bold">{{ rec.systemAmount | number }} đ</td>
                       <td class="text-gold fw-bold">{{ rec.gatewayAmount | number }} đ</td>
-                      <td class="text-secondary small">{{ rec.fee | number }} đ</td>
                       <td>
                         <span class="badge" [class.bg-success]="rec.status === 'MATCHED'" [class.bg-danger]="rec.status !== 'MATCHED'">
                           {{ rec.status === 'MATCHED' ? 'Khớp 100%' : 'Sai lệch' }}

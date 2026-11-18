@@ -127,14 +127,15 @@ export class MusicalService {
   login(req: AuthLoginRequest): Observable<{ success: boolean; user: UserStaff; token: string; message: string; notFound?: boolean }> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, req).pipe(
       map(res => {
-        if (res.success && res.data?.user) {
-          if (res.data.user.role !== 'customer') {
+        const u = res.data?.user || res.user || (res.data && res.data.email ? res.data : null);
+        if (res.success && u) {
+          if (u.role && u.role !== 'customer') {
             throw new Error('Tài khoản này không thuộc phân hệ khách hàng.');
           }
-          this.currentUser.set(res.data.user);
+          this.currentUser.set(u);
           this.isLoggedIn.set(true);
           if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem(this.customerSessionKey, JSON.stringify(res.data.user));
+            localStorage.setItem(this.customerSessionKey, JSON.stringify(u));
           }
         }
         return res;
@@ -153,14 +154,15 @@ export class MusicalService {
   register(req: AuthRegisterRequest): Observable<{ success: boolean; user: UserStaff; token: string; message: string; alreadyExists?: boolean }> {
     return this.http.post<any>(`${this.apiUrl}/auth/register`, req).pipe(
       map(res => {
-        if (res.success && res.data?.user) {
-          if (res.data.user.role !== 'customer') {
+        const u = res.data?.user || res.user || (res.data && res.data.email ? res.data : null);
+        if (res.success && u) {
+          if (u.role && u.role !== 'customer') {
             throw new Error('Tài khoản này không thuộc phân hệ khách hàng.');
           }
-          this.currentUser.set(res.data.user);
+          this.currentUser.set(u);
           this.isLoggedIn.set(true);
           if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem(this.customerSessionKey, JSON.stringify(res.data.user));
+            localStorage.setItem(this.customerSessionKey, JSON.stringify(u));
           }
         }
         return res;
@@ -813,8 +815,9 @@ export class MusicalService {
   }
 
   getReconciliations(): Observable<ReconciliationRecord[]> {
+    const validGateways = ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'];
     return this.http.get<ApiResponse<ReconciliationRecord[]>>(`${this.apiUrl}/admin/reports/reconciliation`).pipe(
-      map(res => res.data),
+      map(res => (res.data || []).filter(r => validGateways.includes(r.gateway))),
       catchError(this.handleError<ReconciliationRecord[]>('getReconciliations', [
         { transactionId: 'TXN-VIETQR-20261115-08192', bookingCode: 'NK-20261115-LL82A', gateway: 'VIETQR', systemAmount: 1600000, gatewayAmount: 1600000, fee: 0, netAmount: 1600000, status: 'MATCHED', notes: 'Khớp 100% đối soát tự động Napas 24/7' },
         { transactionId: 'TXN-VNPAY-20261115-08204', bookingCode: 'NK-20261115-TT44B', gateway: 'VNPAY', systemAmount: 2400000, gatewayAmount: 2400000, fee: 36000, netAmount: 2364000, status: 'MATCHED', notes: 'Khớp đối soát tự động VNPAY QR' },

@@ -25,12 +25,21 @@ class AuthController {
 
   async login(req, res) {
     try {
-      const { username, password } = req.body;
-      if (!username || !password) {
-        return res.status(400).json({ success: false, message: 'Vui lòng nhập tài khoản và mật khẩu' });
+      const { username, email, identifier, password, method, otp } = req.body;
+      const accountIdentifier = identifier || username || email;
+      if (!accountIdentifier) {
+        return res.status(400).json({ success: false, message: 'Vui lòng nhập tài khoản hoặc email' });
       }
-      const result = await userService.login(username, password, req);
-      return res.status(200).json({ success: true, message: 'Đăng nhập thành công', ...result });
+      if (method !== 'google' && method !== 'phone' && !password && !otp) {
+        return res.status(400).json({ success: false, message: 'Vui lòng nhập mật khẩu' });
+      }
+      const result = await userService.login(accountIdentifier, password, req, { method, otp });
+      return res.status(200).json({
+        success: true,
+        message: 'Đăng nhập thành công',
+        data: result,
+        ...result
+      });
     } catch (err) {
       return res.status(401).json({ success: false, message: err.message });
     }
@@ -43,7 +52,12 @@ class AuthController {
         return res.status(400).json({ success: false, message: 'Vui lòng nhập tài khoản và mật khẩu nội bộ' });
       }
       const result = await userService.staffLogin(username, password, req);
-      return res.status(200).json({ success: true, message: 'Đăng nhập phân hệ quản trị thành công', ...result });
+      return res.status(200).json({
+        success: true,
+        message: 'Đăng nhập phân hệ quản trị thành công',
+        data: result,
+        ...result
+      });
     } catch (err) {
       return res.status(401).json({ success: false, message: err.message });
     }
@@ -56,7 +70,25 @@ class AuthController {
         return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ họ tên, email và mật khẩu' });
       }
       const newUser = await userService.register({ fullName, email, password, phone }, req);
-      return res.status(201).json({ success: true, message: 'Đăng ký tài khoản thành công', user: newUser });
+      return res.status(201).json({
+        success: true,
+        message: 'Đăng ký tài khoản thành công',
+        data: { user: newUser },
+        user: newUser
+      });
+    } catch (err) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+  }
+
+  async resetPassword(req, res) {
+    try {
+      const { identifier, otp, newPassword } = req.body;
+      if (!identifier || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Vui lòng cung cấp đầy đủ thông tin' });
+      }
+      const result = await userService.resetPassword(identifier, newPassword, req);
+      return res.status(200).json({ success: true, message: 'Cập nhật mật khẩu thành công', data: result });
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }

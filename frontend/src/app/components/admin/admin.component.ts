@@ -285,6 +285,10 @@ export class AdminComponent implements OnInit {
   // --- 9. BÁO CÁO & THỐNG KÊ (REPORTS) ---
   revenueReport = signal<RevenueReport | null>(null);
   reconciliations = signal<ReconciliationRecord[]>([]);
+  filteredReconciliations = computed(() => {
+    const valid = ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'];
+    return this.reconciliations().filter(r => valid.includes(r.gateway));
+  });
   reportPeriod = signal<'week' | 'month' | 'quarter' | 'year'>('month');
   showExportSuccess = signal<boolean>(false);
 
@@ -1681,17 +1685,68 @@ export class AdminComponent implements OnInit {
       next: (data) => this.revenueReport.set(data)
     });
     this.musicalService.getReconciliations().subscribe({
-      next: (data) => this.reconciliations.set(data)
+      next: (data) => {
+        const valid = ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'];
+        this.reconciliations.set((data || []).filter(r => valid.includes(r.gateway)));
+      }
     });
   }
 
   exportReport(): void {
-    this.showExportSuccess.set(true);
-    this.showToast('Đang kết xuất báo cáo tài chính sang định dạng Excel/CSV...');
-    setTimeout(() => {
-      this.showExportSuccess.set(false);
-      this.showToast('Tải xuống báo cáo tài chính thành công!');
-    }, 2500);
+    const list = this.filteredReconciliations();
+    const filename = `Bao_Cao_Doi_Soat_Tai_Chinh_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    const exportRows = list.map((rec, index) => ({
+      'STT': index + 1,
+      'Mã Giao Dịch': rec.transactionId,
+      'Mã Đơn Vé': rec.bookingCode,
+      'Cổng Thanh Toán': rec.gateway === 'VIETQR' ? 'VietQR' : (rec.gateway === 'VNPAY' ? 'VNPAY' : (rec.gateway === 'MOMO' ? 'MoMo' : 'ZaloPay')),
+      'Tiền Hệ Thống (VNĐ)': rec.systemAmount,
+      'Cổng Báo Nhận (VNĐ)': rec.gatewayAmount,
+      'Trạng Thái Đối Soát': rec.status === 'MATCHED' ? 'Khớp 100%' : 'Sai lệch'
+    }));
+
+    const xlsxLib = (window as any).XLSX;
+    if (xlsxLib && xlsxLib.utils) {
+      const worksheet = xlsxLib.utils.json_to_sheet(exportRows);
+      worksheet['!cols'] = [
+        { wch: 6 },
+        { wch: 28 },
+        { wch: 20 },
+        { wch: 18 },
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 20 }
+      ];
+      const workbook = xlsxLib.utils.book_new();
+      xlsxLib.utils.book_append_sheet(workbook, worksheet, 'Doi_Soat_Giao_Dich');
+      xlsxLib.writeFile(workbook, filename);
+      this.showToast(`Đã xuất báo cáo đối soát tài chính "${filename}" thành công!`, 'success');
+    } else {
+      const headers = ['STT', 'Mã Giao Dịch', 'Mã Đơn Vé', 'Cổng Thanh Toán', 'Tiền Hệ Thống (VNĐ)', 'Cổng Báo Nhận (VNĐ)', 'Trạng Thái Đối Soát'];
+      const lines = [headers.join(',')];
+      exportRows.forEach(r => {
+        lines.push([
+          r['STT'],
+          `"${r['Mã Giao Dịch']}"`,
+          `"${r['Mã Đơn Vé']}"`,
+          `"${r['Cổng Thanh Toán']}"`,
+          r['Tiền Hệ Thống (VNĐ)'],
+          r['Cổng Báo Nhận (VNĐ)'],
+          `"${r['Trạng Thái Đối Soát']}"`
+        ].join(','));
+      });
+      const csvBlob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      const csvUrl = URL.createObjectURL(csvBlob);
+      const link = document.createElement('a');
+      link.href = csvUrl;
+      link.download = filename.replace('.xlsx', '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(csvUrl);
+      this.showToast('Đã tải xuống báo cáo đối soát giao dịch thành công!', 'success');
+    }
   }
 
   // --- 10. ACCOUNTS RBAC ---

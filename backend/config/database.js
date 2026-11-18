@@ -63,6 +63,7 @@ const connectDatabase = async () => {
       }
 
       // 5. Đồng bộ bảng đối soát giao dịch mẫu vào MongoDB
+      await Reconciliation.deleteMany({ gateway: { $nin: ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'] } });
       for (const rec of store.memReconciliations) {
         await Reconciliation.findOneAndUpdate(
           { transactionId: rec.transactionId },

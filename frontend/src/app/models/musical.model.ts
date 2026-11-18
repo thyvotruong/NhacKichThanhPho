@@ -262,11 +262,11 @@ export interface DashboardStats {
 export interface ReconciliationRecord {
   transactionId: string;
   bookingCode: string;
-  gateway: string;
+  gateway: 'VIETQR' | 'VNPAY' | 'MOMO' | 'ZALOPAY';
   systemAmount: number;
   gatewayAmount: number;
-  fee: number;
-  netAmount: number;
+  fee?: number;
+  netAmount?: number;
   status: 'MATCHED' | 'DISCREPANCY';
   transactionDate?: string | Date;
   notes?: string;

@@ -12,13 +12,16 @@ const store = require('../config/store');
 
 class ReconciliationService {
   async getReconciliations() {
+    const validGateways = ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'];
     if (store.isMongoConnected) {
       try {
-        const records = await Reconciliation.find().sort({ createdAt: -1 });
+        const records = await Reconciliation.find({ gateway: { $in: validGateways } }).sort({ createdAt: -1 });
         if (records && records.length > 0) return records;
-      } catch (e) {}
+      } catch (e) {
+        console.warn('⚠️ Lỗi truy vấn Reconciliation từ MongoDB:', e.message);
+      }
     }
-    return store.memReconciliations;
+    return store.memReconciliations.filter(r => validGateways.includes(r.gateway));
   }
 }
 
