@@ -45,15 +45,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   appliedVoucher = signal<any>(null);
   voucherError = signal<string | null>(null);
 
-  // Cổng thanh toán được chọn (BPMN 2.2.3 Bước 10 & 11)
-  selectedPayment = signal<'VIETQR' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'BANK_CARD' | null>(null);
+  // Cổng thanh toán được chọn (BPMN 2.2.3 Bước 10 & 11) - Chuẩn hóa 4 cổng thực tế
+  selectedPayment = signal<'VIETQR' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | null>(null);
   selectedPaymentName = computed(() => {
     switch (this.selectedPayment()) {
       case 'VIETQR': return 'VietQR';
       case 'VNPAY': return 'Ví VNPAY';
       case 'MOMO': return 'Ví MoMo';
       case 'ZALOPAY': return 'Ví ZaloPay';
-      case 'BANK_CARD': return 'Thẻ ngân hàng';
       default: return '';
     }
   });

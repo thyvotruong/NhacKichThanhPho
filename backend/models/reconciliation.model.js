@@ -21,7 +21,7 @@ const ReconciliationSchema = new mongoose.Schema(
     },
     gateway: {
       type: String,
-      enum: ['VNPAY', 'MOMO', 'ZALOPAY', 'VIETQR', 'BANK_CARD'],
+      enum: ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'],
       required: true
     },
     systemAmount: {

@@ -69,6 +69,7 @@ export class SchedulesComponent implements OnInit {
 
   // Danh sách các khung giờ diễn phổ biến
   readonly availableTimeSlots: string[] = ['15:00', '19:30', '20:00'];
+  showAllSchedules = signal<boolean>(false);
 
   // Bản đồ thể loại mặc định theo slug
   private readonly genreMap: Record<string, string> = {
@@ -145,6 +146,31 @@ export class SchedulesComponent implements OnInit {
     });
   });
 
+  private readonly orderedFilteredSchedules = computed(() =>
+    [...this.filteredSchedules()].sort((a, b) =>
+      this.getScheduleTimestamp(a) - this.getScheduleTimestamp(b) || a.time.localeCompare(b.time)
+    )
+  );
+
+  upcomingSchedules = computed(() =>
+    this.orderedFilteredSchedules().filter(schedule => {
+      const timestamp = this.getScheduleTimestamp(schedule);
+      return Number.isFinite(timestamp) && timestamp >= Date.now();
+    })
+  );
+
+  visibleSchedules = computed(() => {
+    if (this.hasActiveFilters() || this.showAllSchedules()) {
+      return this.orderedFilteredSchedules();
+    }
+
+    return this.upcomingSchedules().slice(0, 4);
+  });
+
+  canShowMoreSchedules = computed(() =>
+    !this.hasActiveFilters() && this.upcomingSchedules().length > 4
+  );
+
   ngOnInit(): void {
     this.loadSchedules();
   }
@@ -219,6 +245,31 @@ export class SchedulesComponent implements OnInit {
     this.startDate.set('');
     this.endDate.set('');
     this.selectedTimes.set([]);
+    this.showAllSchedules.set(false);
+  }
+
+  toggleShowAllSchedules(): void {
+    this.showAllSchedules.update(showAll => !showAll);
+  }
+
+  private getScheduleTimestamp(schedule: ScheduleWithGenre): number {
+    const date = new Date(schedule.performanceDate);
+    if (Number.isNaN(date.getTime())) return Number.POSITIVE_INFINITY;
+
+    const timeMatch = /^(\d{1,2}):(\d{2})$/.exec(schedule.time);
+    if (!timeMatch) return date.getTime();
+
+    const hours = Number(timeMatch[1]);
+    const minutes = Number(timeMatch[2]);
+    if (hours > 23 || minutes > 59) return date.getTime();
+
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hours,
+      minutes
+    ).getTime();
   }
 
   // Dữ liệu mẫu 20 suất diễn chuẩn rải đều phủ kín từ 18/11/2026 đến 30/11/2026

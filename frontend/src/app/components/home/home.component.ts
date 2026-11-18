@@ -10,11 +10,12 @@
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { MusicalService } from '../../services/musical.service';
 import { Musical, Schedule, Artist } from '../../models/musical.model';
 
 type FeaturedMusical = Musical & { isDemo?: boolean };
+type ScheduleCard = Schedule & { genre: string; posterUrl: string; subtitle?: string };
 
 @Component({
   selector: 'app-home',
@@ -30,9 +31,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('featuredMusicalsTrack')
   private featuredMusicalsTrack?: ElementRef<HTMLDivElement>;
 
+  @ViewChild('upcomingSchedulesTrack')
+  private upcomingSchedulesTrack?: ElementRef<HTMLDivElement>;
+
   // Angular Signals quản lý trạng thái
   musicals = signal<FeaturedMusical[]>([]);
-  schedules = signal<Schedule[]>([]);
+  schedules = signal<ScheduleCard[]>([]);
   artists = signal<Artist[]>([]);
   isLoading = signal<boolean>(true);
 
@@ -65,21 +69,38 @@ export class HomeComponent implements OnInit, OnDestroy {
     return String(genre || '');
   }
 
-  getUpcomingSchedules(): Schedule[] {
+  getUpcomingSchedules(): ScheduleCard[] {
     const getPerformanceTime = (schedule: Schedule): number =>
       schedule.performanceDate instanceof Date
         ? schedule.performanceDate.getTime()
         : Date.parse(schedule.performanceDate);
     const now = Date.now();
 
-    return this.schedules()
+    const upcomingSchedules = this.schedules()
       .filter(schedule =>
         schedule.status === 'available' &&
-        schedule.bookedSeats < schedule.totalSeats &&
+        this.availableSeatCount(schedule) > 0 &&
+        Number.isFinite(getPerformanceTime(schedule)) &&
         getPerformanceTime(schedule) >= now
       )
       .sort((a, b) => getPerformanceTime(a) - getPerformanceTime(b))
-      .slice(0, 4);
+    const nearestScheduleByMusical = new Map<string, ScheduleCard>();
+
+    for (const schedule of upcomingSchedules) {
+      if (!nearestScheduleByMusical.has(schedule.musicalSlug)) {
+        nearestScheduleByMusical.set(schedule.musicalSlug, schedule);
+      }
+    }
+
+    return Array.from(nearestScheduleByMusical.values()).slice(0, 5);
+  }
+
+  availableSeatCount(schedule: Schedule): number {
+    if (schedule.seats?.length) {
+      return schedule.seats.filter(seat => seat.status === 'available').length;
+    }
+
+    return Math.max(0, schedule.totalSeats - schedule.bookedSeats - (schedule.lockedSeatsCount ?? 0));
   }
 
   /**
@@ -114,88 +135,24 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     });
 
-    // 2. Tải danh sách lịch diễn
-    this.musicalService.getSchedules().subscribe({
-      next: (data) => {
-        if (data && data.length > 0) {
-          this.schedules.set(data);
-        } else {
-          this.schedules.set([
-            {
-              _id: 'sch_lo-lem-chiec-giay-thuy-tinh',
-              musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
-              musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
-              performanceDate: '2026-11-20T19:30:00Z',
-              time: '19:30',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A - Hoàng Gia',
-              totalSeats: 110,
-              bookedSeats: 35,
-              status: 'available'
-            },
-            {
-              _id: 'sch_loi-the-thu-9',
-              musicalSlug: 'loi-the-thu-9',
-              musicalTitle: 'Lời thề thứ 9',
-              performanceDate: '2026-11-22T20:00:00Z',
-              time: '20:00',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A - Hoàng Gia',
-              totalSeats: 110,
-              bookedSeats: 48,
-              status: 'available'
-            },
-            {
-              _id: 'sch_tuoi-tho-du-doi',
-              musicalSlug: 'tuoi-tho-du-doi',
-              musicalTitle: 'Tuổi thơ dữ dội',
-              performanceDate: '2026-11-24T19:30:00Z',
-              time: '19:30',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A - Hoàng Gia',
-              totalSeats: 110,
-              bookedSeats: 52,
-              status: 'available'
-            },
-            {
-              _id: 'sch_hon-truong-ba-da-hang-thit',
-              musicalSlug: 'hon-truong-ba-da-hang-thit',
-              musicalTitle: 'Hồn Trương Ba, Da Hàng Thịt',
-              performanceDate: '2026-11-26T20:00:00Z',
-              time: '20:00',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Broadway Opera',
-              totalSeats: 110,
-              bookedSeats: 60,
-              status: 'available'
-            },
-            {
-              _id: 'sch_quan-khu-nam-dong',
-              musicalSlug: 'quan-khu-nam-dong',
-              musicalTitle: 'Quân khu Nam Đồng',
-              performanceDate: '2026-11-28T19:30:00Z',
-              time: '19:30',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A - Hoàng Gia',
-              totalSeats: 110,
-              bookedSeats: 40,
-              status: 'available'
-            },
-            {
-              _id: 'sch_giac-mo-cua-bom',
-              musicalSlug: 'giac-mo-cua-bom',
-              musicalTitle: 'Giấc mơ của Bờm',
-              performanceDate: '2026-11-30T20:00:00Z',
-              time: '20:00',
-              venue: 'Nhà Hát Thành Phố - Số 07 Lam Sơn, Q.1',
-              hall: 'Khán phòng Grand A - Hoàng Gia',
-              totalSeats: 110,
-              bookedSeats: 30,
-              status: 'available'
-            }
-          ]);
-        }
-      }
+    // 2. Tải lịch diễn và thông tin vở để hiển thị cùng dữ liệu với trang /schedules.
+    forkJoin({
+      schedules: this.musicalService.getSchedules(),
+      musicals: this.musicalService.getMusicals()
+    }).subscribe({
+      next: ({ schedules, musicals }) => {
+        const musicalsBySlug = new Map(musicals.map(musical => [musical.slug, musical]));
+        this.schedules.set(schedules.map(schedule => {
+          const musical = musicalsBySlug.get(schedule.musicalSlug);
+          return {
+            ...schedule,
+            genre: musical ? this.formatGenre(musical.genre) : 'Kịch Nghệ',
+            posterUrl: musical?.posterUrl || `/images/musicals/${schedule.musicalSlug.replace(/-/g, '_')}.jpg`,
+            subtitle: musical?.subtitle || musical?.synopsis
+          };
+        }));
+      },
+      error: () => this.schedules.set([])
     });
 
     // 3. Tải danh sách nghệ sĩ
@@ -276,6 +233,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  scrollUpcomingSchedules(direction: -1 | 1): void {
+    const track = this.upcomingSchedulesTrack?.nativeElement;
+    const firstCard = track?.querySelector<HTMLElement>('.upcoming-schedule-slide');
+    if (!track || !firstCard) return;
+
+    const gap = Number.parseFloat(getComputedStyle(track).gap) || 0;
+    track.scrollBy({
+      left: direction * (firstCard.offsetWidth + gap),
+      behavior: 'smooth'
+    });
+  }
+
   scrollToSection(id: string): void {
     const el = document.getElementById(id);
     if (el) {
@@ -285,14 +254,20 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // Trạng thái quản lý Modal xác nhận ưu đãi
   isConsentModalOpen = signal<boolean>(false);
+  vipEmail = signal<string>('');
+  isSubmittingVip = signal<boolean>(false);
+  vipAlert = signal<{ type: 'success' | 'danger'; text: string } | null>(null);
+
   openConsentModal(): void {
     const inputElement = document.getElementById('userEmailInput') as HTMLInputElement;
-    if (inputElement && inputElement.value.trim() !== '') {
-      this.isConsentModalOpen.set(true);
-    } else {
-      alert('Vui lòng nhập địa chỉ email của bạn trước khi nhận ưu đãi!');
+    const emailVal = inputElement ? inputElement.value.trim() : '';
+    if (!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      alert('Vui lòng nhập địa chỉ email hợp lệ trước khi nhận ưu đãi!');
       inputElement?.focus();
+      return;
     }
+    this.vipEmail.set(emailVal);
+    this.isConsentModalOpen.set(true);
   }
 
   closeConsentModal(): void {
@@ -300,9 +275,29 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   confirmConsent(): void {
-    this.isConsentModalOpen.set(false);
-    alert('Đăng ký thành công! Chúng tôi sẽ sớm thông tin đến bạn các chương trình ưu đãi.');
-    const inputElement = document.getElementById('userEmailInput') as HTMLInputElement;
-    if (inputElement) inputElement.value = '';
+    const emailVal = this.vipEmail();
+    if (!emailVal || this.isSubmittingVip()) return;
+
+    this.isSubmittingVip.set(true);
+    this.musicalService.subscribeNewsletter(emailVal, 'homepage_vip', '').subscribe({
+      next: (res) => {
+        this.isSubmittingVip.set(false);
+        this.isConsentModalOpen.set(false);
+        this.vipAlert.set({ type: 'success', text: res.message || 'Đăng ký nhận ưu đãi VIP thành công! Cảm ơn bạn.' });
+        alert(res.message || 'Đăng ký nhận ưu đãi VIP thành công! Cảm ơn bạn.');
+        const inputElement = document.getElementById('userEmailInput') as HTMLInputElement;
+        if (inputElement) inputElement.value = '';
+        this.vipEmail.set('');
+        setTimeout(() => this.vipAlert.set(null), 5000);
+      },
+      error: (err) => {
+        this.isSubmittingVip.set(false);
+        this.isConsentModalOpen.set(false);
+        const errMsg = err.error?.message || 'Không thể đăng ký nhận ưu đãi lúc này. Vui lòng thử lại sau!';
+        this.vipAlert.set({ type: 'danger', text: errMsg });
+        alert(errMsg);
+        setTimeout(() => this.vipAlert.set(null), 5000);
+      }
+    });
   }
 }

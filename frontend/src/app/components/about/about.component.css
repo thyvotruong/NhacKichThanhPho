@@ -11,6 +11,23 @@
     linear-gradient(145deg, #090F1B 0%, #0C1220 52%, #120D18 100%);
 }
 
+.about-page .about-separated-section {
+  position: relative;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(245, 190, 110, 0.2);
+}
+
+.about-section-heading::after {
+  display: block;
+  width: 84px;
+  height: 2px;
+  margin: 0.85rem auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #F59E0B, #E11D48, #F59E0B, transparent);
+  content: '';
+}
+
 .about-page .text-gold {
   color: #FFDA91 !important;
 }
@@ -219,6 +236,11 @@
 @media (max-width: 575.98px) {
   .about-hero-artwork {
     aspect-ratio: 1.2;
+  }
+
+  .about-page .about-separated-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
   }
 
   .project-origin {

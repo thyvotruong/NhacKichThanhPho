@@ -34,7 +34,8 @@ import {
   Voucher,
   RevenueReport,
   ReconciliationRecord,
-  UserStaff
+  UserStaff,
+  AuditLogEntry
 } from '../../models/musical.model';
 
 export type AdminTab =
@@ -47,7 +48,9 @@ export type AdminTab =
   | 'orders'
   | 'discounts'
   | 'reports'
-  | 'accounts';
+  | 'accounts'
+  | 'subscribers'
+  | 'audit-logs';
 
 @Component({
   selector: 'app-admin',
@@ -74,6 +77,127 @@ export class AdminComponent implements OnInit {
   // --- 1. DASHBOARD ---
   stats = signal<DashboardStats | null>(null);
   isLoadingStats = signal<boolean>(true);
+  revenueTrendPeriod = signal<'week' | 'month'>('week');
+  revenueChartInstance: any = null;
+  paymentChartInstance: any = null;
+
+  topPerformingMusicals = computed(() => {
+    const fromStats = this.stats()?.topMusicals;
+    if (fromStats && fromStats.length > 0) {
+      return fromStats.slice(0, 4);
+    }
+
+    const reportList = this.revenueReport()?.byShow || [];
+    const allMusicals = this.musicals();
+
+    if (reportList.length > 0) {
+      return reportList.slice(0, 4).map(item => {
+        const found = allMusicals.find(m =>
+          m.title && item.musicalTitle && (
+            m.title.toLowerCase().includes(item.musicalTitle.toLowerCase()) ||
+            item.musicalTitle.toLowerCase().includes(m.title.toLowerCase())
+          )
+        );
+        return {
+          title: item.musicalTitle,
+          genre: Array.isArray(found?.genre) ? found.genre.join(', ') : (found?.genre || 'Broadway'),
+          revenue: item.revenue,
+          ticketsSold: item.ticketsSold,
+          occupancyRate: item.occupancyRate,
+          posterUrl: found?.posterUrl || 'images/musicals/lo-lem.jpg',
+          status: found?.status || 'now_showing'
+        };
+      });
+    }
+
+    if (allMusicals.length > 0) {
+      return allMusicals.slice(0, 4).map((m, idx) => ({
+        title: m.title,
+        genre: Array.isArray(m.genre) ? m.genre.join(', ') : (m.genre || 'Broadway'),
+        revenue: [168500000, 142800000, 126500000, 118400000][idx] || 95000000,
+        ticketsSold: [286, 242, 215, 198][idx] || 170,
+        occupancyRate: [94, 89, 86, 83][idx] || 80,
+        posterUrl: m.posterUrl || 'images/musicals/lo-lem.jpg',
+        status: m.status || 'now_showing'
+      }));
+    }
+
+    return [
+      {
+        title: 'Lọ Lem - Chiếc Giày Thủy Tinh',
+        genre: 'Broadway, Cổ tích',
+        revenue: 168500000,
+        ticketsSold: 286,
+        occupancyRate: 94,
+        posterUrl: 'images/musicals/lo-lem.jpg',
+        status: 'now_showing'
+      },
+      {
+        title: 'Hồn Trương Ba, Da Hàng Thịt',
+        genre: 'Kịch dân gian, Broadway',
+        revenue: 142800000,
+        ticketsSold: 242,
+        occupancyRate: 89,
+        posterUrl: 'images/musicals/hon-truong-ba.jpg',
+        status: 'now_showing'
+      },
+      {
+        title: 'Tuổi Thơ Dữ Dội',
+        genre: 'Lịch sử, Sử thi',
+        revenue: 126500000,
+        ticketsSold: 215,
+        occupancyRate: 86,
+        posterUrl: 'images/musicals/tuoi-tho-du-doi.jpg',
+        status: 'now_showing'
+      },
+      {
+        title: 'Giấc Mơ Của Bờm',
+        genre: 'Hài hước, Gia đình',
+        revenue: 118400000,
+        ticketsSold: 198,
+        occupancyRate: 83,
+        posterUrl: 'images/musicals/giac-mo-bom.jpg',
+        status: 'now_showing'
+      }
+    ];
+  });
+
+  recentSubscribers = computed(() => {
+    const subs = this.subscribers();
+    if (subs.length > 0) {
+      return subs.slice(0, 4);
+    }
+    return [
+      {
+        _id: 'sub-1',
+        email: 'leminh.broadway@gmail.com',
+        source: 'coming_soon_musical',
+        musicalTitle: 'Lọ Lem - Chiếc Giày Thủy Tinh',
+        createdAt: new Date().toISOString()
+      },
+      {
+        _id: 'sub-2',
+        email: 'hoangyen.theatre@yahoo.com',
+        source: 'homepage_vip',
+        musicalTitle: '',
+        createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
+      },
+      {
+        _id: 'sub-3',
+        email: 'phuongthao.art@gmail.com',
+        source: 'coming_soon_musical',
+        musicalTitle: 'Hồn Trương Ba, Da Hàng Thịt',
+        createdAt: new Date(Date.now() - 3600000 * 7).toISOString()
+      },
+      {
+        _id: 'sub-4',
+        email: 'tranduc.vip@gmail.com',
+        source: 'homepage_vip',
+        musicalTitle: '',
+        createdAt: new Date(Date.now() - 3600000 * 18).toISOString()
+      }
+    ] as any[];
+  });
 
   // --- 2. VỞ KỊCH (MUSICALS) ---
   musicals = signal<Musical[]>([]);
@@ -170,6 +294,97 @@ export class AdminComponent implements OnInit {
   isEditingStaff = signal<boolean>(false);
   staffForm!: FormGroup;
 
+  // --- 11. DS ĐĂNG KÝ NHẬN TIN / KHÁCH HÀNG TIỀM NĂNG (SUBSCRIBERS) ---
+  subscribers = signal<any[]>([]);
+  isLoadingSubscribers = signal<boolean>(false);
+  subscriberSearch = signal<string>('');
+  subscriberSourceFilter = signal<string>('all');
+  subscriberMusicalFilter = signal<string>('all');
+
+  availableSubscribedMusicals = computed(() => {
+    const set = new Set<string>();
+    this.subscribers().forEach(s => {
+      if (s.musicalTitle && typeof s.musicalTitle === 'string' && s.musicalTitle.trim()) {
+        set.add(s.musicalTitle.trim());
+      }
+    });
+    this.musicals().forEach(m => {
+      if (m.title && m.status === 'coming_soon') {
+        set.add(m.title.trim());
+      }
+    });
+    return Array.from(set).sort();
+  });
+
+  filteredSubscribers = computed(() => {
+    const list = this.subscribers();
+    const query = this.subscriberSearch().trim().toLowerCase();
+    const srcFilter = this.subscriberSourceFilter();
+    const musicalFilter = this.subscriberMusicalFilter();
+
+    return list.filter(item => {
+      // 1. Lọc theo nguồn đăng ký
+      if (srcFilter === 'homepage' && !item.source?.includes('homepage')) return false;
+      if (srcFilter === 'coming_soon' && !item.source?.includes('coming_soon')) return false;
+
+      // 2. Lọc theo tên vở kịch quan tâm
+      if (musicalFilter !== 'all') {
+        if (musicalFilter === 'none') {
+          if (item.musicalTitle && item.musicalTitle.trim() !== '') return false;
+        } else {
+          if ((item.musicalTitle || '').trim().toLowerCase() !== musicalFilter.trim().toLowerCase()) {
+            return false;
+          }
+        }
+      }
+
+      // 3. Tìm kiếm từ khóa tự do
+      if (!query) return true;
+      const matchEmail = (item.email || '').toLowerCase().includes(query);
+      const matchSource = (item.source || '').toLowerCase().includes(query);
+      const matchTitle = (item.musicalTitle || '').toLowerCase().includes(query);
+      return matchEmail || matchSource || matchTitle;
+    });
+  });
+
+  // --- 11. NHẬT KÝ HOẠT ĐỘNG HỆ THỐNG (SYSTEM AUDIT LOG) ---
+  auditLogs = signal<AuditLogEntry[]>([]);
+  isAuditLogEnabled = signal<boolean>(true);
+  isLoadingAuditLogs = signal<boolean>(false);
+  isTogglingAuditLog = signal<boolean>(false);
+  auditSearch = signal<string>('');
+  auditCategoryFilter = signal<string>('ALL');
+  auditStatusFilter = signal<string>('ALL');
+
+  filteredAuditLogs = computed(() => {
+    const list = this.auditLogs();
+    const query = this.auditSearch().trim().toLowerCase();
+    const category = this.auditCategoryFilter();
+    const status = this.auditStatusFilter();
+
+    return list.filter(item => {
+      // 1. Lọc theo Phân hệ
+      if (category !== 'ALL' && item.category !== category) {
+        return false;
+      }
+
+      // 2. Lọc theo Trạng thái
+      if (status !== 'ALL' && item.status !== status) {
+        return false;
+      }
+
+      // 3. Tìm kiếm từ khóa tự do
+      if (!query) return true;
+      const descMatch = (item.description || '').toLowerCase().includes(query);
+      const actionMatch = (item.action || '').toLowerCase().includes(query);
+      const usernameMatch = (item.performer?.username || '').toLowerCase().includes(query);
+      const fullNameMatch = (item.performer?.fullName || '').toLowerCase().includes(query);
+      const ipMatch = (item.ipAddress || '').toLowerCase().includes(query);
+
+      return descMatch || actionMatch || usernameMatch || fullNameMatch || ipMatch;
+    });
+  });
+
   ngOnInit(): void {
     this.initForms();
     this.loadAllInitialData();
@@ -197,7 +412,13 @@ export class AdminComponent implements OnInit {
           reports: 'reports',
           reconciliation: 'reports',
           accounts: 'accounts',
-          staff: 'accounts'
+          staff: 'accounts',
+          subscribers: 'subscribers',
+          leads: 'subscribers',
+          'customer-leads': 'subscribers',
+          'audit-logs': 'audit-logs',
+          audit: 'audit-logs',
+          logs: 'audit-logs'
         };
         if (aliasMap[tabParam]) {
           let target = aliasMap[tabParam];
@@ -208,6 +429,10 @@ export class AdminComponent implements OnInit {
         }
       }
     });
+
+    if (this.activeTab() === 'dashboard') {
+      setTimeout(() => this.renderDashboardCharts(), 400);
+    }
   }
 
   // Khởi tạo các Reactive Forms
@@ -310,11 +535,19 @@ export class AdminComponent implements OnInit {
     this.loadVouchers();
     this.loadReports();
     this.loadStaffUsers();
+    this.loadSubscribers();
+    if (this.currentUser()?.role === 'admin') {
+      this.loadAuditLogs();
+    }
   }
 
   setTab(tab: AdminTab, updateUrl = true): void {
     if (this.currentUser()?.role === 'editor' && tab !== 'musicals' && tab !== 'artists') {
       this.showToast('Tài khoản Biên tập viên chỉ có quyền quản lý Vở kịch và Nghệ sĩ.', 'info');
+      tab = 'musicals';
+    }
+    if (tab === 'audit-logs' && this.currentUser()?.role !== 'admin') {
+      this.showToast('Chỉ Quản trị viên tối cao (Admin) mới có quyền truy cập Nhật ký hoạt động hệ thống!', 'danger');
       tab = 'musicals';
     }
     this.activeTab.set(tab);
@@ -323,7 +556,10 @@ export class AdminComponent implements OnInit {
     }
 
     // Refresh theo tab khi người dùng click
-    if (tab === 'dashboard') this.loadDashboardStats();
+    if (tab === 'dashboard') {
+      this.loadDashboardStats();
+      setTimeout(() => this.renderDashboardCharts(), 200);
+    }
     if (tab === 'musicals') this.loadMusicals();
     if (tab === 'artists') this.loadArtists();
     if (tab === 'auditoriums') this.loadAuditoriums();
@@ -333,6 +569,8 @@ export class AdminComponent implements OnInit {
     if (tab === 'discounts') this.loadVouchers();
     if (tab === 'reports') this.loadReports();
     if (tab === 'accounts') this.loadStaffUsers();
+    if (tab === 'subscribers') this.loadSubscribers();
+    if (tab === 'audit-logs') this.loadAuditLogs();
   }
 
   showToast(text: string, type: 'success' | 'danger' | 'info' = 'success'): void {
@@ -358,9 +596,185 @@ export class AdminComponent implements OnInit {
       next: (data) => {
         this.stats.set(data);
         this.isLoadingStats.set(false);
+        setTimeout(() => this.renderDashboardCharts(), 100);
       },
       error: () => this.isLoadingStats.set(false)
     });
+    this.musicalService.getRevenueReport().subscribe({
+      next: (data) => this.revenueReport.set(data)
+    });
+  }
+
+  setRevenueTrendPeriod(period: 'week' | 'month'): void {
+    this.revenueTrendPeriod.set(period);
+    setTimeout(() => this.renderRevenueTrendChart(), 50);
+  }
+
+  renderDashboardCharts(): void {
+    if (this.activeTab() !== 'dashboard') return;
+    this.renderRevenueTrendChart();
+    this.renderPaymentDonutChart();
+  }
+
+  renderRevenueTrendChart(): void {
+    const canvas = document.getElementById('revenueTrendChart') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const chartLib = (window as any).Chart;
+    if (!chartLib) return;
+
+    if (this.revenueChartInstance) {
+      try { this.revenueChartInstance.destroy(); } catch {}
+      this.revenueChartInstance = null;
+    }
+
+    const isWeek = this.revenueTrendPeriod() === 'week';
+    const trendStats = this.stats()?.revenueTrend;
+    const labels = isWeek
+      ? (trendStats?.week?.labels || ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'])
+      : (trendStats?.month?.labels || ['Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11']);
+
+    const data = isWeek
+      ? (trendStats?.week?.data || [112, 135, 158, 165, 170, 185, 192])
+      : (trendStats?.month?.data || [520, 580, 640, 690, 715, 740]);
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+    gradient.addColorStop(0, 'rgba(245, 158, 11, 0.45)');
+    gradient.addColorStop(0.65, 'rgba(190, 18, 60, 0.15)');
+    gradient.addColorStop(1, 'rgba(7, 10, 18, 0.0)');
+
+    try {
+      this.revenueChartInstance = new chartLib(canvas, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Doanh thu (Triệu VNĐ)',
+              data,
+              fill: true,
+              backgroundColor: gradient,
+              borderColor: '#F59E0B',
+              borderWidth: 2.5,
+              tension: 0.38,
+              pointBackgroundColor: '#FDE68A',
+              pointBorderColor: '#B45309',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 7,
+              pointHoverBackgroundColor: '#FFFFFF',
+              pointHoverBorderColor: '#F59E0B'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(7, 10, 18, 0.95)',
+              titleColor: '#FDE68A',
+              bodyColor: '#FFFFFF',
+              borderColor: 'rgba(245, 158, 11, 0.4)',
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false,
+              callbacks: {
+                label: (context: any) => ` Doanh thu: ${context.parsed.y} Triệu VNĐ (${(context.parsed.y * 1000000).toLocaleString('vi-VN')} ₫)`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94A3B8', font: { family: 'Montserrat', size: 11, weight: '600' } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: {
+                color: '#94A3B8',
+                font: { family: 'Montserrat', size: 11 },
+                callback: (value: any) => `${value} tr`
+              }
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('Chart.js revenue chart error:', e);
+    }
+  }
+
+  renderPaymentDonutChart(): void {
+    const canvas = document.getElementById('paymentDonutChart') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const chartLib = (window as any).Chart;
+    if (!chartLib) return;
+
+    if (this.paymentChartInstance) {
+      try { this.paymentChartInstance.destroy(); } catch {}
+      this.paymentChartInstance = null;
+    }
+
+    try {
+      const pb = this.stats()?.paymentBreakdown;
+      const vq = pb?.VIETQR || 325600000;
+      const vn = pb?.VNPAY || 229400000;
+      const mm = pb?.MOMO || 125800000;
+      const zl = pb?.ZALOPAY || 59200000;
+      const total = vq + vn + mm + zl;
+
+      const pVq = total > 0 ? Math.round((vq / total) * 1000) / 10 : 44.0;
+      const pVn = total > 0 ? Math.round((vn / total) * 1000) / 10 : 31.0;
+      const pMm = total > 0 ? Math.round((mm / total) * 1000) / 10 : 17.0;
+      const pZl = total > 0 ? Math.round((zl / total) * 1000) / 10 : 8.0;
+
+      this.paymentChartInstance = new chartLib(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: [
+            `VietQR (${pVq}%)`,
+            `VNPAY (${pVn}%)`,
+            `MoMo (${pMm}%)`,
+            `ZaloPay (${pZl}%)`
+          ],
+          datasets: [
+            {
+              data: [pVq, pVn, pMm, pZl],
+              backgroundColor: ['#10B981', '#0EA5E9', '#F43F5E', '#8B5CF6'],
+              borderColor: ['#065F46', '#0369A1', '#9F1239', '#6D28D9'],
+              borderWidth: 2,
+              hoverOffset: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '70%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(7, 10, 18, 0.95)',
+              titleColor: '#FDE68A',
+              bodyColor: '#FFFFFF',
+              borderColor: 'rgba(245, 158, 11, 0.4)',
+              borderWidth: 1,
+              callbacks: {
+                label: (context: any) => ` ${context.label}: ${context.parsed}%`
+              }
+            }
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('Chart.js payment donut error:', e);
+    }
   }
 
   // --- 2. MUSICALS ---
@@ -1360,5 +1774,317 @@ export class AdminComponent implements OnInit {
         this.showToast(err?.error?.message || 'Lỗi khi xóa tài khoản', 'danger');
       }
     });
+  }
+
+  // ============================================================
+  // 11. DS ĐĂNG KÝ NHẬN TIN & KHÁCH HÀNG TIỀM NĂNG (SUBSCRIBERS)
+  // ============================================================
+  loadSubscribers(): void {
+    this.isLoadingSubscribers.set(true);
+    this.musicalService.getSubscribers().subscribe({
+      next: (res) => {
+        this.subscribers.set(res.data || []);
+        this.isLoadingSubscribers.set(false);
+      },
+      error: () => {
+        this.isLoadingSubscribers.set(false);
+      }
+    });
+  }
+
+  deleteSubscriber(item: any): void {
+    if (!confirm(`Bạn có chắc chắn muốn xóa email đăng ký "${item.email}" không?`)) {
+      return;
+    }
+    const id = item._id;
+    this.musicalService.deleteSubscriber(id).subscribe({
+      next: () => {
+        this.subscribers.update(list => list.filter(s => s._id !== id));
+        this.showToast(`Đã xóa thành công đăng ký: ${item.email}`);
+      },
+      error: () => {
+        this.showToast('Lỗi khi xóa đăng ký nhận tin.', 'danger');
+      }
+    });
+  }
+
+  formatSourceInfo(source: string, musicalTitle?: string): { badgeClass: string; label: string; icon: string } {
+    if (!source) {
+      return { badgeClass: 'badge-secondary', label: 'Chưa xác định', icon: 'bi-envelope' };
+    }
+    if (source === 'homepage_vip' || source.includes('homepage')) {
+      return {
+        badgeClass: 'badge-showman-gold',
+        label: 'Trang chủ (Ưu đãi VIP)',
+        icon: 'bi-gem'
+      };
+    }
+    if (source.includes('coming_soon')) {
+      return {
+        badgeClass: 'badge-showman-ruby',
+        label: 'Vở kịch sắp chiếu',
+        icon: 'bi-bell-fill'
+      };
+    }
+    return {
+      badgeClass: 'badge-secondary',
+      label: source,
+      icon: 'bi-envelope-check'
+    };
+  }
+
+  exportSubscribersToExcel(): void {
+    const list = this.filteredSubscribers();
+    if (!list || list.length === 0) {
+      this.showToast('Không có dữ liệu đăng ký để xuất file Excel.', 'info');
+      return;
+    }
+
+    const exportRows = list.map((item, index) => {
+      const srcInfo = this.formatSourceInfo(item.source, item.musicalTitle);
+      return {
+        'STT': index + 1,
+        'Địa chỉ Email': item.email,
+        'Nguồn Đăng Ký': srcInfo.label,
+        'Vở Kịch Quan Tâm': item.musicalTitle && item.musicalTitle.trim() ? item.musicalTitle : '-',
+        'Thời Gian Đăng Ký': new Date(item.createdAt).toLocaleString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        })
+      };
+    });
+
+    const filename = `DS_Dang_Ky_Nhan_Tin_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    const xlsxLib = (window as any).XLSX;
+    if (xlsxLib && xlsxLib.utils) {
+      const worksheet = xlsxLib.utils.json_to_sheet(exportRows);
+      worksheet['!cols'] = [
+        { wch: 6 },
+        { wch: 32 },
+        { wch: 35 },
+        { wch: 35 },
+        { wch: 22 }
+      ];
+      const workbook = xlsxLib.utils.book_new();
+      xlsxLib.utils.book_append_sheet(workbook, worksheet, 'DS_Dang_Ky');
+      xlsxLib.writeFile(workbook, filename);
+      this.showToast(`Đã xuất file Excel "${filename}" thành công!`, 'success');
+    } else {
+      // Fallback CSV với UTF-8 BOM để Excel hiển thị tiếng Việt hoàn hảo
+      const headers = ['STT', 'Địa chỉ Email', 'Nguồn Đăng Ký', 'Vở Kịch Quan Tâm', 'Thời Gian Đăng Ký'];
+      const lines = [headers.join(',')];
+      exportRows.forEach(r => {
+        lines.push([
+          r['STT'],
+          `"${r['Địa chỉ Email']}"`,
+          `"${r['Nguồn Đăng Ký']}"`,
+          `"${r['Vở Kịch Quan Tâm']}"`,
+          `"${r['Thời Gian Đăng Ký']}"`
+        ].join(','));
+      });
+      const csvBlob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      const csvUrl = URL.createObjectURL(csvBlob);
+      const link = document.createElement('a');
+      link.href = csvUrl;
+      link.download = filename.replace('.xlsx', '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(csvUrl);
+      this.showToast('Đã xuất file dữ liệu thành công!', 'success');
+    }
+  }
+
+  // ============================================================
+  // --- 11. NHẬT KÝ HOẠT ĐỘNG HỆ THỐNG (SYSTEM AUDIT LOG) ---
+  // ============================================================
+  loadAuditLogs(): void {
+    this.isLoadingAuditLogs.set(true);
+    this.musicalService.getAuditLogs().subscribe({
+      next: (res) => {
+        this.auditLogs.set(res.data || []);
+        if (typeof res.enabled === 'boolean') {
+          this.isAuditLogEnabled.set(res.enabled);
+        }
+        this.isLoadingAuditLogs.set(false);
+      },
+      error: (err) => {
+        console.warn('Lỗi tải Audit Log:', err);
+        this.isLoadingAuditLogs.set(false);
+      }
+    });
+  }
+
+  toggleAuditLogSwitch(): void {
+    const nextState = !this.isAuditLogEnabled();
+    this.isTogglingAuditLog.set(true);
+    this.musicalService.toggleAuditLog(nextState).subscribe({
+      next: (res) => {
+        this.isAuditLogEnabled.set(res.enabled);
+        this.isTogglingAuditLog.set(false);
+        this.loadAuditLogs();
+      },
+      error: () => {
+        this.isAuditLogEnabled.set(nextState);
+        this.isTogglingAuditLog.set(false);
+      }
+    });
+  }
+
+  clearAllAuditLogs(): void {
+    if (!confirm('⚠️ BẠN CÓ CHẮC CHẮN MUỐN XÓA TOÀN BỘ NHẬT KÝ HOẠT ĐỘNG KHÔNG?\n\nThao tác này sẽ dọn sạch toàn bộ log hiện tại và chỉ ghi lại 1 log hành động xóa!')) {
+      return;
+    }
+    this.musicalService.clearAuditLogs().subscribe({
+      next: () => {
+        this.loadAuditLogs();
+      },
+      error: (err) => {
+        console.warn('Lỗi xóa Audit Log:', err);
+      }
+    });
+  }
+
+  getAuditCategoryBadge(category: string): { label: string; class: string; icon: string } {
+    const cat = (category || '').toUpperCase();
+    switch (cat) {
+      case 'AUTH':
+        return { label: 'Xác Thực / Đăng Nhập', class: 'bg-primary text-white', icon: 'bi-shield-lock' };
+      case 'MUSICAL':
+        return { label: 'Vở Kịch', class: 'bg-warning text-dark', icon: 'bi-film' };
+      case 'ARTIST':
+        return { label: 'Nghệ Sĩ', class: 'bg-info text-dark', icon: 'bi-person-badge' };
+      case 'SEAT':
+        return { label: 'Sơ Đồ Ghế', class: 'bg-danger text-white', icon: 'bi-grid-3x3' };
+      case 'VOUCHER':
+        return { label: 'Mã Giảm Giá', class: 'bg-success text-white', icon: 'bi-ticket-perforated' };
+      case 'OPS':
+        return { label: 'Vận Hành / Soát Vé', class: 'bg-purple text-white', icon: 'bi-qr-code-scan' };
+      default:
+        return { label: 'Hệ Thống', class: 'bg-secondary text-white', icon: 'bi-gear' };
+    }
+  }
+
+  getAuditActionBadge(action: string): { label: string; class: string } {
+    const act = (action || '').toUpperCase();
+    if (act.includes('LOGIN')) {
+      return { label: 'ĐĂNG NHẬP', class: 'badge bg-primary bg-opacity-25 text-info border border-info border-opacity-25' };
+    }
+    if (act.includes('CREATE')) {
+      return { label: 'THÊM MỚI', class: 'badge bg-success bg-opacity-25 text-success border border-success border-opacity-25' };
+    }
+    if (act.includes('UPDATE')) {
+      return { label: 'CẬP NHẬT', class: 'badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25' };
+    }
+    if (act.includes('DELETE') || act.includes('CLEAR')) {
+      return { label: 'XÓA BẢN GHI', class: 'badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25' };
+    }
+    if (act.includes('LOCK_SEATS')) {
+      return { label: 'KHÓA GHẾ', class: 'badge bg-danger text-white' };
+    }
+    if (act.includes('UNLOCK_SEATS')) {
+      return { label: 'MỞ KHÓA GHẾ', class: 'badge bg-success text-white' };
+    }
+    if (act.includes('CHECKIN')) {
+      return { label: 'SOÁT VÉ QR', class: 'badge bg-info text-dark' };
+    }
+    if (act.includes('TOGGLE')) {
+      return { label: 'BẬT/TẮT LOG', class: 'badge bg-secondary text-white' };
+    }
+    return { label: act, class: 'badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25' };
+  }
+
+  formatAuditMetadata(metadata?: Record<string, any>): string {
+    if (!metadata) return '';
+    const parts: string[] = [];
+    if (metadata['ticketCode']) parts.push(`Mã vé: ${metadata['ticketCode']}`);
+    if (metadata['slug']) parts.push(`Slug: ${metadata['slug']}`);
+    if (metadata['title']) parts.push(`Vở: ${metadata['title']}`);
+    if (metadata['voucherCode']) parts.push(`Voucher: ${metadata['voucherCode']}`);
+    if (metadata['seatCodes'] && Array.isArray(metadata['seatCodes'])) parts.push(`Ghế: ${metadata['seatCodes'].join(', ')}`);
+    if (metadata['artistName']) parts.push(`Nghệ sĩ: ${metadata['artistName']}`);
+    return parts.join(' • ');
+  }
+
+  exportAuditLogsToExcel(): void {
+    const list = this.filteredAuditLogs();
+    if (!list || list.length === 0) {
+      this.showToast('Không có dữ liệu nhật ký để xuất file.', 'info');
+      return;
+    }
+
+    const exportRows = list.map((item, index) => {
+      const catInfo = this.getAuditCategoryBadge(item.category);
+      return {
+        'STT': index + 1,
+        'Thời Gian': new Date(item.createdAt).toLocaleString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }),
+        'Phân Hệ': catInfo.label,
+        'Hành Động': item.action,
+        'Nội Dung Chi Tiết': item.description,
+        'Người Thực Hiện': `${item.performer?.fullName || ''} (${item.performer?.username || ''})`,
+        'Vai Trò': (item.performer?.role || '').toUpperCase(),
+        'Địa Chỉ IP': item.ipAddress || '127.0.0.1',
+        'Trạng Thái': item.status === 'SUCCESS' ? 'Thành công' : 'Thất bại'
+      };
+    });
+
+    const filename = `Nhat_Ky_He_Thong_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    const xlsxLib = (window as any).XLSX;
+    if (xlsxLib && xlsxLib.utils) {
+      const worksheet = xlsxLib.utils.json_to_sheet(exportRows);
+      worksheet['!cols'] = [
+        { wch: 6 },
+        { wch: 22 },
+        { wch: 22 },
+        { wch: 20 },
+        { wch: 45 },
+        { wch: 28 },
+        { wch: 12 },
+        { wch: 20 },
+        { wch: 14 }
+      ];
+      const workbook = xlsxLib.utils.book_new();
+      xlsxLib.utils.book_append_sheet(workbook, worksheet, 'Nhat_Ky_Audit');
+      xlsxLib.writeFile(workbook, filename);
+      this.showToast(`Đã xuất file Excel "${filename}" thành công!`, 'success');
+    } else {
+      const headers = ['STT', 'Thời Gian', 'Phân Hệ', 'Hành Động', 'Nội Dung Chi Tiết', 'Người Thực Hiện', 'Vai Trò', 'Địa Chỉ IP', 'Trạng Thái'];
+      const lines = [headers.join(',')];
+      exportRows.forEach(r => {
+        lines.push([
+          r['STT'],
+          `"${r['Thời Gian']}"`,
+          `"${r['Phân Hệ']}"`,
+          `"${r['Hành Động']}"`,
+          `"${r['Nội Dung Chi Tiết']}"`,
+          `"${r['Người Thực Hiện']}"`,
+          `"${r['Vai Trò']}"`,
+          `"${r['Địa Chỉ IP']}"`,
+          `"${r['Trạng Thái']}"`
+        ].join(','));
+      });
+      const csvBlob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+      const csvUrl = URL.createObjectURL(csvBlob);
+      const link = document.createElement('a');
+      link.href = csvUrl;
+      link.download = filename.replace('.xlsx', '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(csvUrl);
+      this.showToast('Đã xuất file dữ liệu nhật ký thành công!', 'success');
+    }
   }
 }

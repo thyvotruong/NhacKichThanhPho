@@ -6,7 +6,7 @@
  * ============================================================
  */
 
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -27,6 +27,19 @@ export class MusicalListComponent implements OnInit, OnDestroy {
 
   musicals = signal<Musical[]>([]);
   isLoading = signal<boolean>(true);
+  visibleMusicals = computed(() => {
+    const list = this.musicals();
+    const st = (this.selectedStatus() || 'all').toLowerCase();
+    if (st === 'all') {
+      return list.filter(m => {
+        const s = (m.status || '').toLowerCase();
+        return s === 'now_showing' || s === 'coming_soon' || !s;
+      });
+    }
+    return list.filter(m => (m.status || '').toLowerCase() === st);
+  });
+  nowShowingMusicals = computed(() => this.visibleMusicals().filter(m => (m.status || '').toLowerCase() === 'now_showing' || !m.status));
+  comingSoonMusicals = computed(() => this.visibleMusicals().filter(m => (m.status || '').toLowerCase() === 'coming_soon'));
 
   // Bộ lọc
   searchKeyword = signal<string>('');

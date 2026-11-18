@@ -105,7 +105,7 @@ export class MusicalDetailComponent implements OnInit {
     const cleanEmail = email.trim();
 
     if (!musical || musical.status !== 'coming_soon' || this.isSubmittingNotification()) return;
-    if (!cleanEmail) {
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       this.notificationError.set('Vui lòng nhập địa chỉ email hợp lệ.');
       return;
     }
@@ -113,10 +113,13 @@ export class MusicalDetailComponent implements OnInit {
     this.isSubmittingNotification.set(true);
     this.notificationMessage.set('');
     this.notificationError.set('');
-    this.musicalService.subscribeToMusicalNotifications(musical.slug, cleanEmail).subscribe({
+    const source = 'coming_soon_musical';
+    this.musicalService.subscribeNewsletter(cleanEmail, source, musical.title).subscribe({
       next: (response) => {
         this.notificationMessage.set(response.message);
         this.isSubmittingNotification.set(false);
+        const input = document.getElementById('scheduleNotificationEmail') as HTMLInputElement;
+        if (input) input.value = '';
       },
       error: (error: HttpErrorResponse) => {
         this.notificationError.set(error.error?.message || 'Không thể đăng ký nhận thông báo lúc này.');

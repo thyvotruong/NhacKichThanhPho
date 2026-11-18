@@ -69,19 +69,19 @@ export class AboutComponent {
 
   readonly coreValues = [
     {
-      title: 'Trải Nghiệm Mượt Mà',
-      desc: 'Theo dõi sơ đồ rạp và hoàn tất đặt vé trên mọi thiết bị chỉ trong vài bước.'
+      title: 'Trải nghiệm mượt mà',
+      desc: 'Theo dõi sơ đồ rạp và hoàn tất đặt vé chỉ trong vài bước.'
     },
     {
-      title: 'Đổi Mới & Sáng Tạo',
-      desc: 'Ứng dụng tư duy thiết kế và công nghệ web hiện đại để làm mới cách tiếp cận sân khấu.'
+      title: 'Đổi mới & sáng tạo',
+      desc: 'Ứng dụng tư duy thiết kế và công nghệ làm mới cách tiếp cận sân khấu.'
     },
     {
-      title: 'Khán Giả Là Trung Tâm',
-      desc: 'Phát triển tính năng theo nhu cầu thực tế, ưu tiên sự thuận tiện và hài lòng của khán giả.'
+      title: 'Khách hàng là trung tâm',
+      desc: 'Phát triển ưu tiên sự thuận tiện và hài lòng của khán giả.'
     },
     {
-      title: 'Minh Bạch & Tin Cậy',
+      title: 'Minh bạch & tin cậy',
       desc: 'Cung cấp lịch diễn, giá vé chính xác và bảo mật dữ liệu giao dịch.'
     }
   ];

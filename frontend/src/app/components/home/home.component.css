@@ -373,11 +373,276 @@
   background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
               radial-gradient(circle at 80% 50%, rgba(190, 18, 60, 0.12) 0%, transparent 60%),
               #0A0F1D;
+  overflow-x: clip;
 }
 
 .date-badge-showman {
   min-width: 52px;
   background: rgba(7, 10, 18, 0.9);
+}
+
+.upcoming-schedules-carousel {
+  position: relative;
+}
+
+.upcoming-schedules-carousel::before,
+.upcoming-schedules-carousel::after {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  bottom: 1.25rem;
+  width: 4rem;
+  content: '';
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.upcoming-schedules-carousel::before {
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    #0A0F1D 0%,
+    rgba(10, 15, 29, 0.92) 20%,
+    rgba(10, 15, 29, 0.6) 45%,
+    rgba(10, 15, 29, 0.2) 75%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(90deg, black 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, black 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+}
+
+.upcoming-schedules-carousel::after {
+  right: 0;
+  background: linear-gradient(
+    270deg,
+    #0A0F1D 0%,
+    rgba(10, 15, 29, 0.92) 20%,
+    rgba(10, 15, 29, 0.6) 45%,
+    rgba(10, 15, 29, 0.2) 75%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(270deg, black 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(270deg, black 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%);
+}
+
+.upcoming-schedules-track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0.75rem 1.25rem;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 0.8%,
+    rgba(0, 0, 0, 0.85) 2%,
+    black 3.5%,
+    black 96.5%,
+    rgba(0, 0, 0, 0.85) 98%,
+    rgba(0, 0, 0, 0.35) 99.2%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 0.8%,
+    rgba(0, 0, 0, 0.85) 2%,
+    black 3.5%,
+    black 96.5%,
+    rgba(0, 0, 0, 0.85) 98%,
+    rgba(0, 0, 0, 0.35) 99.2%,
+    transparent 100%
+  );
+}
+
+.upcoming-schedules-track::-webkit-scrollbar {
+  display: none;
+}
+
+.upcoming-schedule-slide {
+  flex: 0 0 calc(50% - 0.75rem);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.upcoming-schedule-card {
+  min-height: 320px;
+  background: linear-gradient(135deg, rgba(14, 22, 41, 0.98) 0%, rgba(18, 28, 48, 0.98) 100%);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.upcoming-schedule-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.25);
+  border-color: rgba(212, 175, 55, 0.6) !important;
+}
+
+.upcoming-schedule-poster {
+  flex: 0 0 38%;
+  max-width: 220px;
+  min-height: 320px;
+  align-self: stretch;
+  background: #070A12;
+}
+
+.upcoming-schedule-poster-img,
+.upcoming-schedule-poster-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.upcoming-schedule-poster-img {
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.upcoming-schedule-card:hover .upcoming-schedule-poster-img {
+  transform: scale(1.04);
+}
+
+.upcoming-schedule-poster-overlay {
+  background: linear-gradient(to top, rgba(7, 10, 18, 0.35) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+.upcoming-schedule-body {
+  min-width: 0;
+}
+
+.upcoming-schedule-title,
+.upcoming-schedule-subtitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.upcoming-schedule-title {
+  -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+
+.upcoming-schedule-subtitle {
+  -webkit-line-clamp: 2;
+}
+
+.upcoming-schedule-actions > a {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.upcoming-schedules-control {
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border: 1.5px solid rgba(245, 158, 11, 0.7);
+  border-radius: 50%;
+  background: rgba(14, 22, 41, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #FDE68A;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 16px rgba(245, 158, 11, 0.3);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.upcoming-schedules-control:hover {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  color: #070A12;
+  border-color: #FEF08A;
+  box-shadow: 0 6px 26px rgba(0, 0, 0, 0.9), 0 0 25px rgba(245, 158, 11, 0.7);
+  transform: translateY(-50%) scale(1.12);
+}
+
+.upcoming-schedules-control:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.upcoming-schedules-prev {
+  left: -2.25rem;
+}
+
+.upcoming-schedules-next {
+  right: -2.25rem;
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .upcoming-schedules-prev {
+    left: -1.25rem;
+  }
+  .upcoming-schedules-next {
+    right: -1.25rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .upcoming-schedules-prev {
+    left: -0.5rem;
+  }
+  .upcoming-schedules-next {
+    right: -0.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .upcoming-schedules-prev {
+    left: 0.25rem;
+  }
+  .upcoming-schedules-next {
+    right: 0.25rem;
+  }
+
+  .upcoming-schedules-control {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+
+  .upcoming-schedules-track {
+    padding-right: 2.5rem;
+    padding-left: 2.5rem;
+  }
+
+  .upcoming-schedule-slide {
+    flex-basis: 100%;
+  }
+
+  .upcoming-schedule-poster {
+    flex-basis: 34%;
+    min-width: 100px;
+    max-width: 160px;
+  }
+
+  .upcoming-schedule-title {
+    font-size: 1.15rem !important;
+  }
+
+  .upcoming-schedule-actions {
+    gap: 0.35rem !important;
+  }
+
+  .upcoming-schedule-actions > a {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.7rem;
+  }
 }
 
 /* Nghệ Sĩ Vòng Sáng Hào Quang - Tỉ lệ 95px gọn gàng */

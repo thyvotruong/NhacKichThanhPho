@@ -22,7 +22,7 @@ import { MusicalService } from '../../services/musical.service';
           <!-- Brand / Logo -->
           <div class="d-flex align-items-center">
             <div class="showman-emblem-box d-flex align-items-center justify-content-center shadow-gold">
-              <span class="showman-icon">🎭</span>
+              <img src="images/logo/logoNKTP.jpg" alt="Logo Nhạc kịch Thành phố" class="brand-logo" />
             </div>
             <div class="ms-3 d-flex flex-column">
               <span class="staff-brand-title fw-bold text-gold-gradient">NHẠC KỊCH THÀNH PHỐ</span>
@@ -90,6 +90,10 @@ import { MusicalService } from '../../services/musical.service';
     </header>
   `,
   styles: [`
+    .staff-header .navbar {
+      padding-top: 0.7rem !important;
+      padding-bottom: 0.7rem !important;
+    }
     .staff-header {
       background: rgba(7, 10, 18, 0.96);
       border-bottom: 1.5px solid rgba(245, 158, 11, 0.35);
@@ -99,23 +103,30 @@ import { MusicalService } from '../../services/musical.service';
       z-index: 1040;
     }
     .showman-emblem-box {
-      width: 40px;
-      height: 40px;
+      width: 46px;
+      height: 46px;
       border-radius: 10px;
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(190, 18, 60, 0.2));
       border: 1px solid rgba(245, 158, 11, 0.5);
-      font-size: 1.25rem;
+      overflow: hidden;
+    }
+    .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .shadow-gold {
       box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
     }
     .staff-brand-title {
-      font-size: 1.05rem;
+      font-size: 1.18rem;
       letter-spacing: 0.8px;
-      line-height: 1.2;
+      line-height: 1.45;
+      padding: 0.08em 0 0.04em;
     }
     .staff-portal-badge {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       letter-spacing: 1.2px;
       font-weight: 700;
       opacity: 0.85;
@@ -123,7 +134,7 @@ import { MusicalService } from '../../services/musical.service';
     .staff-nav {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 1.5rem;
     }
     .staff-nav-link {
       position: relative;
@@ -132,39 +143,40 @@ import { MusicalService } from '../../services/musical.service';
       min-height: 40px;
       color: #CBD5E1;
       text-decoration: none;
-      font-size: 0.92rem;
-      font-weight: 600;
+      font-size: 0.98rem;
+      font-weight: 700;
       letter-spacing: 0.3px;
-      transition: all 0.2s ease;
-      padding: 0.3rem 0.85rem;
-      border-radius: 8px;
+      transition: all 0.25s ease;
+      padding: 0.35rem 0.35rem;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
     }
     .staff-nav-link::after {
+      content: '';
       position: absolute;
-      right: 0.85rem;
-      bottom: 2px;
-      left: 0.85rem;
+      bottom: 0;
+      left: 50%;
+      width: 0%;
       height: 2px;
       background: linear-gradient(90deg, #BE123C, #F59E0B);
-      content: '';
-      transform: scaleX(0);
-      transform-origin: center;
-      transition: transform 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(-50%);
+      box-shadow: 0 0 8px #F59E0B;
       border-radius: 2px;
     }
-    .staff-nav-link:hover {
-      color: #FDE68A;
-      background: rgba(245, 158, 11, 0.08);
-    }
+    .staff-nav-link:hover,
     .staff-nav-link.active {
-      color: #FDE68A;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+      color: #FDE68A !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
     }
     .staff-nav-link:hover::after,
     .staff-nav-link.active::after {
-      transform: scaleX(1);
+      width: 100%;
     }
     .staff-user-box {
       padding: 0.3rem 0.8rem;
@@ -174,7 +186,7 @@ import { MusicalService } from '../../services/musical.service';
       line-height: 1.3;
     }
     .staff-user-name {
-      font-size: 0.88rem;
+      font-size: 0.92rem;
     }
     .staff-user-role-badge .badge {
       font-size: 0.72rem;
@@ -201,7 +213,7 @@ import { MusicalService } from '../../services/musical.service';
       min-height: 38px;
       padding: 0.45rem 0.95rem;
       border-radius: 0.6rem;
-      font-size: 0.88rem;
+      font-size: 0.92rem;
       font-weight: 600;
       white-space: nowrap;
       transition: all 0.2s ease;
@@ -239,8 +251,12 @@ import { MusicalService } from '../../services/musical.service';
         padding: 0.4rem 0.75rem;
       }
       .staff-nav-link::after {
-        right: auto;
-        width: 3rem;
+        left: 0.75rem;
+        transform: none;
+      }
+      .staff-nav-link:hover::after,
+      .staff-nav-link.active::after {
+        width: 3.5rem;
       }
       .staff-account-actions {
         flex-wrap: wrap;

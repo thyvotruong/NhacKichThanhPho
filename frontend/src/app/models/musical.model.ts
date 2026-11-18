@@ -157,7 +157,7 @@ export interface BookingRequest {
   ticketTier?: string;
   quantity?: number;
   voucherCode?: string | null;
-  paymentMethod?: 'VNPAY' | 'MOMO' | 'ZALOPAY' | 'VIETQR' | 'BANK_CARD' | string;
+  paymentMethod?: 'VIETQR' | 'VNPAY' | 'MOMO' | 'ZALOPAY' | string;
   notes?: string;
 }
 
@@ -224,7 +224,38 @@ export interface DashboardStats {
     VNPAY: number;
     MOMO: number;
     ZALOPAY: number;
-    BANK_CARD: number;
+  };
+  paymentPercentages?: {
+    VIETQR: number;
+    VNPAY: number;
+    MOMO: number;
+    ZALOPAY: number;
+  };
+  topMusicals?: {
+    title: string;
+    slug?: string;
+    genre: string;
+    revenue: number;
+    ticketsSold: number;
+    occupancyRate: number;
+    posterUrl: string;
+    status: string;
+  }[];
+  revenueTrend?: {
+    week: {
+      labels: string[];
+      data: number[];
+      peakDay?: string;
+      peakAmount?: number;
+      dailyAverage?: number;
+      growthMoM?: string;
+    };
+    month: {
+      labels: string[];
+      data: number[];
+      peakMonth?: string;
+      peakAmount?: number;
+    };
   };
 }
 
@@ -295,4 +326,20 @@ export interface ApiResponse<T> {
   message?: string;
   code?: string;
   details?: any;
+}
+
+export interface AuditLogEntry {
+  _id?: string;
+  action: string;
+  category: string;
+  description: string;
+  performer: {
+    username: string;
+    fullName: string;
+    role: string;
+  };
+  ipAddress: string;
+  status: 'SUCCESS' | 'FAILED';
+  metadata?: Record<string, any>;
+  createdAt: string | Date;
 }

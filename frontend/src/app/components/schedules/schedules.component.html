@@ -136,7 +136,7 @@
 
     <!-- Lưới Card Suất Diễn -->
     <div class="row g-4">
-      @for (sched of filteredSchedules(); track sched._id) {
+      @for (sched of visibleSchedules(); track sched._id) {
         <div class="col-12 col-lg-6">
           <div class="card h-100 card-showman-glass schedule-card-hover border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-row align-items-center">
             <div class="position-relative overflow-hidden schedule-poster-wrapper">
@@ -222,5 +222,17 @@
         </div>
       }
     </div>
+
+    @if (canShowMoreSchedules()) {
+      <div class="text-center mt-4">
+        <button
+          type="button"
+          class="btn btn-showman-outline rounded-pill px-4 py-2 fw-bold"
+          (click)="toggleShowAllSchedules()"
+        >
+          {{ showAllSchedules() ? 'Thu gọn' : 'Xem thêm...' }}
+        </button>
+      </div>
+    }
   </div>
 </div>

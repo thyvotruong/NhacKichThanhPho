@@ -94,3 +94,88 @@
   margin: 0 auto; /* Giúp thanh divider luôn tự động căn giữa */
   border-radius: 2px;
 }
+
+/* ============================================================
+   NÂNG CẤP BẢO MẬT: NÚT HIỆN/ẨN MẬT KHẨU & THANH ĐO ĐỘ MẠNH
+   ============================================================ */
+.btn-toggle-password {
+  background: rgba(12, 18, 33, 0.88) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  border-left: none !important;
+  color: #94A3B8 !important;
+  padding: 0 0.85rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-top-right-radius: 0.375rem !important;
+  border-bottom-right-radius: 0.375rem !important;
+}
+
+.btn-toggle-password:hover {
+  color: #FDE68A !important;
+  background: rgba(22, 34, 62, 0.95) !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+.btn-toggle-password:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Khung đo độ mạnh mật khẩu */
+.password-strength-container {
+  background: rgba(10, 15, 29, 0.85);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.password-strength-meter {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s ease, background-color 0.35s ease;
+}
+
+.password-policy-checklist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+@media (max-width: 575.98px) {
+  .password-policy-checklist {
+    grid-template-columns: 1fr;
+  }
+}
+
+.policy-item {
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #94A3B8;
+  transition: color 0.25s ease;
+}
+
+.policy-item.passed {
+  color: #34D399;
+  font-weight: 600;
+}
+
+.policy-item.passed i {
+  color: #10B981;
+}
+
+.policy-item.failed i {
+  color: #64748B;
+}
+

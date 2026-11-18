@@ -49,6 +49,75 @@ export class AccountComponent implements OnInit {
   profileForm!: FormGroup;
   passwordForm!: FormGroup;
 
+  // Trạng thái Ẩn/Hiện mật khẩu (Toggle Show/Hide Password)
+  showCurrentPassword = signal<boolean>(false);
+  showNewPassword = signal<boolean>(false);
+  showConfirmPassword = signal<boolean>(false);
+
+  // Theo dõi giá trị để tính độ mạnh mật khẩu & checklist
+  newPasswordValue = signal<string>('');
+  confirmPasswordValue = signal<string>('');
+  isSubmittingPassword = signal<boolean>(false);
+
+  // Tiêu chí chính sách mật khẩu (Password Policy)
+  readonly hasMinLength = computed(() => (this.newPasswordValue() || '').length >= 8);
+  readonly hasLetterCase = computed(() => /[A-Z]/.test(this.newPasswordValue() || '') && /[a-z]/.test(this.newPasswordValue() || ''));
+  readonly hasNumber = computed(() => /[0-9]/.test(this.newPasswordValue() || ''));
+  readonly hasSpecialChar = computed(() => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(this.newPasswordValue() || ''));
+
+  // Điểm độ mạnh mật khẩu (0 - 4)
+  readonly passwordStrengthScore = computed(() => {
+    const pwd = this.newPasswordValue() || '';
+    if (!pwd) return 0;
+    let score = 0;
+    if (this.hasMinLength()) score++;
+    if (this.hasLetterCase()) score++;
+    if (this.hasNumber()) score++;
+    if (this.hasSpecialChar()) score++;
+    return score;
+  });
+
+  // Nhãn độ mạnh mật khẩu
+  readonly passwordStrengthLabel = computed(() => {
+    const pwd = this.newPasswordValue() || '';
+    if (!pwd) return '';
+    const score = this.passwordStrengthScore();
+    if (score <= 1) return 'Rất yếu (Weak)';
+    if (score === 2) return 'Yếu (Fair)';
+    if (score === 3) return 'Trung bình (Good)';
+    return 'Mạnh (Strong)';
+  });
+
+  // Màu sắc thanh độ mạnh
+  readonly passwordStrengthColor = computed(() => {
+    const score = this.passwordStrengthScore();
+    if (score <= 1) return '#EF4444';
+    if (score === 2) return '#F97316';
+    if (score === 3) return '#F59E0B';
+    return '#10B981';
+  });
+
+  // Phần trăm thanh độ mạnh
+  readonly passwordStrengthPercent = computed(() => {
+    const pwd = this.newPasswordValue() || '';
+    if (!pwd) return 0;
+    const score = this.passwordStrengthScore();
+    if (score === 0) return 10;
+    return (score / 4) * 100;
+  });
+
+  toggleCurrentPassword(): void {
+    this.showCurrentPassword.update(v => !v);
+  }
+
+  toggleNewPassword(): void {
+    this.showNewPassword.update(v => !v);
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword.update(v => !v);
+  }
+
   ngOnInit(): void {
     // Khởi tạo form thông tin cá nhân từ User hiện tại
     const user = this.musicalService.currentUser();
@@ -70,8 +139,15 @@ export class AccountComponent implements OnInit {
     // Form đổi mật khẩu
     this.passwordForm = this.fb.group({
       currentPassword: ['', [Validators.required]],
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]
+    });
+
+    this.passwordForm.get('newPassword')?.valueChanges.subscribe(val => {
+      this.newPasswordValue.set(val || '');
+    });
+    this.passwordForm.get('confirmPassword')?.valueChanges.subscribe(val => {
+      this.confirmPasswordValue.set(val || '');
     });
 
     // Lắng nghe URL và QueryParams để chuyển tab phù hợp
@@ -165,23 +241,57 @@ export class AccountComponent implements OnInit {
     this.securityMessage.set(null);
 
     const val = this.passwordForm.value;
-    if (!val.currentPassword) {
+    const current = (val.currentPassword || '').trim();
+    const next = (val.newPassword || '').trim();
+    const confirm = (val.confirmPassword || '').trim();
+
+    if (!current) {
       this.securityError.set('Vui lòng nhập mật khẩu hiện tại.');
       return;
     }
-    if (!val.newPassword || val.newPassword.length < 6) {
-      this.securityError.set('Mật khẩu mới phải có tối thiểu 6 ký tự.');
+    if (!next) {
+      this.securityError.set('Vui lòng nhập mật khẩu mới.');
       return;
     }
-    if (val.newPassword !== val.confirmPassword) {
+    if (next === current) {
+      this.securityError.set('Mật khẩu mới không được trùng với mật khẩu hiện tại đang sử dụng.');
+      return;
+    }
+    if (next.length < 8) {
+      this.securityError.set('Mật khẩu mới phải có tối thiểu 8 ký tự.');
+      return;
+    }
+    if (!this.hasMinLength() || !this.hasLetterCase() || !this.hasNumber() || !this.hasSpecialChar()) {
+      this.securityError.set('Mật khẩu mới chưa đáp ứng chính sách bảo mật: Cần ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.');
+      return;
+    }
+    if (!confirm) {
+      this.securityError.set('Vui lòng nhập xác nhận mật khẩu mới.');
+      return;
+    }
+    if (next !== confirm) {
       this.securityError.set('Mật khẩu xác nhận không khớp với mật khẩu mới.');
       return;
     }
 
-    // Giả lập cập nhật mật khẩu thành công
-    this.securityMessage.set('🎉 Đổi mật khẩu thành công! Hãy dùng mật khẩu mới cho lần đăng nhập tới.');
-    this.passwordForm.reset();
-    setTimeout(() => this.securityMessage.set(null), 4000);
+    this.isSubmittingPassword.set(true);
+    this.musicalService.changePassword(current, next).subscribe({
+      next: (res) => {
+        this.isSubmittingPassword.set(false);
+        this.securityMessage.set(res.message || '🎉 Đổi mật khẩu thành công! Hãy dùng mật khẩu mới cho lần đăng nhập tới.');
+        this.passwordForm.reset();
+        this.newPasswordValue.set('');
+        this.confirmPasswordValue.set('');
+        this.showCurrentPassword.set(false);
+        this.showNewPassword.set(false);
+        this.showConfirmPassword.set(false);
+        setTimeout(() => this.securityMessage.set(null), 5000);
+      },
+      error: (err) => {
+        this.isSubmittingPassword.set(false);
+        this.securityError.set(err.message || 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.');
+      }
+    });
   }
 
   onLogout(): void {

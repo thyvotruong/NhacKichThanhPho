@@ -229,6 +229,7 @@
         }
 
         <form class="account-form" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <!-- 1. MẬT KHẨU HIỆN TẠI -->
           <div class="mb-3">
             <label class="form-label text-gold small fw-bold">MẬT KHẨU HIỆN TẠI *</label>
             <div class="input-group">
@@ -236,14 +237,25 @@
                 <i class="bi bi-key"></i>
               </span>
               <input
-                type="password"
+                [type]="showCurrentPassword() ? 'text' : 'password'"
                 class="form-control"
                 placeholder="Nhập mật khẩu đang dùng..."
                 formControlName="currentPassword"
+                autocomplete="current-password"
               />
+              <button
+                type="button"
+                class="btn-toggle-password"
+                (click)="toggleCurrentPassword()"
+                [attr.aria-label]="showCurrentPassword() ? 'Ẩn mật khẩu hiện tại' : 'Hiện mật khẩu hiện tại'"
+                tabindex="-1"
+              >
+                <i class="bi" [class.bi-eye]="!showCurrentPassword()" [class.bi-eye-slash]="showCurrentPassword()"></i>
+              </button>
             </div>
           </div>
 
+          <!-- 2. MẬT KHẨU MỚI -->
           <div class="mb-3">
             <label class="form-label text-gold small fw-bold">MẬT KHẨU MỚI *</label>
             <div class="input-group">
@@ -251,14 +263,64 @@
                 <i class="bi bi-lock"></i>
               </span>
               <input
-                type="password"
+                [type]="showNewPassword() ? 'text' : 'password'"
                 class="form-control"
-                placeholder="Tối thiểu 6 ký tự..."
+                placeholder="Tối thiểu 8 ký tự (hoa, thường, số, ký tự đặc biệt)..."
                 formControlName="newPassword"
+                autocomplete="new-password"
               />
+              <button
+                type="button"
+                class="btn-toggle-password"
+                (click)="toggleNewPassword()"
+                [attr.aria-label]="showNewPassword() ? 'Ẩn mật khẩu mới' : 'Hiện mật khẩu mới'"
+                tabindex="-1"
+              >
+                <i class="bi" [class.bi-eye]="!showNewPassword()" [class.bi-eye-slash]="showNewPassword()"></i>
+              </button>
             </div>
+
+            <!-- THANH ĐO ĐỘ MẠNH & CHECKLIST TIÊU CHÍ (STRENGTH INDICATOR) -->
+            @if (newPasswordValue()) {
+              <div class="password-strength-container mt-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="small text-secondary" style="font-size: 0.75rem;">Độ mạnh mật khẩu:</span>
+                  <span class="small fw-bold" [style.color]="passwordStrengthColor()" style="font-size: 0.75rem;">
+                    {{ passwordStrengthLabel() }}
+                  </span>
+                </div>
+                <div class="password-strength-meter mb-2">
+                  <div
+                    class="password-strength-bar"
+                    [style.width.%]="passwordStrengthPercent()"
+                    [style.background-color]="passwordStrengthColor()"
+                  ></div>
+                </div>
+
+                <!-- Checklist 4 tiêu chí bảo mật -->
+                <div class="password-policy-checklist pt-1">
+                  <div class="policy-item" [class.passed]="hasMinLength()" [class.failed]="!hasMinLength()">
+                    <i class="bi" [class.bi-check-circle-fill]="hasMinLength()" [class.bi-circle]="!hasMinLength()"></i>
+                    <span>Tối thiểu 8 ký tự</span>
+                  </div>
+                  <div class="policy-item" [class.passed]="hasLetterCase()" [class.failed]="!hasLetterCase()">
+                    <i class="bi" [class.bi-check-circle-fill]="hasLetterCase()" [class.bi-circle]="!hasLetterCase()"></i>
+                    <span>Chữ hoa & chữ thường</span>
+                  </div>
+                  <div class="policy-item" [class.passed]="hasNumber()" [class.failed]="!hasNumber()">
+                    <i class="bi" [class.bi-check-circle-fill]="hasNumber()" [class.bi-circle]="!hasNumber()"></i>
+                    <span>Ít nhất 1 chữ số (0-9)</span>
+                  </div>
+                  <div class="policy-item" [class.passed]="hasSpecialChar()" [class.failed]="!hasSpecialChar()">
+                    <i class="bi" [class.bi-check-circle-fill]="hasSpecialChar()" [class.bi-circle]="!hasSpecialChar()"></i>
+                    <span>Ký tự đặc biệt (!@#$...)</span>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
 
+          <!-- 3. XÁC NHẬN MẬT KHẨU MỚI -->
           <div class="mb-4">
             <label class="form-label text-gold small fw-bold">XÁC NHẬN MẬT KHẨU MỚI *</label>
             <div class="input-group">
@@ -266,16 +328,46 @@
                 <i class="bi bi-check2-circle"></i>
               </span>
               <input
-                type="password"
+                [type]="showConfirmPassword() ? 'text' : 'password'"
                 class="form-control"
                 placeholder="Nhập lại mật khẩu mới..."
                 formControlName="confirmPassword"
+                autocomplete="new-password"
               />
+              <button
+                type="button"
+                class="btn-toggle-password"
+                (click)="toggleConfirmPassword()"
+                [attr.aria-label]="showConfirmPassword() ? 'Ẩn xác nhận mật khẩu' : 'Hiện xác nhận mật khẩu'"
+                tabindex="-1"
+              >
+                <i class="bi" [class.bi-eye]="!showConfirmPassword()" [class.bi-eye-slash]="showConfirmPassword()"></i>
+              </button>
             </div>
+
+            <!-- Báo lỗi khớp khẩu lệnh trực quan theo thời gian thực -->
+            @if (confirmPasswordValue() && newPasswordValue() && confirmPasswordValue() !== newPasswordValue()) {
+              <small class="text-danger small mt-1 d-flex align-items-center gap-1">
+                <i class="bi bi-x-circle-fill"></i> Mật khẩu xác nhận chưa khớp với mật khẩu mới.
+              </small>
+            } @else if (confirmPasswordValue() && newPasswordValue() && confirmPasswordValue() === newPasswordValue()) {
+              <small class="text-success small mt-1 d-flex align-items-center gap-1">
+                <i class="bi bi-check-circle-fill"></i> Mật khẩu xác nhận trùng khớp!
+              </small>
+            }
           </div>
 
-          <button type="submit" class="btn btn-showman-gold w-100 py-3 rounded-pill fw-bold">
-            <i class="bi bi-shield-check me-1"></i> XÁC NHẬN CẬP NHẬT MẬT KHẨU
+          <button
+            type="submit"
+            class="btn btn-showman-gold w-100 py-3 rounded-pill fw-bold"
+            [disabled]="isSubmittingPassword()"
+          >
+            @if (isSubmittingPassword()) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              ĐANG XỬ LÝ...
+            } @else {
+              <i class="bi bi-shield-check me-1"></i> XÁC NHẬN CẬP NHẬT MẬT KHẨU
+            }
           </button>
         </form>
       </section>

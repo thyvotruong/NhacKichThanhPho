@@ -106,7 +106,7 @@ const BookingSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['VNPAY', 'MOMO', 'ZALOPAY', 'VIETQR', 'BANK_CARD'],
+      enum: ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'],
       default: 'VIETQR'
     },
     paymentStatus: {

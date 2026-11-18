@@ -27,7 +27,7 @@ import { MusicalService } from '../../services/musical.service';
           <!-- Logo thương hiệu phong cách The Greatest Showman -->
           <a class="navbar-brand d-flex align-items-center gap-3" routerLink="/">
             <div class="showman-emblem-box d-flex align-items-center justify-content-center">
-              <span class="showman-icon">🎭</span>
+              <img src="images/logo/logoNKTP.jpg" alt="Logo Nhạc kịch Thành phố" class="brand-logo" />
             </div>
             <div class="d-flex flex-column">
               <span class="brand-name fw-bold text-gold-gradient">NHẠC KỊCH THÀNH PHỐ</span>
@@ -215,6 +215,10 @@ import { MusicalService } from '../../services/musical.service';
     </header>
   `,
   styles: [`
+    .showman-header .navbar {
+      padding-top: 0.7rem !important;
+      padding-bottom: 0.7rem !important;
+    }
     .showman-header {
       background: rgba(7, 10, 18, 0.95);
       backdrop-filter: blur(18px);
@@ -223,21 +227,25 @@ import { MusicalService } from '../../services/musical.service';
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(245, 158, 11, 0.18);
     }
     .showman-emblem-box {
-      width: 38px;
-      height: 38px;
+      width: 44px;
+      height: 44px;
       border-radius: 10px;
       background: radial-gradient(circle, rgba(190, 18, 60, 0.35) 0%, rgba(7, 10, 18, 0.95) 100%);
       border: 1.5px solid rgba(245, 158, 11, 0.5);
       box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);
+      overflow: hidden;
     }
-    .showman-icon {
-      font-size: 1.25rem;
-      filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.75));
+    .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .brand-name {
-      font-size: 1.02rem;
+      font-size: 1.18rem;
       letter-spacing: 0.8px;
-      line-height: 1.2;
+      line-height: 1.45;
+      padding: 0.08em 0 0.04em;
     }
     .brand-sub {
       font-size: 0.58rem;
@@ -246,12 +254,15 @@ import { MusicalService } from '../../services/musical.service';
     }
     .nav-link-showman {
       color: #CBD5E1 !important;
-      font-size: 0.775rem;
+      font-size: 0.85rem;
       letter-spacing: 0.5px;
       padding: 0.35rem 0.35rem !important;
       position: relative;
       transition: all 0.25s ease;
       cursor: pointer;
+    }
+    .showman-header .btn {
+      font-size: 0.9rem;
     }
     .nav-link-showman::after {
       content: '';
@@ -275,8 +286,8 @@ import { MusicalService } from '../../services/musical.service';
       width: 100%;
     }
     .nav-user-circle {
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       background: rgba(245, 158, 11, 0.2);
       border: 1px solid var(--showman-gold);

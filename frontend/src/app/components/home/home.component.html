@@ -183,83 +183,82 @@
       </p>
     </div>
 
-    <!-- Lưới lịch chiếu Card Theatrical -->
-    <div class="row g-4 justify-content-center">
-      @for (schedule of getUpcomingSchedules(); track schedule._id) {
-        <div class="col-12 col-sm-6 col-xl-3">
-          <!-- Thay card-showman-glass bằng style nền sáng hơn, sang trọng hơn -->
-          <div class="card rounded-4 h-100 border border-gold-glow shadow-lg" style="background: linear-gradient(135deg, rgba(40, 30, 45, 0.95) 0%, rgba(20, 15, 25, 0.98) 100%);">
-            <div class="card-body d-flex flex-column justify-content-between p-4">
-              <div>
-                <!-- Header Ngày & Trạng Thái Vé (@if) -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div class="date-badge-showman text-center p-2 rounded-3 border border-gold-glow bg-dark bg-opacity-50">
-                    <span class="d-block text-gold fw-bold fs-4 line-height-1">
-                      {{ schedule.performanceDate | date:'dd' }}
-                    </span>
-                    <span class="d-block text-uppercase text-light x-small fw-semibold opacity-75">
-                      THÁNG {{ schedule.performanceDate | date:'MM' }}
-                    </span>
-                  </div>
+    <div class="upcoming-schedules-carousel">
+      @if (getUpcomingSchedules().length > 1) {
+        <button
+          type="button"
+          class="upcoming-schedules-control upcoming-schedules-prev"
+          (click)="scrollUpcomingSchedules(-1)"
+          aria-label="Các lịch diễn trước đó"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+      }
 
-                  <!-- DIRECTIVE @if: CẬP NHẬT TRẠNG THÁI VÉ CÒN VÉ / CHÁY VÉ -->
-                  @if (schedule.status === 'available') {
-                    <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-3 py-2 rounded-pill small fw-semibold">
-                      <i class="bi bi-check-circle-fill me-1"></i> Còn vé
-                    </span>
-                  }
-                  @if (schedule.status === 'sold_out') {
-                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 px-3 py-2 rounded-pill small fw-semibold">
-                      <i class="bi bi-fire me-1"></i> Cháy vé
-                    </span>
-                  }
+      <div class="upcoming-schedules-track" #upcomingSchedulesTrack>
+        @for (schedule of getUpcomingSchedules(); track schedule._id) {
+          <div class="upcoming-schedule-slide">
+            <article class="card h-100 card-showman-glass upcoming-schedule-card border border-secondary border-opacity-25 rounded-4 overflow-hidden d-flex flex-row align-items-center">
+              <div class="position-relative overflow-hidden upcoming-schedule-poster">
+                <img [src]="schedule.posterUrl" [alt]="schedule.musicalTitle" class="upcoming-schedule-poster-img" />
+                <div class="upcoming-schedule-poster-overlay"></div>
+                <div class="position-absolute top-0 start-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+                  <i class="bi bi-ticket-perforated-fill text-success me-1"></i> CÒN VÉ
                 </div>
+                <div class="position-absolute bottom-0 start-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+                  <i class="bi bi-calendar3 text-gold me-1"></i> {{ schedule.performanceDate | date:'dd/MM/yyyy' }}
+                </div>
+                <div class="position-absolute bottom-0 end-0 m-3 z-3 text-white small fw-bold bg-dark-glass px-2 py-1 rounded-2 border border-secondary border-opacity-25">
+                  <i class="bi bi-clock-history text-gold me-1"></i> {{ schedule.time }}
+                </div>
+              </div>
 
-                <!-- Tên vở diễn & Thông tin suất -->
-                <h4 class="text-white fs-5 fw-bold mb-3">
+              <div class="card-body p-3 d-flex flex-column flex-grow-1 upcoming-schedule-body">
+                <h3 class="card-title fs-4 fw-bold text-gold-gradient mb-2 upcoming-schedule-title">
                   {{ schedule.musicalTitle }}
-                </h4>
-                <div class="schedule-meta small d-flex flex-column gap-2 mb-3">
-                  <span class="d-flex align-items-center text-light">
-                    <i class="bi bi-clock-fill text-gold me-2 flex-shrink-0"></i> 
-                    <span>Giờ diễn: <strong class="text-white ms-1">{{ schedule.time }}</strong></span>
-                  </span>
-                  <span class="d-flex align-items-center text-light">
-                    <i class="bi bi-door-open-fill text-ruby-glow me-2 flex-shrink-0"></i> 
-                    <span class="text-truncate">{{ schedule.hall }}</span>
-                  </span>
-                  <span class="d-flex align-items-center text-light opacity-75">
-                    <i class="bi bi-geo-alt-fill text-gold me-2 flex-shrink-0"></i> 
-                    <span>{{ schedule.venue }}</span>
-                  </span>
+                </h3>
+                @if (schedule.subtitle) {
+                  <p class="text-secondary small mb-3 upcoming-schedule-subtitle">
+                    {{ schedule.subtitle }}
+                  </p>
+                }
+
+                <div class="small text-white mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+                  <i class="bi bi-tag-fill text-gold me-1"></i> {{ schedule.genre }}
+                </div>
+
+                <div class="small text-white mb-3">
+                  <i class="bi bi-people-fill text-gold me-2"></i>
+                  <strong>Chỗ trống:</strong> {{ availableSeatCount(schedule) }} ghế
+                </div>
+
+                <div class="d-flex gap-2 mt-auto upcoming-schedule-actions">
+                  <a [routerLink]="['/musical', schedule.musicalSlug]" class="btn btn-showman-outline py-2 fw-bold">
+                    <i class="bi bi-info-circle me-1"></i> CHI TIẾT
+                  </a>
+                  <a [routerLink]="['/seat-selection', schedule._id]" class="btn btn-showman-gold py-2 fw-bold">
+                    <i class="bi bi-ticket-perforated me-1"></i> CHỌN GHẾ
+                  </a>
                 </div>
               </div>
-
-              <!-- Nút hành động tương ứng trạng thái vé -->
-              <div class="pt-3 border-top border-secondary border-opacity-25 mt-2">
-                @if (schedule.status === 'available') {
-                  <a
-                    [routerLink]="['/musical', schedule.musicalSlug]"
-                    class="btn btn-warning w-100 rounded-pill btn-sm py-2 fw-bold text-dark shadow-sm"
-                    style="background: linear-gradient(45deg, #f39c12, #f1c40f); border: none;"
-                  >
-                    <i class="bi bi-ticket-perforated me-1"></i> ĐẶT SUẤT NÀY
-                  </a>
-                }
-                @if (schedule.status === 'sold_out') {
-                  <!-- Đã sửa màu chữ thành sáng rõ, không bị ẩn chìm nữa -->
-                  <button class="btn btn-dark w-100 rounded-pill btn-sm py-2 text-light border border-secondary opacity-75" disabled>
-                    <i class="bi bi-bell-slash me-1"></i> ĐÃ HẾT CHỖ
-                  </button>
-                }
-              </div>
-            </div>
+            </article>
           </div>
-        </div>
-      } @empty {
-        <div class="col-12 text-center py-5">
-          <p class="text-secondary fs-5">Hiện chưa có lịch diễn sắp tới còn vé. Vui lòng quay lại sau!</p>
-        </div>
+        } @empty {
+          <div class="col-12 text-center py-5">
+            <p class="text-secondary fs-5">Hiện chưa có lịch diễn sắp tới còn vé. Vui lòng quay lại sau!</p>
+          </div>
+        }
+      </div>
+
+      @if (getUpcomingSchedules().length > 1) {
+        <button
+          type="button"
+          class="upcoming-schedules-control upcoming-schedules-next"
+          (click)="scrollUpcomingSchedules(1)"
+          aria-label="Các lịch diễn tiếp theo"
+        >
+          <i class="bi bi-chevron-right"></i>
+        </button>
       }
     </div>
   </div>
@@ -335,6 +334,13 @@
             GỬI TÔI CÁC ƯU ĐÃI
           </button>
         </div>
+
+        @if (vipAlert()) {
+          <div class="alert alert-{{ vipAlert()!.type }} border border-gold-glow mt-3 text-center fade show py-2 px-3 small rounded-3" role="alert">
+            <i class="bi bi-info-circle-fill me-1"></i>
+            {{ vipAlert()!.text }}
+          </div>
+        }
       </div>
     </div>
   </div>

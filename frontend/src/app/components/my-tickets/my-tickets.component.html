@@ -41,7 +41,7 @@
             [class.btn-showman-outline]="activeTab() !== 'USED'"
             (click)="activeTab.set('USED')"
           >
-            ĐÃ CHECK-IN
+            ĐÃ SOÁT VÉ
           </button>
         </div>
       </div>
@@ -67,7 +67,7 @@
                 </span>
               } @else if (order.bookingStatus === 'CHECKED_IN') {
                 <span class="badge badge-showman-gold">
-                  <i class="bi bi-check2-circle me-1"></i> Đã Check-in
+                  <i class="bi bi-check2-circle me-1"></i> Đã soát vé
                 </span>
               }
             </div>
@@ -103,25 +103,21 @@
 
               @if (order.checkInInfo?.checkedInAt) {
                 <div class="text-info pt-2 border-top border-secondary border-opacity-25 small">
-                  <i class="bi bi-check-all me-1"></i> Đã check-in lúc: {{ order.checkInInfo?.checkedInAt | date:'HH:mm dd/MM/yyyy' }} 
+                      <i class="bi bi-check-all me-1"></i> Đã soát vé lúc: {{ order.checkInInfo?.checkedInAt | date:'HH:mm dd/MM/yyyy' }}
                   ({{ order.checkInInfo?.checkedInBy || 'Cổng soát vé' }})
                 </div>
               }
 
             </div>
 
-            <!-- Nút hành động trên từng vé -->
-            <div class="d-flex flex-wrap gap-2 mt-auto">
-              <button class="btn btn-showman-gold rounded-pill fw-bold btn-sm py-2 px-3 flex-grow-1" (click)="openDetailModal(order)">
-                <i class="bi bi-file-earmark-text me-1"></i> XEM CHI TIẾT VÉ
-              </button>
-
-              <button class="btn btn-showman-outline rounded-pill fw-bold btn-sm py-2 px-3" (click)="openQrModal(order)" title="Xem nhanh mã QR">
-                <i class="bi bi-qr-code"></i>
-              </button>
-
-              <button class="btn btn-showman-outline rounded-pill fw-bold btn-sm py-2 px-3" (click)="downloadTicket(order)" aria-label="Tải vé điện tử">
-                <i class="bi bi-download me-1"></i> TẢI VÉ
+            <!-- Nút hành động duy nhất trên thẻ vé: Xem chi tiết / Vé điện tử -->
+            <div class="mt-auto">
+              <button
+                class="btn btn-showman-gold w-100 rounded-pill fw-bold py-2 px-3 d-flex align-items-center justify-content-center gap-2 shadow-sm single-action-btn"
+                (click)="openDetailModal(order)"
+              >
+                <i class="bi bi-qr-code-scan fs-6"></i>
+                <span>Xem chi tiết / Vé điện tử</span>
               </button>
             </div>
           </div>
@@ -141,156 +137,113 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       MODAL: CHI TIẾT VÉ ĐIỆN TỬ (E-TICKET)
-       ============================================================ -->
+  <!-- Chi tiết vé điện tử -->
   @if (selectedDetailOrder(); as detail) {
-    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
-      <div class="card card-showman-glass rounded-4 p-4 max-w-650 w-100 border-gold-glow shadow-2xl modal-scrollable">
-        <!-- Header Modal -->
-        <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-gold-glow">
-          <div class="d-flex align-items-center gap-2">
-            <div class="theatre-emblem">🎭</div>
-            <div>
-              <h5 class="text-gold-gradient fw-bold mb-0">VÉ ĐIỆN TỬ (E-TICKET)</h5>
-              <span class="text-secondary extra-small">NHÀ HÁT THÀNH PHỐ • HỆ THỐNG PHÁT HÀNH CHÍNH THỨC</span>
-            </div>
+    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3" (click)="closeDetailModal()">
+      <div class="card card-showman-glass rounded-4 p-3 p-sm-4 max-w-650 w-100 border-gold-glow shadow-2xl modal-scrollable" (click)="$event.stopPropagation()">
+
+        @if (downloadFeedback()) {
+          <div class="alert bg-opacity-25 text-white py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2"
+            [class.alert-success]="!downloadFailed()"
+            [class.bg-success]="!downloadFailed()"
+            [class.border-success]="!downloadFailed()"
+            [class.alert-danger]="downloadFailed()"
+            [class.bg-danger]="downloadFailed()"
+            [class.border-danger]="downloadFailed()">
+            <i class="fs-5" [class.bi]="true" [class.bi-check-circle-fill]="!downloadFailed()" [class.bi-exclamation-circle-fill]="downloadFailed()" [class.text-success]="!downloadFailed()" [class.text-danger]="downloadFailed()"></i>
+            <span>{{ downloadFeedback() }}</span>
           </div>
-          <button class="btn btn-sm btn-outline-secondary rounded-circle" (click)="closeDetailModal()">✕</button>
-        </div>
+        }
 
         <!-- Thông tin vé điện tử -->
-        <div class="ticket-document p-4 rounded-4 mb-4">
+        <div class="ticket-document p-3 p-sm-4 rounded-4 mb-3">
           <!-- Huy hiệu trạng thái vé -->
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="font-monospace text-gold fw-bold fs-5">MÃ VÉ: {{ detail.bookingCode }}</span>
+          <div class="ticket-topline d-flex justify-content-between align-items-center mb-3">
+            <span class="font-monospace text-gold fw-bold ticket-code">MÃ VÉ: {{ detail.bookingCode }}</span>
             @if (detail.bookingStatus === 'CONFIRMED') {
-              <span class="badge badge-status-available fs-6 px-3 py-2">
-                <i class="bi bi-check-circle-fill me-1"></i> HỢP LỆ (CHƯA DÙNG)
+              <span class="badge badge-status-available px-2 py-2">
+                <i class="bi bi-check-circle-fill me-1"></i> Chưa sử dụng
               </span>
             } @else if (detail.bookingStatus === 'CHECKED_IN') {
-              <span class="badge badge-showman-gold fs-6 px-3 py-2">
-                <i class="bi bi-check2-circle me-1"></i> ĐÃ CHECK-IN
+              <span class="badge badge-showman-gold px-2 py-2">
+                <i class="bi bi-check2-circle me-1"></i> ĐÃ SOÁT VÉ
               </span>
             }
           </div>
 
           <!-- Thông tin vở kịch -->
-          <div class="text-center my-3 pb-3 border-bottom border-gold-glow">
+          <div class="ticket-show-info text-center my-3 p-3 rounded-3">
             <h3 class="text-white fw-bold mb-2">{{ detail.musicalTitle }}</h3>
-            <p class="text-gold mb-1 fs-5">
-              <i class="bi bi-calendar-event me-2"></i>{{ detail.performanceDate | date:'EEEE, dd/MM/yyyy' }} • {{ detail.performanceTime }}
+            <p class="text-gold mb-2">
+              <i class="bi bi-calendar-event me-2"></i>{{ formatPerformanceDate(detail.performanceDate) }} · {{ detail.performanceTime }}
             </p>
             <p class="text-secondary small mb-0">
-              <i class="bi bi-geo-alt-fill text-ruby me-1"></i> {{ detail.hall }} - {{ detail.venue || 'Nhà hát Lớn Thành phố' }}
+              <i class="bi bi-geo-alt-fill text-ruby me-1"></i>{{ detail.hall }} · {{ detail.venue || 'Nhà hát Thành phố' }}
             </p>
           </div>
 
-          <!-- Sơ đồ mã QR & Thông tin ghế ngồi -->
           <div class="row align-items-center g-3 my-2">
-            <div class="col-sm-5 text-center">
-              <div class="qr-box p-3 bg-white rounded-3 shadow-lg d-inline-block">
-                <svg width="150" height="150" viewBox="0 0 100 100">
-                  <rect width="100" height="100" fill="white" />
-                  <rect x="10" y="10" width="25" height="25" fill="#090D16" />
-                  <rect x="15" y="15" width="15" height="15" fill="white" />
-                  <rect x="18" y="18" width="9" height="9" fill="#BE123C" />
-                  <rect x="65" y="10" width="25" height="25" fill="#090D16" />
-                  <rect x="70" y="15" width="15" height="15" fill="white" />
-                  <rect x="73" y="18" width="9" height="9" fill="#BE123C" />
-                  <rect x="10" y="65" width="25" height="25" fill="#090D16" />
-                  <rect x="15" y="70" width="15" height="15" fill="white" />
-                  <rect x="18" y="73" width="9" height="9" fill="#BE123C" />
-                  <rect x="42" y="15" width="8" height="8" fill="#F59E0B" />
-                  <rect x="45" y="35" width="12" height="12" fill="#090D16" />
-                  <rect x="65" y="65" width="10" height="10" fill="#090D16" />
-                  <rect x="78" y="75" width="12" height="12" fill="#F59E0B" />
-                  <rect x="40" y="70" width="10" height="10" fill="#090D16" />
-                </svg>
-              </div>
-              <span class="d-block text-secondary extra-small mt-2">Quét mã QR tại cổng kiểm soát</span>
+            <div class="col-5 text-center">
+              @if (qrCodeImage()) {
+                <img class="ticket-qr-image" [src]="qrCodeImage()" alt="Mã QR vé điện tử" />
+                <span class="d-block text-secondary extra-small mt-2">Quét mã tại cổng soát vé</span>
+              } @else if (qrCodeLoading()) {
+                <div class="ticket-qr-placeholder text-secondary small">Đang tạo mã QR…</div>
+              } @else {
+                <div class="ticket-qr-placeholder text-warning small">{{ qrCodeError() }}</div>
+              }
             </div>
 
-            <div class="col-sm-7">
+            <div class="col-7">
               <div class="bg-dark-translucent p-3 rounded-3 border border-secondary border-opacity-25 small">
                 <div class="mb-2">
-                  <span class="text-secondary">Khách hàng: </span>
+                  <span class="text-secondary">Khán giả: </span>
                   <strong class="text-white">{{ detail.customerName }}</strong>
                 </div>
                 <div class="mb-2">
-                  <span class="text-secondary">Điện thoại / Email: </span>
-                  <span class="text-white">{{ detail.customerPhone }} • {{ detail.customerEmail }}</span>
-                </div>
-                <div class="mb-2">
-                  <span class="text-secondary">Ghế ngồi đã đặt:</span>
+                  <span class="text-secondary">Ghế ngồi:</span>
                   <div class="d-flex flex-wrap gap-1 mt-1">
                     @for (s of detail.seats; track s.seatCode) {
-                      <span class="badge badge-showman-gold">{{ s.seatCode }} ({{ s.type }} - {{ s.price | number:'1.0-0' }}đ)</span>
+                      <span class="badge badge-showman-gold">{{ s.seatCode }} ({{ s.type === 'Standard' ? 'Tiêu chuẩn' : s.type === 'Couple' ? 'Cặp đôi' : s.type }})</span>
                     }
                   </div>
-                </div>
-                <div class="pt-2 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
-                  <span class="text-secondary">Tổng tiền:</span>
-                  <span class="text-gold-gradient fw-bold fs-6">{{ detail.totalPrice | number:'1.0-0' }} đ</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Lưu ý quy định vào rạp -->
-          <div class="p-2 rounded-2 bg-dark border border-secondary border-opacity-25 extra-small text-secondary mt-3">
-            <i class="bi bi-info-circle-fill text-gold me-1"></i>
-            <strong>Quy định:</strong> Vui lòng có mặt trước giờ diễn 15-30 phút. Trang phục lịch sự. Trẻ em dưới độ tuổi quy định sẽ không được vào khán phòng.
+          <div class="ticket-total d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary border-opacity-25">
+            <span class="text-secondary small">Tổng thanh toán:</span>
+            <span class="text-gold-gradient fw-bold">{{ detail.totalPrice | number:'1.0-0' }} đ</span>
+          </div>
+
+          <div class="ticket-rules mt-3 p-3 rounded-3 small">
+            @if (ageLimitLoading()) {
+              <div class="text-secondary">Đang tải quy định độ tuổi…</div>
+            } @else if (ageLimit()) {
+              <div class="text-white fw-semibold mb-2">
+                <i class="bi bi-person-badge text-gold me-1"></i> Độ tuổi: {{ ageLimit() }}
+              </div>
+            } @else {
+              <div class="text-warning mb-2">{{ ageLimitError() }}</div>
+            }
+            <div class="text-secondary">
+              <i class="bi bi-info-circle-fill text-gold me-1"></i>
+              Khán giả vui lòng đến đúng giờ để thưởng thức trọn vẹn chương trình.
+            </div>
           </div>
         </div>
 
-        <!-- Tải vé điện tử hoặc đóng chi tiết -->
-        <div class="d-flex flex-wrap gap-2 pt-2 border-top border-secondary border-opacity-25">
-          <button class="btn btn-showman-gold rounded-pill py-2 px-4 fw-bold flex-grow-1" (click)="downloadTicket(detail)">
-            <i class="bi bi-download me-1"></i> TẢI VÉ ĐIỆN TỬ
-          </button>
-
-          <button class="btn btn-showman-outline rounded-pill py-2 px-3" (click)="closeDetailModal()">
-            ĐÓNG
+        <div class="ticket-download-bar pt-2 border-top border-secondary border-opacity-25">
+          <button
+            class="btn btn-showman-gold w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
+            [disabled]="ageLimitLoading() || !ageLimit() || qrCodeLoading() || !qrCodeImage()"
+            (click)="downloadTicket(detail)"
+          >
+            <i class="bi bi-download"></i>
+            <span>TẢI VÉ</span>
           </button>
         </div>
-      </div>
-    </div>
-  }
-
-  <!-- ============================================================
-       MODAL: XEM MÃ QR CHECK-IN PHÓNG TO
-       ============================================================ -->
-  @if (viewingQrOrder(); as qrTarget) {
-    <div class="custom-modal-backdrop d-flex align-items-center justify-content-center p-3">
-      <div class="card card-showman-glass rounded-4 p-4 max-w-450 w-100 border-gold-glow text-center shadow-2xl">
-        <h4 class="text-gold-gradient fw-bold mb-1">{{ qrTarget.musicalTitle }}</h4>
-        <p class="text-secondary small mb-3">{{ qrTarget.performanceTime }} • {{ qrTarget.performanceDate | date:'dd/MM/yyyy' }} • {{ qrTarget.hall }}</p>
-
-        <div class="qr-box p-3 bg-white rounded-3 shadow-lg d-inline-block mb-3 mx-auto">
-          <svg width="180" height="180" viewBox="0 0 100 100">
-            <rect width="100" height="100" fill="white" />
-            <rect x="10" y="10" width="25" height="25" fill="#090D16" />
-            <rect x="15" y="15" width="15" height="15" fill="white" />
-            <rect x="18" y="18" width="9" height="9" fill="#BE123C" />
-            <rect x="65" y="10" width="25" height="25" fill="#090D16" />
-            <rect x="70" y="15" width="15" height="15" fill="white" />
-            <rect x="73" y="18" width="9" height="9" fill="#BE123C" />
-            <rect x="10" y="65" width="25" height="25" fill="#090D16" />
-            <rect x="15" y="70" width="15" height="15" fill="white" />
-            <rect x="18" y="73" width="9" height="9" fill="#BE123C" />
-            <rect x="42" y="15" width="8" height="8" fill="#F59E0B" />
-            <rect x="45" y="35" width="12" height="12" fill="#090D16" />
-            <rect x="65" y="65" width="10" height="10" fill="#090D16" />
-            <rect x="78" y="75" width="12" height="12" fill="#F59E0B" />
-            <rect x="40" y="70" width="10" height="10" fill="#090D16" />
-          </svg>
-        </div>
-
-        <span class="d-block text-gold fw-bold fs-5 font-monospace mb-1">{{ qrTarget.bookingCode }}</span>
-        <span class="d-block text-white small mb-3">Ghế: {{ qrTarget.seats[0]?.seatCode }} {{ qrTarget.seats.length > 1 ? '(và ' + (qrTarget.seats.length - 1) + ' ghế khác)' : '' }}</span>
-
-        <button class="btn btn-showman-ruby w-100 rounded-pill py-2 fw-bold" (click)="closeQrModal()">ĐÓNG</button>
       </div>
     </div>
   }

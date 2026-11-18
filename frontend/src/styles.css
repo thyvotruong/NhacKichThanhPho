@@ -567,3 +567,23 @@ html::-webkit-scrollbar {
   background: linear-gradient(180deg, #E11D48 0%, #F59E0B 100%);
   box-shadow: 0 0 8px #F59E0B;
 }
+
+/* ============================================================
+   GLOBAL INPUT-GROUP-TEXT & BG-DARK-GLASS SHOWMAN THEME
+   Khắc phục triệt để nền trắng của Bootstrap, đồng bộ tông vàng kim sang trọng
+   ============================================================ */
+.bg-dark-glass {
+  background: rgba(14, 22, 41, 0.78) !important;
+}
+
+.input-group-text.bg-dark-glass {
+  background: linear-gradient(135deg, #FEF3C7 0%, #F59E0B 50%, #D97706 100%) !important;
+  border-color: #F59E0B !important;
+  color: #070A12 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+}
+
+.input-group-text.bg-dark-glass i {
+  color: #070A12 !important;
+  font-weight: 800;
+}

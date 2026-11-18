@@ -7,17 +7,6 @@
 
 <div class="admin-portal-page position-relative py-2.5">
   <div class="container-fluid px-3 px-xl-4 position-relative z-2">
-    <!-- Toast Notification Banner -->
-    @if (toastMessage()) {
-      <div class="alert alert-{{ toastMessage()!.type }} border border-gold-glow shadow-2xl d-flex align-items-center justify-content-between mb-4 fade show" role="alert">
-        <div class="d-flex align-items-center gap-2">
-          <i class="bi bi-info-circle-fill fs-5"></i>
-          <span class="fw-bold">{{ toastMessage()!.text }}</span>
-        </div>
-        <button type="button" class="btn-close btn-close-white" (click)="toastMessage.set(null)" aria-label="Close"></button>
-      </div>
-    }
-
     <!-- 10-Tab Navigation Bar -->
     <div class="admin-tab-strip">
       @if (currentUser()?.role === 'admin') {
@@ -62,6 +51,14 @@
         <button class="btn admin-tab-btn" [class.active]="activeTab() === 'accounts'" (click)="setTab('accounts')">
           Quản Lý RBAC
         </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'subscribers'" (click)="setTab('subscribers')">
+          <i class="bi bi-envelope-paper me-1 text-gold"></i> DS Đăng Ký Nhận Tin
+        </button>
+
+        <button class="btn admin-tab-btn" [class.active]="activeTab() === 'audit-logs'" (click)="setTab('audit-logs')">
+          <i class="bi bi-shield-shaded me-1 text-gold"></i> Nhật Ký Hoạt Động
+        </button>
       }
     </div>
 
@@ -70,11 +67,12 @@
          ============================================================ -->
     @if (activeTab() === 'dashboard') {
       <div class="tab-pane-content fade show">
-        <div class="dashboard-heading mb-4">
+        <!-- 1. Header Toolbar -->
+        <div class="dashboard-heading mb-3">
           <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
             <div>
-              <h1 class="text-gold-gradient fw-bold mb-1">Tổng quan hoạt động nhà hát</h1>
-              <p class="text-slate-light mb-0">Theo dõi doanh thu, lượng vé phát hành và tiến độ vận hành theo thời gian thực</p>
+              <h1 class="text-gold-gradient fw-bold mb-1 fs-3">Tổng quan vận hành nhà hát</h1>
+              <p class="text-slate-light small mb-0">Theo dõi doanh thu, hiệu suất khán phòng và phản hồi khách hàng theo thời gian thực</p>
             </div>
             <div class="d-flex align-items-center gap-2">
               <span class="badge live-badge px-3 py-2 d-flex align-items-center gap-2">
@@ -82,7 +80,7 @@
                 <span>Dữ liệu thời gian thực</span>
               </span>
               <button class="btn btn-sm btn-refresh-stats" (click)="loadDashboardStats()" title="Làm mới dữ liệu">
-                Làm mới
+                <i class="bi bi-arrow-clockwise me-1"></i>Làm mới
               </button>
             </div>
           </div>
@@ -94,212 +92,320 @@
             <p class="text-slate-light mt-2">Đang tải dữ liệu tổng quan thời gian thực...</p>
           </div>
         } @else if (stats()) {
-          <!-- 4 Stat Cards -->
-          <div class="row g-4 mb-4">
-            <!-- Thẻ 1: Tổng doanh thu (HERO METRIC - NỔI BẬT & SÁNG NHẤT) -->
+          <!-- HÀNG 1: TOP KPIS BAR (4 CỘT CÂN ĐỐI) -->
+          <div class="row g-3 mb-3">
+            <!-- Thẻ 1: Tổng doanh thu (Hero Metric) -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium stat-card-hero p-4 rounded-4 h-100">
+              <div class="stat-card-premium stat-card-hero p-3.5 rounded-4 h-100">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <span class="stat-label-gold text-uppercase fw-bold">Tổng doanh thu</span>
                   <span class="badge badge-hero-kpi">KPI CHỦ LỰC</span>
                 </div>
-                <div class="stat-value-hero fw-bold mb-2">
+                <div class="stat-value-hero fw-bold mb-2 fs-3">
                   {{ stats()!.totalRevenue | number:'1.0-0' }} <span class="stat-currency">₫</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                   <span class="badge badge-growth-success">+14.8% tuần này</span>
-                  <span class="stat-subtext text-slate-light">so với tuần trước</span>
+                  <span class="stat-subtext text-slate-light small">so với tuần trước</span>
                 </div>
               </div>
             </div>
 
             <!-- Thẻ 2: Vé đã phát hành -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium p-4 rounded-4 h-100">
+              <div class="stat-card-premium p-3.5 rounded-4 h-100">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <span class="stat-label text-uppercase fw-bold">Vé đã phát hành</span>
                   <span class="badge badge-tag-info">100% Mã QR</span>
                 </div>
-                <div class="stat-value-white fw-bold mb-2">
-                  {{ stats()!.totalTicketsSold | number }} <span class="stat-unit text-slate-light">vé</span>
+                <div class="stat-value-white fw-bold mb-2 fs-3">
+                  {{ stats()!.totalTicketsSold | number }} <span class="stat-unit text-slate-light fs-6">vé</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                  <span class="stat-subtext text-slate-light">Đã xác thực điện tử qua cổng</span>
+                  <span class="stat-subtext text-slate-light small">Tự động đối soát qua e-Gate & QR scanner</span>
                 </div>
               </div>
             </div>
 
             <!-- Thẻ 3: Tỷ lệ lấp đầy rạp -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium p-4 rounded-4 h-100">
+              <div class="stat-card-premium p-3.5 rounded-4 h-100">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <span class="stat-label-gold text-uppercase fw-bold">Tỷ lệ lấp đầy rạp</span>
                   <span class="badge badge-tag-warning">Khung giờ vàng</span>
                 </div>
-                <div class="stat-value-gold fw-bold mb-2">
-                  {{ stats()!.occupancyRate }}<span class="stat-percent">%</span>
+                <div class="stat-value-gold fw-bold mb-2 fs-3">
+                  {{ stats()!.occupancyRate }}<span class="stat-percent fs-5">%</span>
                 </div>
-                <div class="progress stat-progress-track mb-2">
+                <div class="progress stat-progress-track mb-2" style="height: 6px;">
                   <div class="progress-bar stat-progress-fill" [style.width.%]="stats()!.occupancyRate"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                  <span class="stat-subtext text-slate-light">Grand A & Blackbox</span>
-                  <span class="stat-subtext text-gold-spark fw-semibold">Suất tối</span>
+                  <span class="stat-subtext text-slate-light small">Grand A & Broadway Opera</span>
+                  <span class="stat-subtext text-gold-spark fw-semibold small">Suất tối</span>
                 </div>
               </div>
             </div>
 
             <!-- Thẻ 4: Vở đang công diễn -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium p-4 rounded-4 h-100">
+              <div class="stat-card-premium p-3.5 rounded-4 h-100">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                   <span class="stat-label text-uppercase fw-bold">Vở đang công diễn</span>
                   <span class="badge badge-tag-warning">Đang công chiếu</span>
                 </div>
-                <div class="stat-value-white fw-bold mb-2">
-                  {{ stats()!.activeShowsCount }} <span class="stat-unit text-slate-light">vở diễn</span>
+                <div class="stat-value-white fw-bold mb-2 fs-3">
+                  {{ stats()!.activeShowsCount }} <span class="stat-unit text-slate-light fs-6">vở diễn</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                  <span class="stat-subtext text-slate-light">12 suất diễn/tuần</span>
+                  <span class="stat-subtext text-slate-light small">12 suất diễn/tuần trên toàn hệ thống</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Doanh thu Cổng thanh toán & Phím tắt quản trị nhanh -->
-          <div class="row g-4">
-            <!-- Thống kê doanh thu theo cổng thanh toán -->
-            <div class="col-lg-8">
-              <div class="dashboard-panel-card p-4 rounded-4 h-100">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4 pb-3 border-bottom border-gold-subtle">
-                  <div>
-                    <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-1">
-                      Thống kê doanh thu theo cổng thanh toán
-                    </h2>
-                    <p class="text-slate-light small mb-0">Tỷ trọng các kênh thanh toán trực tuyến qua cổng Gateway</p>
+          <!-- HÀNG 2: BIỂU ĐỒ DOANH THU & PHÂN BỔ CỔNG THANH TOÁN (ONE-PAGE ARCHITECTURE) -->
+          <div class="row g-3 mb-3">
+            <!-- Cột trái (8 cols): Biểu đồ xu hướng doanh thu -->
+            <div class="col-xl-8 col-lg-7">
+              <div class="dashboard-panel-card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
+                    <div>
+                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                        <i class="bi bi-graph-up-arrow text-gold me-2"></i>Xu Hướng Doanh Thu Bán Vé
+                      </h2>
+                      <p class="text-slate-light small mb-0">Biến động doanh số bán vé trực tuyến theo chu kỳ</p>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn"
+                        [class.btn-period-active]="revenueTrendPeriod() === 'week'"
+                        [class.btn-period-inactive]="revenueTrendPeriod() !== 'week'"
+                        (click)="setRevenueTrendPeriod('week')">
+                        7 ngày qua
+                      </button>
+                      <button type="button" class="btn"
+                        [class.btn-period-active]="revenueTrendPeriod() === 'month'"
+                        [class.btn-period-inactive]="revenueTrendPeriod() !== 'month'"
+                        (click)="setRevenueTrendPeriod('month')">
+                        6 tháng qua
+                      </button>
+                    </div>
                   </div>
-                  <span class="badge badge-outline-gold px-3 py-1.5">
-                    Đối soát 100% tự động
-                  </span>
+
+                  <div style="position: relative; height: 215px; width: 100%;">
+                    <canvas id="revenueTrendChart"></canvas>
+                  </div>
                 </div>
 
-                <div class="d-flex flex-column gap-3.5">
-                  <!-- VietQR -->
-                  <div class="payment-stat-row p-3 rounded-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div>
-                        <div class="text-white fw-bold">VietQR</div>
-                        <div class="text-slate-light x-small">Chuyển khoản liên ngân hàng tức thì 24/7</div>
-                      </div>
-                      <div class="text-end">
-                        <div class="text-gold fw-bold fs-6">{{ stats()!.paymentBreakdown.VIETQR | number }} ₫</div>
-                        <span class="badge bg-dark text-gold-spark border border-gold-subtle">43.6%</span>
-                      </div>
+                <!-- Footer Summary Chips -->
+                <div class="d-flex flex-wrap gap-2 pt-2.5 mt-2 border-top border-gold-subtle">
+                  <span class="dashboard-stat-chip">
+                    <i class="bi bi-star-fill text-gold me-1"></i>
+                    <span>Đỉnh doanh thu: <strong class="text-white">192.000.000 ₫</strong> (Chủ Nhật)</span>
+                  </span>
+                  <span class="dashboard-stat-chip">
+                    <i class="bi bi-cash-stack text-info me-1"></i>
+                    <span>Trung bình: <strong class="text-white">159.500.000 ₫/ngày</strong></span>
+                  </span>
+                  <span class="dashboard-stat-chip">
+                    <i class="bi bi-arrow-up-circle-fill text-success me-1"></i>
+                    <span>Tăng trưởng: <strong class="text-success">+18.2%</strong> MoM</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cột phải (4 cols): Thống kê cổng thanh toán thu gọn -->
+            <div class="col-xl-4 col-lg-5">
+              <div class="dashboard-panel-card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
+                    <div>
+                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                        <i class="bi bi-pie-chart text-gold me-2"></i>Tỷ Trọng Cổng Thanh Toán
+                      </h2>
+                      <p class="text-slate-light small mb-0">Phân bổ nguồn thu các kênh Gateway</p>
                     </div>
-                    <div class="progress payment-progress-bar">
-                      <div class="progress-bar bg-vietqr" style="width: 43.6%;"></div>
-                    </div>
+                    <span class="badge badge-outline-gold px-2 py-1 small">
+                      Tự động
+                    </span>
                   </div>
 
-                  <!-- VNPAY -->
-                  <div class="payment-stat-row p-3 rounded-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div>
-                        <div class="text-white fw-bold">VNPAY QR & Ví VNPAY</div>
-                        <div class="text-slate-light x-small">Ứng dụng ngân hàng số & Ví điện tử VNPAY</div>
-                      </div>
-                      <div class="text-end">
-                        <div class="text-gold fw-bold fs-6">{{ stats()!.paymentBreakdown.VNPAY | number }} ₫</div>
-                        <span class="badge bg-dark text-info border border-info border-opacity-30">30.9%</span>
-                      </div>
-                    </div>
-                    <div class="progress payment-progress-bar">
-                      <div class="progress-bar bg-vnpay" style="width: 30.9%;"></div>
-                    </div>
+                  <!-- Donut Chart Canvas -->
+                  <div class="d-flex justify-content-center align-items-center mb-2" style="position: relative; height: 110px;">
+                    <canvas id="paymentDonutChart"></canvas>
                   </div>
 
-                  <!-- MoMo -->
-                  <div class="payment-stat-row p-3 rounded-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div>
-                        <div class="text-white fw-bold">Ví Điện Tử MoMo</div>
-                        <div class="text-slate-light x-small">Thanh toán một chạm qua siêu ứng dụng MoMo</div>
+                  <!-- 4 Compact Payment Breakdown Rows -->
+                  <div class="d-flex flex-column gap-2">
+                    <!-- VietQR -->
+                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #10B981;">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25 py-0 px-1.5 small">
+                          {{ (stats()!.paymentPercentages?.VIETQR ?? 44.0) | number:'1.1-1' }}%
+                        </span>
+                        <span class="text-white small fw-semibold">VietQR</span>
                       </div>
-                      <div class="text-end">
-                        <div class="text-gold fw-bold fs-6">{{ stats()!.paymentBreakdown.MOMO | number }} ₫</div>
-                        <span class="badge bg-dark text-danger border border-danger border-opacity-30">16.4%</span>
-                      </div>
+                      <span class="text-gold fw-bold small">{{ stats()!.paymentBreakdown.VIETQR | number }} ₫</span>
                     </div>
-                    <div class="progress payment-progress-bar">
-                      <div class="progress-bar bg-momo" style="width: 16.4%;"></div>
-                    </div>
-                  </div>
 
-                  <!-- Bank Card & ZaloPay -->
-                  <div class="payment-stat-row p-3 rounded-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                      <div>
-                        <div class="text-white fw-bold">Thẻ Quốc Tế Visa / Master & ZaloPay</div>
-                        <div class="text-slate-light x-small">Thanh toán thẻ quốc tế & ví ZaloPay</div>
+                    <!-- VNPAY -->
+                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #0EA5E9;">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-info-subtle text-info border border-info border-opacity-25 py-0 px-1.5 small">
+                          {{ (stats()!.paymentPercentages?.VNPAY ?? 31.0) | number:'1.1-1' }}%
+                        </span>
+                        <span class="text-white small fw-semibold">VNPAY QR</span>
                       </div>
-                      <div class="text-end">
-                        <div class="text-gold fw-bold fs-6">{{ (stats()!.paymentBreakdown.BANK_CARD + stats()!.paymentBreakdown.ZALOPAY) | number }} ₫</div>
-                        <span class="badge bg-dark text-success border border-success border-opacity-30">9.1%</span>
-                      </div>
+                      <span class="text-gold fw-bold small">{{ stats()!.paymentBreakdown.VNPAY | number }} ₫</span>
                     </div>
-                    <div class="progress payment-progress-bar">
-                      <div class="progress-bar bg-card" style="width: 9.1%;"></div>
+
+                    <!-- MoMo -->
+                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #F43F5E;">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-danger-subtle text-danger border border-danger border-opacity-25 py-0 px-1.5 small">
+                          {{ (stats()!.paymentPercentages?.MOMO ?? 17.0) | number:'1.1-1' }}%
+                        </span>
+                        <span class="text-white small fw-semibold">Ví MoMo</span>
+                      </div>
+                      <span class="text-gold fw-bold small">{{ stats()!.paymentBreakdown.MOMO | number }} ₫</span>
+                    </div>
+
+                    <!-- ZaloPay -->
+                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #8B5CF6;">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-purple text-light border border-purple border-opacity-25 py-0 px-1.5 small">
+                          {{ (stats()!.paymentPercentages?.ZALOPAY ?? 8.0) | number:'1.1-1' }}%
+                        </span>
+                        <span class="text-white small fw-semibold">Ví ZaloPay</span>
+                      </div>
+                      <span class="text-gold fw-bold small">{{ stats()!.paymentBreakdown.ZALOPAY | number }} ₫</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Thao tác quản trị nhanh -->
-            <div class="col-lg-4">
-              <div class="dashboard-panel-card p-4 rounded-4 h-100">
-                <div class="mb-4 pb-3 border-bottom border-gold-subtle">
-                  <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-1">
-                    Thao tác quản trị nhanh
-                  </h2>
-                  <p class="text-slate-light small mb-0">Lối tắt nghiệp vụ rạp thường dùng</p>
+          <!-- HÀNG 3: BẢNG TÓM TẮT DỮ LIỆU THỜI GIAN THỰC (TOP VỞ DIỄN & SUBSCRIBERS MỚI) -->
+          <div class="row g-3">
+            <!-- Cột trái (7 cols): Top Vở Nhạc Kịch Doanh Thu Cao -->
+            <div class="col-xl-7 col-lg-6">
+              <div class="dashboard-panel-card p-3.5 rounded-4 h-100">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
+                  <div>
+                    <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                      <i class="bi bi-trophy text-gold me-2"></i>Top Vở Kịch Doanh Thu Cao Nhất
+                    </h2>
+                    <p class="text-slate-light small mb-0">Xếp hạng các tác phẩm kịch có sức hút phòng vé lớn nhất</p>
+                  </div>
+                  <button type="button" class="btn btn-outline-gold-subtle" (click)="setTab('musicals')">
+                    Quản lý vở kịch <i class="bi bi-arrow-right ms-1"></i>
+                  </button>
                 </div>
 
-                <div class="d-flex flex-column gap-2.5">
-                  <button type="button" class="quick-action-btn" (click)="setTab('seat-locking')">
-                    <div class="text-start flex-grow-1">
-                      <div class="quick-action-title">Khóa ghế nội bộ suất diễn</div>
-                      <div class="quick-action-sub">Giữ chỗ khách mời, ban tổ chức</div>
-                    </div>
-                  </button>
+                <div class="table-responsive">
+                  <table class="table showman-table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th style="width: 48px;">VỞ DIỄN</th>
+                        <th>TÊN TÁC PHẨM</th>
+                        <th class="text-center">VÉ ĐÃ BÁN</th>
+                        <th class="text-center">LẤP ĐẦY</th>
+                        <th class="text-end">DOANH THU</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of topPerformingMusicals(); track item.title; let idx = $index) {
+                        <tr>
+                          <td>
+                            <img [src]="item.posterUrl" [alt]="item.title" class="table-dashboard-mini-poster"
+                              (error)="item.posterUrl = 'images/musicals/lo-lem.jpg'">
+                          </td>
+                          <td>
+                            <div class="fw-bold text-white small text-truncate" style="max-width: 220px;" [title]="item.title">
+                              {{ item.title }}
+                            </div>
+                            <span class="text-slate-light x-small">{{ item.genre }}</span>
+                          </td>
+                          <td class="text-center">
+                            <span class="badge bg-dark text-slate-light border border-slate-700 px-2 py-1 small">
+                              {{ item.ticketsSold | number }} vé
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <span class="text-gold-spark fw-bold small">{{ item.occupancyRate }}%</span>
+                            <div class="progress mt-1" style="height: 4px; background: rgba(255,255,255,0.08); min-width: 50px;">
+                              <div class="progress-bar bg-warning" [style.width.%]="item.occupancyRate"></div>
+                            </div>
+                          </td>
+                          <td class="text-end">
+                            <span class="text-gold fw-bold small">{{ item.revenue | number }} ₫</span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
 
-                  <button type="button" class="quick-action-btn" (click)="openCreateMusicalModal()">
-                    <div class="text-start flex-grow-1">
-                      <div class="quick-action-title">Thêm vở kịch mới lên lịch</div>
-                      <div class="quick-action-sub">Cập nhật poster, cốt truyện, giá vé</div>
+            <!-- Cột phải (5 cols): Khách Hàng Đăng Ký Mới (Subscribers / Leads) -->
+            <div class="col-xl-5 col-lg-6">
+              <div class="dashboard-panel-card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
+                    <div>
+                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                        <i class="bi bi-envelope-heart text-gold me-2"></i>Khách Hàng Đăng Ký Mới
+                      </h2>
+                      <p class="text-slate-light small mb-0">Thu thập email tiềm năng & khách quan tâm</p>
                     </div>
-                  </button>
+                    <button type="button" class="btn btn-outline-gold-subtle" (click)="setTab('subscribers')">
+                      Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                  </div>
 
-                  <button type="button" class="quick-action-btn" (click)="openCreateScheduleModal()">
-                    <div class="text-start flex-grow-1">
-                      <div class="quick-action-title">Mở thêm suất diễn mới</div>
-                      <div class="quick-action-sub">Khung giờ diễn & khán phòng</div>
-                    </div>
-                  </button>
+                  <div class="d-flex flex-column gap-2">
+                    @for (sub of recentSubscribers(); track sub._id || sub.email; let idx = $index) {
+                      <div class="sub-list-item d-flex align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-2.5 overflow-hidden">
+                          <div class="sub-avatar-circle">
+                            <i class="bi bi-person-fill"></i>
+                          </div>
+                          <div class="overflow-hidden">
+                            <div class="text-white small fw-bold text-truncate" style="max-width: 210px;" [title]="sub.email">
+                              {{ sub.email }}
+                            </div>
+                            <div class="d-flex align-items-center gap-1.5 mt-0.5">
+                              @if (sub.musicalTitle) {
+                                <span class="badge bg-purple text-light border border-purple border-opacity-50 py-0 px-1.5 x-small text-truncate" style="max-width: 170px;" [title]="sub.musicalTitle">
+                                  <i class="bi bi-film me-1"></i>{{ sub.musicalTitle }}
+                                </span>
+                              } @else {
+                                <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 py-0 px-1.5 x-small">
+                                  <i class="bi bi-star-fill me-1"></i>VIP Trang Chủ
+                                </span>
+                              }
+                            </div>
+                          </div>
+                        </div>
 
-                  <button type="button" class="quick-action-btn" (click)="openCreateVoucherModal()">
-                    <div class="text-start flex-grow-1">
-                      <div class="quick-action-title">Tạo mã giảm giá khuyến mãi</div>
-                      <div class="quick-action-sub">Phát hành voucher ưu đãi tri ân</div>
-                    </div>
-                  </button>
+                        <div class="text-end flex-shrink-0">
+                          <span class="text-slate-light x-small">
+                            {{ sub.createdAt ? (sub.createdAt | date:'dd/MM HH:mm') : 'Gần đây' }}
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
 
-                  <button type="button" class="quick-action-btn" (click)="setTab('reports')">
-                    <div class="text-start flex-grow-1">
-                      <div class="quick-action-title">Xem báo cáo đối soát tài chính</div>
-                      <div class="quick-action-sub">Sao kê doanh thu & xuất dữ liệu</div>
-                    </div>
-                  </button>
+                <div class="pt-2.5 mt-2 border-top border-gold-subtle text-center">
+                  <span class="text-slate-light small">
+                    Tổng cộng <strong class="text-gold">{{ subscribers().length || 4 }}</strong> khách hàng đăng ký quan tâm
+                  </span>
                 </div>
               </div>
             </div>
@@ -327,7 +433,7 @@
 
             <div class="d-flex flex-wrap align-items-center gap-2">
               <div class="input-group input-group-sm workspace-search">
-                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25">
                   <i class="bi bi-search"></i>
                 </span>
                 <input
@@ -453,7 +559,7 @@
 
             <div class="d-flex flex-wrap align-items-center gap-2">
               <div class="input-group input-group-sm" style="width: 280px;">
-                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25">
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25">
                   <i class="bi bi-search"></i>
                 </span>
                 <input
@@ -663,7 +769,7 @@
           <div class="row g-3 mb-4">
             <div class="col-md-7">
               <div class="input-group">
-                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
                 <input
                   type="text"
                   class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
@@ -915,7 +1021,7 @@
           <div class="row g-3 mb-4">
             <div class="col-md-7">
               <div class="input-group">
-                <span class="input-group-text bg-dark-glass text-gold border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25"><i class="bi bi-search"></i></span>
                 <input
                   type="text"
                   class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
@@ -1235,6 +1341,437 @@
             </table>
           </div>
         </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 11: DS ĐĂNG KÝ NHẬN TIN & KHÁCH HÀNG TIỀM NĂNG (SUBSCRIBERS)
+         ============================================================ -->
+    @if (activeTab() === 'subscribers') {
+      <div class="tab-pane-content fade show">
+        <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+              <h4 class="text-gold fw-bold mb-1">
+                <i class="bi bi-envelope-paper-heart-fill me-2"></i> DANH SÁCH ĐĂNG KÝ NHẬN TIN & KHÁCH HÀNG TIỀM NĂNG
+              </h4>
+              <p class="text-secondary small mb-0">
+                Thu thập và quản lý danh sách email từ form Ưu đãi VIP Trang chủ & Form đăng ký thông báo lịch diễn các vở sắp chiếu.
+              </p>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <button class="btn btn-sm btn-showman-gold px-3 py-2 fw-bold d-flex align-items-center gap-2" (click)="exportSubscribersToExcel()">
+                <i class="bi bi-file-earmark-excel-fill text-success fs-6"></i>
+                <span>Xuất Excel (.xlsx)</span>
+              </button>
+
+              <button class="btn btn-sm btn-outline-warning px-3 py-2 fw-bold d-flex align-items-center gap-1" (click)="loadSubscribers()">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span>Làm mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bộ lọc và tìm kiếm thông minh -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6 col-lg-5">
+              <div class="input-group">
+                <span class="input-group-text bg-dark-glass border-secondary border-opacity-25">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                  placeholder="Tìm kiếm theo email, nguồn hoặc tên vở kịch..."
+                  [value]="subscriberSearch()"
+                  (input)="subscriberSearch.set($any($event.target).value)"
+                />
+              </div>
+            </div>
+
+            <div class="col-md-3 col-lg-3">
+              <select
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [value]="subscriberSourceFilter()"
+                (change)="subscriberSourceFilter.set($any($event.target).value)"
+              >
+                <option value="all">Tất cả nguồn đăng ký</option>
+                <option value="homepage">Trang chủ (Ưu đãi VIP)</option>
+                <option value="coming_soon">Vở kịch sắp chiếu</option>
+              </select>
+            </div>
+
+            <div class="col-md-3 col-lg-4">
+              <select
+                class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                [value]="subscriberMusicalFilter()"
+                (change)="subscriberMusicalFilter.set($any($event.target).value)"
+              >
+                <option value="all">Tất cả vở kịch</option>
+                <option value="none">Chỉ nhận ưu đãi chung (-)</option>
+                @for (mTitle of availableSubscribedMusicals(); track mTitle) {
+                  <option [value]="mTitle">🎭 {{ mTitle }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Bảng danh sách email -->
+          <div class="table-responsive">
+            <table class="table table-dark table-hover admin-table align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">STT</th>
+                  <th>ĐỊA CHỈ EMAIL</th>
+                  <th>NGUỒN ĐĂNG KÝ</th>
+                  <th>VỞ KỊCH QUAN TÂM</th>
+                  <th>THỜI GIAN ĐĂNG KÝ</th>
+                  <th class="text-end" style="width: 100px;">THAO TÁC</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (isLoadingSubscribers()) {
+                  <tr>
+                    <td colspan="6" class="text-center py-5">
+                      <div class="spinner-border text-gold" role="status"></div>
+                      <p class="text-secondary small mt-2 mb-0">Đang tải danh sách đăng ký nhận tin...</p>
+                    </td>
+                  </tr>
+                } @else {
+                  @for (sub of filteredSubscribers(); track sub._id; let idx = $index) {
+                    <tr>
+                      <td class="text-secondary font-monospace">{{ idx + 1 }}</td>
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <i class="bi bi-envelope-at text-gold"></i>
+                          <span class="text-white fw-bold font-monospace">{{ sub.email }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge {{ formatSourceInfo(sub.source, sub.musicalTitle).badgeClass }} px-2 py-1">
+                          <i class="bi {{ formatSourceInfo(sub.source, sub.musicalTitle).icon }} me-1"></i>
+                          {{ formatSourceInfo(sub.source, sub.musicalTitle).label }}
+                        </span>
+                      </td>
+                      <td>
+                        @if (sub.musicalTitle && sub.musicalTitle.trim()) {
+                          <span class="badge badge-showman-ruby px-2.5 py-1.5 fw-bold">
+                            <i class="bi bi-film me-1"></i> {{ sub.musicalTitle }}
+                          </span>
+                        } @else {
+                          <span class="text-secondary">-</span>
+                        }
+                      </td>
+                      <td>
+                        <div class="text-secondary small">
+                          <i class="bi bi-clock me-1 text-gold"></i>
+                          {{ sub.createdAt | date:'HH:mm - dd/MM/yyyy' }}
+                        </div>
+                      </td>
+                      <td class="text-end">
+                        <button
+                          class="btn-action-icon action-delete"
+                          (click)="deleteSubscriber(sub)"
+                          title="Xóa email đăng ký này"
+                        >
+                          <i class="bi bi-trash3"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="text-center py-5 text-secondary">
+                        <i class="bi bi-inbox fs-1 d-block mb-2 text-gold"></i>
+                        <span>Chưa có email nào đăng ký nhận tin phù hợp với bộ lọc.</span>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25 mt-3 text-secondary small">
+            <span>Tổng cộng: <strong class="text-gold">{{ filteredSubscribers().length }}</strong> khách hàng đăng ký</span>
+            <span class="text-muted extra-small">Dữ liệu được cập nhật từ hệ thống MongoDB & in-memory cache</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================
+         TAB 11: NHẬT KÝ HOẠT ĐỘNG HỆ THỐNG (SYSTEM AUDIT LOG) - RBAC ADMIN ONLY
+         ============================================================ -->
+    @if (activeTab() === 'audit-logs') {
+      <div class="tab-pane fade show active">
+        <!-- RBAC Guard for Non-Admin -->
+        @if (currentUser()?.role !== 'admin') {
+          <div class="card-showman-glass p-5 rounded-4 border border-danger text-center my-4">
+            <i class="bi bi-shield-x text-danger display-3 d-block mb-3"></i>
+            <h4 class="text-danger fw-bold">TRUY CẬP BỊ TỪ CHỐI (403 FORBIDDEN)</h4>
+            <p class="text-secondary max-w-lg mx-auto">
+              Chức năng Nhật ký hoạt động hệ thống (System Audit Log) yêu cầu đặc quyền Quản trị viên tối cao (Admin).
+              Tài khoản hiện tại của bạn không có quyền xem dữ liệu bảo mật này.
+            </p>
+            <button class="btn btn-showman-gold px-4 py-2 mt-2" (click)="setTab('musicals')">
+              <i class="bi bi-arrow-left me-1"></i> Quay lại Quản lý Vở Kịch
+            </button>
+          </div>
+        } @else {
+          <div class="card-showman-glass p-4 rounded-4 border border-gold-glow mb-4">
+            <!-- Header & Switch Toolbar -->
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <h4 class="text-gold fw-bold mb-0">
+                    <i class="bi bi-shield-shaded me-2"></i>NHẬT KÝ HOẠT ĐỘNG HỆ THỐNG
+                  </h4>
+                  <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 small">
+                    <i class="bi bi-lock-fill me-1"></i>RBAC Admin Only
+                  </span>
+                </div>
+                <p class="text-secondary small mb-0">
+                  Ghi nhận và kiểm toán các thao tác nhạy cảm: Đăng nhập nội bộ, Thêm/Sửa/Xóa Vở kịch & Nghệ sĩ, Khóa/Mở ghế, Tạo Voucher.
+                </p>
+              </div>
+
+              <!-- Controls Toolbar -->
+              <div class="d-flex flex-wrap align-items-center gap-3">
+                <!-- Toggle Switch Bật/Tắt Ghi Log -->
+                <div class="d-flex align-items-center gap-2 bg-dark-glass px-3 py-2 rounded-pill border border-secondary border-opacity-25">
+                  <span class="text-secondary small fw-bold">Ghi Log:</span>
+                  <div class="form-check form-switch m-0 d-flex align-items-center gap-2 p-0">
+                    <input
+                      class="form-check-input m-0 custom-audit-switch"
+                      type="checkbox"
+                      role="switch"
+                      id="auditToggleSwitch"
+                      [checked]="isAuditLogEnabled()"
+                      [disabled]="isTogglingAuditLog()"
+                      (change)="toggleAuditLogSwitch()"
+                      title="Bật/Tắt ghi nhận hành động hệ thống"
+                    />
+                    <label class="form-check-label user-select-none cursor-pointer" for="auditToggleSwitch">
+                      @if (isAuditLogEnabled()) {
+                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1">
+                          <i class="bi bi-record-circle-fill text-success animate-pulse me-1"></i>Đang Bật
+                        </span>
+                      } @else {
+                        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50 px-2 py-1">
+                          <i class="bi bi-pause-circle-fill text-warning me-1"></i>Đang Tắt (Test)
+                        </span>
+                      }
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <button
+                  class="btn btn-sm btn-showman-gold px-3 py-2 fw-bold d-flex align-items-center gap-2"
+                  (click)="exportAuditLogsToExcel()"
+                >
+                  <i class="bi bi-file-earmark-excel-fill text-success fs-6"></i>
+                  <span>Xuất Excel</span>
+                </button>
+
+                <button
+                  class="btn btn-sm btn-outline-warning px-3 py-2 fw-bold d-flex align-items-center gap-1"
+                  (click)="loadAuditLogs()"
+                >
+                  <i class="bi bi-arrow-clockwise" [class.spin-animation]="isLoadingAuditLogs()"></i>
+                  <span>Làm mới</span>
+                </button>
+
+                <button
+                  class="btn btn-sm btn-outline-danger px-3 py-2 fw-bold d-flex align-items-center gap-1"
+                  (click)="clearAllAuditLogs()"
+                  title="Xóa toàn bộ bản ghi log hiện tại"
+                >
+                  <i class="bi bi-trash3"></i>
+                  <span>Dọn sạch Log</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="row g-2 mb-4">
+              <!-- Search box -->
+              <div class="col-12 col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-dark-glass border-secondary border-opacity-25">
+                    <i class="bi bi-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
+                    placeholder="Tìm theo nội dung, hành động, tài khoản, IP..."
+                    [value]="auditSearch()"
+                    (input)="auditSearch.set($any($event.target).value)"
+                  />
+                  @if (auditSearch()) {
+                    <button class="btn btn-outline-secondary border-opacity-25" (click)="auditSearch.set('')">
+                      <i class="bi bi-x-lg text-secondary"></i>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Category filter -->
+              <div class="col-6 col-md-4">
+                <select
+                  class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                  [value]="auditCategoryFilter()"
+                  (change)="auditCategoryFilter.set($any($event.target).value)"
+                >
+                  <option value="ALL">Tất cả phân hệ</option>
+                  <option value="AUTH">Xác thực / Đăng nhập (AUTH)</option>
+                  <option value="MUSICAL">Quản lý Vở kịch (MUSICAL)</option>
+                  <option value="ARTIST">Quản lý Nghệ sĩ (ARTIST)</option>
+                  <option value="SEAT">Khóa / Mở ghế (SEAT)</option>
+                  <option value="VOUCHER">Mã giảm giá (VOUCHER)</option>
+                  <option value="OPS">Soát vé QR / Vận hành (OPS)</option>
+                  <option value="SYSTEM">Hệ thống chung (SYSTEM)</option>
+                </select>
+              </div>
+
+              <!-- Status filter -->
+              <div class="col-6 col-md-3">
+                <select
+                  class="form-select bg-dark-glass text-white border-secondary border-opacity-25"
+                  [value]="auditStatusFilter()"
+                  (change)="auditStatusFilter.set($any($event.target).value)"
+                >
+                  <option value="ALL">Tất cả trạng thái</option>
+                  <option value="SUCCESS">Thành công (SUCCESS)</option>
+                  <option value="FAILED">Thất bại / Lỗi (FAILED)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Audit Logs Table -->
+            <div class="table-responsive">
+              <table class="table showman-table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">#</th>
+                    <th style="width: 150px;">Thời Gian</th>
+                    <th style="width: 140px;">Phân Hệ</th>
+                    <th style="width: 130px;">Hành Động</th>
+                    <th>Nội Dung Chi Tiết</th>
+                    <th style="width: 180px;">Người Thực Hiện</th>
+                    <th style="width: 150px;">Địa Chỉ IP</th>
+                    <th style="width: 110px;" class="text-center">Trạng Thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @if (isLoadingAuditLogs()) {
+                    <tr>
+                      <td colspan="8" class="text-center py-5">
+                        <div class="spinner-border text-gold" role="status"></div>
+                        <p class="text-secondary small mt-2 mb-0">Đang tải nhật ký hoạt động hệ thống...</p>
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (log of filteredAuditLogs(); track log._id || $index; let idx = $index) {
+                      <tr>
+                        <td class="text-secondary font-monospace small">{{ idx + 1 }}</td>
+                        <td>
+                          <div class="small text-white fw-bold">
+                            {{ log.createdAt | date:'HH:mm:ss' }}
+                          </div>
+                          <div class="extra-small text-secondary font-monospace">
+                            {{ log.createdAt | date:'dd/MM/yyyy' }}
+                          </div>
+                        </td>
+                        <td>
+                          @let catInfo = getAuditCategoryBadge(log.category);
+                          <span class="badge {{ catInfo.class }} px-2 py-1 small d-inline-flex align-items-center gap-1">
+                            <i class="bi {{ catInfo.icon }}"></i>
+                            <span>{{ catInfo.label }}</span>
+                          </span>
+                        </td>
+                        <td>
+                          @let actInfo = getAuditActionBadge(log.action);
+                          <span class="{{ actInfo.class }} font-monospace small px-2 py-1">
+                            {{ actInfo.label }}
+                          </span>
+                        </td>
+                        <td>
+                          <div class="text-white small fw-medium">
+                            {{ log.description }}
+                          </div>
+                          @let metaInfo = formatAuditMetadata(log.metadata);
+                          @if (metaInfo) {
+                            <div class="extra-small text-gold font-monospace opacity-75 mt-1">
+                              {{ metaInfo }}
+                            </div>
+                          }
+                        </td>
+                        <td>
+                          <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary bg-opacity-25 text-info rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                              <i class="bi bi-person-fill"></i>
+                            </div>
+                            <div>
+                              <div class="text-white small fw-bold text-truncate" style="max-width: 120px;" [title]="log.performer?.fullName">
+                                {{ log.performer?.fullName || log.performer?.username || 'Hệ thống' }}
+                              </div>
+                              <div class="extra-small text-secondary font-monospace">
+                                @<span class="text-gold">{{ log.performer?.username }}</span>
+                                <span class="badge bg-secondary bg-opacity-25 text-light ms-1" style="font-size: 0.65rem;">
+                                  {{ (log.performer?.role || 'user').toUpperCase() }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="font-monospace extra-small text-secondary bg-dark-glass px-2 py-1 rounded border border-secondary border-opacity-25 d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-hdd-network text-info"></i>
+                            <span>{{ log.ipAddress || '127.0.0.1' }}</span>
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          @if (log.status === 'SUCCESS') {
+                            <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50 px-2 py-1 extra-small">
+                              <i class="bi bi-check-circle-fill me-1"></i>Thành công
+                            </span>
+                          } @else {
+                            <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 px-2 py-1 extra-small">
+                              <i class="bi bi-x-circle-fill me-1"></i>Thất bại
+                            </span>
+                          }
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="8" class="text-center py-5 text-secondary">
+                          <i class="bi bi-shield-check fs-1 d-block mb-2 text-gold"></i>
+                          <span>Không có bản ghi nhật ký hoạt động nào phù hợp với bộ lọc.</span>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pt-3 border-top border-secondary border-opacity-25 mt-3 text-secondary small gap-2">
+              <div class="d-flex align-items-center gap-3">
+                <span>Hiển thị: <strong class="text-gold">{{ filteredAuditLogs().length }}</strong> / {{ auditLogs().length }} bản ghi</span>
+                <span class="text-muted">|</span>
+                <span>Trạng thái: 
+                  <strong [class.text-success]="isAuditLogEnabled()" [class.text-warning]="!isAuditLogEnabled()">
+                    {{ isAuditLogEnabled() ? 'Đang tự động ghi Log' : 'Tạm dừng ghi Log (Testing)' }}
+                  </strong>
+                </span>
+              </div>
+              <span class="text-muted extra-small">Dữ liệu được bảo mật và tự động đồng bộ theo thời gian thực</span>
+            </div>
+          </div>
+        }
       </div>
     }
   </div>

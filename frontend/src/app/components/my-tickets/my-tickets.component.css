@@ -86,3 +86,105 @@
   border: 2px dashed #D4AF37;
   position: relative;
 }
+
+.ticket-show-info {
+  background: rgba(7, 10, 18, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.ticket-show-info h3 {
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
+}
+
+.ticket-code {
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.ticket-download-bar {
+  position: sticky;
+  bottom: -1rem;
+  padding-bottom: 0.25rem;
+  background: #0c101d;
+}
+
+.ticket-total {
+  padding-top: 0.75rem;
+}
+
+.ticket-qr-image {
+  width: 150px;
+  max-width: 100%;
+  padding: 8px;
+  background: #FFFFFF;
+  border-radius: 12px;
+}
+
+.ticket-qr-placeholder {
+  width: 150px;
+  height: 150px;
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(245, 158, 11, 0.5);
+  border-radius: 12px;
+}
+
+.ticket-rules {
+  background: rgba(7, 10, 18, 0.65);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.modal-scrollable > .border-top button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.single-action-btn {
+  letter-spacing: 0.5px;
+  font-size: 0.92rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+}
+
+.single-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.4);
+}
+
+.border-gold-glow {
+  border: 1px solid rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.18), 0 20px 45px rgba(0, 0, 0, 0.85) !important;
+}
+
+@media (max-width: 480px) {
+  .ticket-topline {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+}
+
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .custom-modal-backdrop {
+    position: static !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+  }
+  .modal-scrollable {
+    border: 2px solid #D4AF37 !important;
+    box-shadow: none !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    max-width: 100% !important;
+  }
+  .modal-scrollable button {
+    display: none !important;
+  }
+}

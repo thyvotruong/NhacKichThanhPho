@@ -24,8 +24,9 @@ const Reconciliation = require('./models/reconciliation.model');
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nhac_kich_thanh_pho';
 
 // Hàm sinh sơ đồ ghế ngồi chi tiết chuẩn hóa khớp 100% giữa Admin & Client
-function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCouplePrice = 1200000) {
+function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCouplePrice = 1200000, targetBooked = 4) {
   const seats = [];
+  let bookedCount = 0;
 
   // ==========================================
   // 1. TẦNG TRỆT (STALLS): Hàng A -> H
@@ -47,8 +48,9 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
         status = 'locked';
         lockedReason = 'Kỹ thuật âm thanh sân khấu';
         lockedBy = 'Admin Kỹ Thuật';
-      } else if (row === 'B' && (num === 5 || num === 6)) {
+      } else if (bookedCount < targetBooked && (row !== 'A' || (num >= 3 && num <= 11))) {
         status = 'booked';
+        bookedCount++;
       }
 
       seats.push({
@@ -70,8 +72,9 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
     for (let num = 1; num <= 14; num++) {
       const code = `${row}${num < 10 ? '0' + num : num}`;
       let status = 'available';
-      if (row === 'D' && (num === 7 || num === 8)) {
+      if (bookedCount < targetBooked) {
         status = 'booked';
+        bookedCount++;
       }
       seats.push({
         seatCode: code,
@@ -88,6 +91,11 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
   // Hàng H: Ghế Đôi (Couple Sweetbox) (6 ghế đôi: H-CP01 - H-CP06)
   for (let num = 1; num <= 6; num++) {
     const code = `H-CP0${num}`;
+    let status = 'available';
+    if (bookedCount < targetBooked) {
+      status = 'booked';
+      bookedCount++;
+    }
     seats.push({
       seatCode: code,
       floor: 'Tầng Trệt',
@@ -95,7 +103,7 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
       number: num,
       type: 'Couple',
       price: baseCouplePrice,
-      status: 'available'
+      status
     });
   }
 
@@ -107,6 +115,11 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
   ['J', 'K', 'L', 'M', 'N', 'P'].forEach(row => {
     for (let num = 1; num <= 14; num++) {
       const code = `${row}${num < 10 ? '0' + num : num}`;
+      let status = 'available';
+      if (bookedCount < targetBooked) {
+        status = 'booked';
+        bookedCount++;
+      }
       seats.push({
         seatCode: code,
         floor: 'Tầng Lầu',
@@ -114,7 +127,7 @@ function generateSeatLayout(baseVipPrice = 800000, baseStdPrice = 450000, baseCo
         number: num,
         type: 'Standard',
         price: baseStdPrice, // Chuẩn cố định 450,000 đ
-        status: 'available'
+        status
       });
     }
   });
@@ -285,15 +298,15 @@ const sampleReconciliations = [
     notes: 'Khớp 100% VietQR tức thì'
   },
   {
-    transactionId: 'TXN-BANK-20261116-08312',
+    transactionId: 'TXN-ZALO-20261116-08312',
     bookingCode: 'NK-20261116-LT38E',
-    gateway: 'BANK_CARD',
+    gateway: 'ZALOPAY',
     systemAmount: 3200000,
     gatewayAmount: 3200000,
-    fee: 64000,
-    netAmount: 3136000,
+    fee: 48000,
+    netAmount: 3152000,
     status: 'MATCHED',
-    notes: 'Khớp cổng thẻ quốc tế Visa 3D-Secure'
+    notes: 'Khớp 100% cổng ví ZaloPay QR'
   },
   {
     transactionId: 'TXN-VNPAY-20261116-08345',
@@ -384,15 +397,15 @@ const sampleReconciliations = [
     notes: 'Khớp đối soát giao dịch MoMo 1 chạm'
   },
   {
-    transactionId: 'TXN-BANK-20261117-08640',
+    transactionId: 'TXN-ZALO-20261117-08640',
     bookingCode: 'NK-20261117-TT73P',
-    gateway: 'BANK_CARD',
+    gateway: 'ZALOPAY',
     systemAmount: 1800000,
     gatewayAmount: 1800000,
-    fee: 36000,
-    netAmount: 1764000,
+    fee: 27000,
+    netAmount: 1773000,
     status: 'MATCHED',
-    notes: 'Khớp cổng Visa/Mastercard quốc tế'
+    notes: 'Khớp đối soát thanh toán Ví ZaloPay'
   },
   {
     transactionId: 'TXN-VIETQR-20261117-08695',
@@ -600,7 +613,7 @@ async function seedDatabase() {
     const musicalMap = new Map(createdMusicals.map(m => [m.slug, m]));
     const schedulesToInsert = standardScheduleDefinitions.map(def => {
       const m = musicalMap.get(def.slug);
-      const layout = generateSeatLayout(800000, 450000, 1200000);
+      const layout = generateSeatLayout(800000, 450000, 1200000, def.bookedSeats);
       return {
         _id: def._id,
         musicalId: m ? m._id : def.slug,
