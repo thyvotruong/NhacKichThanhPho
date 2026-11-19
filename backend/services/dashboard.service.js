@@ -219,21 +219,10 @@ class DashboardService {
         }
       });
 
-      // Tỷ lệ lấp đầy chuẩn hóa phản ánh đúng hiệu suất phòng vé của từng tác phẩm (nằm trong khoảng 76% - 94%)
-      let occRate = defaultOccupancies[m.slug] || 82.0;
-      const baseSoldMap = {
-        'lo-lem-chiec-giay-thuy-tinh': 286,
-        'hon-truong-ba-da-hang-thit': 242,
-        'tuoi-tho-du-doi': 215,
-        'giac-mo-cua-bom': 198,
-        'loi-the-thu-9': 175,
-        'quan-khu-nam-dong': 154
-      };
-      const baseSold = baseSoldMap[m.slug] || 150;
-      if (showData.ticketsSold > baseSold) {
-        const extraSold = showData.ticketsSold - baseSold;
-        occRate = Math.min(99.0, Math.round((occRate + extraSold * 0.1) * 10) / 10);
-      }
+      // Tỷ lệ lấp đầy trực tiếp từ trạng thái ghế thực tế (Single Source of Truth: booked + locked)
+      let occRate = showCapacity > 0
+        ? Math.round((showOccupied / showCapacity) * 1000) / 10
+        : (defaultOccupancies[m.slug] || 82.0);
 
       return {
         title: m.title,

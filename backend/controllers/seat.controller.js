@@ -11,11 +11,15 @@ const seatService = require('../services/seat.service');
 class SeatController {
   async getSeats(req, res) {
     try {
-      const seats = await seatService.getSeatsByScheduleId(req.params.scheduleId);
-      if (!seats) {
+      const scheduleData = await seatService.getSeatsByScheduleId(req.params.scheduleId);
+      if (!scheduleData) {
         return res.status(404).json({ success: false, message: 'Không tìm thấy sơ đồ ghế cho suất diễn này' });
       }
-      return res.status(200).json({ success: true, count: seats.length, data: seats });
+      return res.status(200).json({
+        success: true,
+        count: scheduleData.seats ? scheduleData.seats.length : 0,
+        data: scheduleData
+      });
     } catch (err) {
       return res.status(500).json({ success: false, message: err.message });
     }

@@ -67,15 +67,43 @@ class MusicalService {
   }
 
   async getMusicalBySlug(slug) {
+    let found = null;
     if (store.isMongoConnected) {
       try {
         const musical = await Musical.findOne({ slug });
-        if (musical) return musical;
+        if (musical) found = musical.toObject ? musical.toObject() : { ...musical._doc };
       } catch (e) {
         console.warn('⚠️ Lỗi tìm Musical theo slug MongoDB:', e.message);
       }
     }
-    return store.memMusicals.find(m => m.slug === slug) || null;
+    if (!found) {
+      const mem = store.memMusicals.find(m => m.slug === slug);
+      if (mem) found = JSON.parse(JSON.stringify(mem));
+    }
+    if (!found) return null;
+
+    // Đính kèm danh sách suất diễn thực tế tương ứng với vở nhạc kịch
+    const schedules = store.memSchedules.filter(s =>
+      s.musicalSlug === slug ||
+      (s.musicalTitle && found.title && s.musicalTitle.toLowerCase() === found.title.toLowerCase())
+    );
+
+    found.schedules = schedules.map(s => ({
+      _id: s._id,
+      musicalId: s.musicalId || found._id || slug,
+      musicalTitle: s.musicalTitle || found.title,
+      musicalSlug: s.musicalSlug || found.slug,
+      performanceDate: s.performanceDate,
+      time: s.time,
+      venue: s.venue || 'Nhà Hát Lớn Thành Phố',
+      hall: s.hall || 'Khán phòng Grand A - Hoàng Gia',
+      totalSeats: s.totalSeats || (s.seats ? s.seats.length : 182),
+      bookedSeats: s.bookedSeats || 0,
+      lockedSeatsCount: s.lockedSeatsCount || 0,
+      status: s.status || 'available'
+    }));
+
+    return found;
   }
 
   async subscribeNotification(slug, payload) {

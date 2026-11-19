@@ -750,8 +750,8 @@ export class AdminComponent implements OnInit {
           datasets: [
             {
               data: [pVq, pVn, pMm, pZl],
-              backgroundColor: ['#10B981', '#0EA5E9', '#F43F5E', '#8B5CF6'],
-              borderColor: ['#065F46', '#0369A1', '#9F1239', '#6D28D9'],
+              backgroundColor: ['#059669', '#2563EB', '#BE123C', '#D97706'],
+              borderColor: ['#064E3B', '#1E3A8A', '#881337', '#78350F'],
               borderWidth: 2,
               hoverOffset: 4
             }

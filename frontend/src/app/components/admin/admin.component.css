@@ -508,26 +508,28 @@
    TAB 1: DASHBOARD STAT CARDS & METRICS (Typography-First, Bright & Prominent)
    ============================================================ */
 .stat-card-premium {
-  background: linear-gradient(145deg, rgba(25, 38, 66, 0.92) 0%, rgba(15, 24, 44, 0.96) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-top: 2px solid rgba(245, 158, 11, 0.45);
-  border-radius: 1rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 15px rgba(245, 158, 11, 0.08);
+  background: linear-gradient(145deg, rgba(22, 34, 60, 0.94) 0%, rgba(13, 20, 36, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-top: 2.5px solid rgba(245, 158, 11, 0.6);
+  border-radius: 1.15rem;
+  padding: 1.5rem 1.65rem !important;
+  min-height: 148px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), 0 0 15px rgba(245, 158, 11, 0.08);
   backdrop-filter: blur(16px);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .stat-card-premium:hover {
   transform: translateY(-3px);
-  border-color: rgba(245, 158, 11, 0.55);
+  border-color: rgba(245, 158, 11, 0.65);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65), 0 0 22px rgba(245, 158, 11, 0.2);
 }
 
 /* Thẻ HERO: Tổng doanh thu (SÁNG VÀ NỔI BẬT NHẤT DASHBOARD) */
 .stat-card-hero {
-  background: linear-gradient(135deg, rgba(37, 54, 94, 0.96) 0%, rgba(20, 31, 56, 0.98) 100%) !important;
+  background: linear-gradient(135deg, rgba(28, 43, 76, 0.96) 0%, rgba(16, 25, 46, 0.98) 100%) !important;
   border: 2px solid #f59e0b !important;
-  border-top: 2.5px solid #fde68a !important;
+  border-top: 3px solid #fde68a !important;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 28px rgba(245, 158, 11, 0.3) !important;
   position: relative;
 }
@@ -551,23 +553,24 @@
 
 .stat-label-gold {
   color: #fde68a;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.6px;
 }
 
 .stat-label {
   color: #f1f5f9;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   letter-spacing: 0.6px;
 }
 
 .stat-value-hero {
-  font-size: clamp(2rem, 2.5vw, 2.6rem);
+  font-size: clamp(2rem, 2.3vw, 2.5rem);
   font-weight: 850;
   line-height: 1.15;
   letter-spacing: -0.5px;
+  white-space: nowrap;
   background: linear-gradient(135deg, #ffffff 0%, #fff4b8 35%, #f59e0b 75%, #d97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -575,19 +578,21 @@
 }
 
 .stat-value-gold {
-  font-size: clamp(1.95rem, 2.4vw, 2.4rem);
+  font-size: clamp(1.9rem, 2.2vw, 2.3rem);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.5px;
+  white-space: nowrap;
   color: #fbbf24;
   text-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
 }
 
 .stat-value-white {
-  font-size: clamp(1.95rem, 2.4vw, 2.4rem);
+  font-size: clamp(1.9rem, 2.2vw, 2.3rem);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.5px;
+  white-space: nowrap;
   color: #ffffff;
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
 }
@@ -612,62 +617,117 @@
 }
 
 .badge-growth-success {
-  background: rgba(34, 197, 94, 0.22);
-  color: #4ade80;
-  border: 1px solid rgba(34, 197, 94, 0.5);
-  font-weight: 700;
-  font-size: 0.8rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 6px;
-}
-
-.badge-tag-info {
-  background: rgba(6, 182, 212, 0.22);
-  color: #38bdf8;
-  border: 1px solid rgba(6, 182, 212, 0.5);
-  font-weight: 700;
-  font-size: 0.8rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 6px;
-}
-
-.badge-tag-warning {
-  background: rgba(245, 158, 11, 0.22);
-  color: #fde68a;
-  border: 1px solid rgba(245, 158, 11, 0.5);
-  font-weight: 700;
+  background: rgba(5, 150, 105, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  font-weight: 600;
   font-size: 0.8rem;
   padding: 0.25rem 0.65rem;
   border-radius: 6px;
 }
 
 .stat-subtext {
-  font-size: 0.82rem;
-  color: #cbd5e1;
+  font-size: 0.84rem;
+  color: #94a3b8;
 }
 
 .stat-progress-track {
-  height: 9px;
-  background: rgba(255, 255, 255, 0.12);
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 999px;
   overflow: hidden;
 }
 
 .stat-progress-fill {
-  background: linear-gradient(90deg, #f59e0b, #fde68a);
+  background: linear-gradient(90deg, #d97706, #f59e0b);
   border-radius: 999px;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
 }
 
 /* ============================================================
-   DASHBOARD PANELS (Payment Breakdown & Quick Actions - Elevated)
+   DASHBOARD PANELS (Khung to, fit nội dung, không pastel lóe)
    ============================================================ */
 .dashboard-panel-card {
-  background: linear-gradient(145deg, rgba(22, 34, 60, 0.94) 0%, rgba(14, 22, 41, 0.98) 100%);
-  border: 1.5px solid rgba(245, 158, 11, 0.32);
-  border-radius: 1rem;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 18px rgba(245, 158, 11, 0.1);
+  background: linear-gradient(145deg, rgba(20, 31, 56, 0.94) 0%, rgba(11, 18, 33, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 1.15rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(18px);
+}
+
+.dashboard-revenue-chart {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+.dashboard-payment-chart {
+  position: relative;
+  height: 210px;
+  width: 100%;
+}
+
+.dashboard-stat-chip {
+  background: rgba(14, 22, 41, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+}
+
+/* 4 Payment Breakdown Rows: Đổi màu pastel sang màu trầm sang trọng */
+.payment-breakdown-row {
+  background: rgba(14, 22, 41, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.payment-breakdown-row:hover {
+  background: rgba(24, 37, 66, 0.85);
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.payment-share-badge {
+  font-size: 0.82rem !important;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem !important;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+.payment-share-vietqr {
+  background: rgba(5, 150, 105, 0.22) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+.payment-share-vnpay {
+  background: rgba(37, 99, 235, 0.22) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+}
+
+.payment-share-momo {
+  background: rgba(190, 18, 60, 0.22) !important;
+  color: #fb7185 !important;
+  border: 1px solid rgba(225, 29, 72, 0.35) !important;
+}
+
+.payment-share-zalopay {
+  background: rgba(217, 119, 6, 0.22) !important;
+  color: #fde68a !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+.table-dashboard-mini-poster {
+  width: 46px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 .dashboard-section-title {

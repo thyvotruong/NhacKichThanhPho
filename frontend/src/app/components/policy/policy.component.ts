@@ -3,13 +3,13 @@
  * NHẠC KỊCH THÀNH PHỐ (CITY MUSICAL SPA) - ANGULAR FRONTEND
  * File: components/policy/policy.component.ts
  * Chức năng: Trang "Chính sách & Điều khoản" (/policy)
- * Trình bày đúng thứ tự 5 mục quy chuẩn:
- * 1. Chính sách bảo mật (privacy)
- * 2. Chính sách giá dịch vụ (pricing)
- * 3. Chính sách thanh toán (payment)
- * 4. Điều khoản & Quy định sử dụng (terms)
- * 5. Chính sách vé không đổi trả (tickets)
- * Định dạng: Text và Bullet points trang nhã, không hình ảnh
+ * Trình bày khoa học theo 5 mục quy chuẩn:
+ * 1. Chính sách giá dịch vụ (pricing)
+ * 2. Chính sách thanh toán (payment)
+ * 3. Chính sách hoàn huỷ vé (tickets)
+ * 4. Điều khoản và nội quy (terms)
+ * 5. Chính sách bảo mật (privacy)
+ * Định dạng: Text trắng sáng, tương phản cao, ưu tiên Bullet points
  * ============================================================
  */
 
@@ -17,7 +17,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
-export type PolicySection = 'privacy' | 'pricing' | 'payment' | 'terms' | 'tickets';
+export type PolicySection = 'terms' | 'pricing' | 'payment' | 'tickets' | 'privacy';
 
 @Component({
   selector: 'app-policy',
@@ -29,15 +29,15 @@ export type PolicySection = 'privacy' | 'pricing' | 'payment' | 'terms' | 'ticke
 export class PolicyComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
-  // Tab đang hoạt động
-  activeSection = signal<PolicySection>('privacy');
+  // Tab đang hoạt động (mặc định tab 1: terms)
+  activeSection = signal<PolicySection>('terms');
 
-  // Danh sách các mục chính sách theo đúng thứ tự yêu cầu
+  // Danh sách các mục chính sách với Điều khoản & Nội quy đứng đầu tiên
   readonly policyNavItems: { id: PolicySection; number: string; title: string }[] = [
     {
-      id: 'privacy',
+      id: 'terms',
       number: '01',
-      title: 'Chính sách bảo mật'
+      title: 'Điều khoản và nội quy'
     },
     {
       id: 'pricing',
@@ -50,14 +50,14 @@ export class PolicyComponent implements OnInit {
       title: 'Chính sách thanh toán'
     },
     {
-      id: 'terms',
+      id: 'tickets',
       number: '04',
-      title: 'Điều khoản & Quy định sử dụng'
+      title: 'Chính sách hoàn huỷ vé'
     },
     {
-      id: 'tickets',
+      id: 'privacy',
       number: '05',
-      title: 'Chính sách vé không đổi trả'
+      title: 'Chính sách bảo mật'
     }
   ];
 
@@ -67,16 +67,16 @@ export class PolicyComponent implements OnInit {
       const tab = params.get('tab');
       if (tab === 'refund') {
         this.activeSection.set('tickets');
-      } else if (tab && ['privacy', 'pricing', 'payment', 'terms', 'tickets'].includes(tab)) {
+      } else if (tab && ['terms', 'pricing', 'payment', 'tickets', 'privacy'].includes(tab)) {
         this.activeSection.set(tab as PolicySection);
       }
     });
 
-    // Hỗ trợ cả fragment anchor nếu có (#privacy, #pricing...)
+    // Hỗ trợ cả fragment anchor nếu có (#terms, #pricing...)
     this.route.fragment.subscribe(fragment => {
       if (fragment === 'refund') {
         this.activeSection.set('tickets');
-      } else if (fragment && ['privacy', 'pricing', 'payment', 'terms', 'tickets'].includes(fragment)) {
+      } else if (fragment && ['terms', 'pricing', 'payment', 'tickets', 'privacy'].includes(fragment)) {
         this.activeSection.set(fragment as PolicySection);
       }
     });

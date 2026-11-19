@@ -25,39 +25,39 @@ try {
 const musicalLookup = new Map(sampleMusicalsFromFile.map(m => [m.slug, m]));
 
 const standardScheduleDefinitions = [
-  // 1. Lọ Lem - Chiếc Giày Thủy Tinh (286 vé, tỷ lệ lấp đầy rạp 94.0%)
-  { _id: 'sch_lo-lem_20261118_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-18T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 60 },
-  { _id: 'sch_lo-lem-chiec-giay-thuy-tinh', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-20T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 60 },
-  { _id: 'sch_lo-lem_20261121_1500', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-21T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 56 },
-  { _id: 'sch_lo-lem_20261127_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-27T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 55 },
-  { _id: 'sch_lo-lem_20261129_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-29T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 55 },
+  // 1. Lọ Lem - Chiếc Giày Thủy Tinh (Tỷ lệ lấp đầy rạp 94.0%)
+  { _id: 'sch_lo-lem_20261118_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-18T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 168 },
+  { _id: 'sch_lo-lem-chiec-giay-thuy-tinh', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-20T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 168 },
+  { _id: 'sch_lo-lem_20261121_1500', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-21T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 168 },
+  { _id: 'sch_lo-lem_20261127_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-27T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 168 },
+  { _id: 'sch_lo-lem_20261129_1930', slug: 'lo-lem-chiec-giay-thuy-tinh', dateStr: '2026-11-29T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 168 },
 
-  // 2. Hồn Trương Ba, Da Hàng Thịt (242 vé, tỷ lệ lấp đầy rạp 89.0%)
-  { _id: 'sch_hon-truong-ba-da-hang-thit', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-23T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 62 },
-  { _id: 'sch_hon-truong-ba_20261127_2000', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-27T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 60 },
-  { _id: 'sch_hon-truong-ba_20261130_2000', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-30T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 60 },
-  { _id: 'sch_hon-truong-ba_extra', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-28T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 60 },
+  // 2. Hồn Trương Ba, Da Hàng Thịt (Tỷ lệ lấp đầy rạp 88.5% ~ 89.0%)
+  { _id: 'sch_hon-truong-ba-da-hang-thit', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-23T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 158 },
+  { _id: 'sch_hon-truong-ba_20261127_2000', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-27T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 158 },
+  { _id: 'sch_hon-truong-ba_20261130_2000', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-30T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 158 },
+  { _id: 'sch_hon-truong-ba_extra', slug: 'hon-truong-ba-da-hang-thit', dateStr: '2026-11-28T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 158 },
 
-  // 3. Tuổi Thơ Dữ Dội (215 vé, tỷ lệ lấp đầy rạp 86.0%)
-  { _id: 'sch_tuoi-tho-du-doi', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-21T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 55 },
-  { _id: 'sch_tuoi-tho-du-doi_20261126_1930', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-26T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 54 },
-  { _id: 'sch_tuoi-tho-du-doi_20261129_1500', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-29T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 53 },
-  { _id: 'sch_tuoi-tho-du-doi_extra', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-30T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 53 },
+  // 3. Tuổi Thơ Dữ Dội (Tỷ lệ lấp đầy rạp 85.7% ~ 86.0%)
+  { _id: 'sch_tuoi-tho-du-doi', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-21T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 153 },
+  { _id: 'sch_tuoi-tho-du-doi_20261126_1930', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-26T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 153 },
+  { _id: 'sch_tuoi-tho-du-doi_20261129_1500', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-29T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 153 },
+  { _id: 'sch_tuoi-tho-du-doi_extra', slug: 'tuoi-tho-du-doi', dateStr: '2026-11-30T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 153 },
 
-  // 4. Giấc Mơ Của Bờm (198 vé, tỷ lệ lấp đầy rạp 83.0%)
-  { _id: 'sch_giac-mo-cua-bom_20261120_2000', slug: 'giac-mo-cua-bom', dateStr: '2026-11-20T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 50 },
-  { _id: 'sch_giac-mo-cua-bom_20261122_1500', slug: 'giac-mo-cua-bom', dateStr: '2026-11-22T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 50 },
-  { _id: 'sch_giac-mo-cua-bom', slug: 'giac-mo-cua-bom', dateStr: '2026-11-25T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 50 },
-  { _id: 'sch_giac-mo-cua-bom_20261128_1500', slug: 'giac-mo-cua-bom', dateStr: '2026-11-28T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 48 },
+  // 4. Giấc Mơ Của Bờm (Tỷ lệ lấp đầy rạp 83.0%)
+  { _id: 'sch_giac-mo-cua-bom_20261120_2000', slug: 'giac-mo-cua-bom', dateStr: '2026-11-20T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 148 },
+  { _id: 'sch_giac-mo-cua-bom_20261122_1500', slug: 'giac-mo-cua-bom', dateStr: '2026-11-22T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 148 },
+  { _id: 'sch_giac-mo-cua-bom', slug: 'giac-mo-cua-bom', dateStr: '2026-11-25T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 148 },
+  { _id: 'sch_giac-mo-cua-bom_20261128_1500', slug: 'giac-mo-cua-bom', dateStr: '2026-11-28T15:00:00+07:00', time: '15:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 148 },
 
-  // 5. Lời Thề Thứ 9 (175 vé, tỷ lệ lấp đầy rạp 79.0%)
-  { _id: 'sch_loi-the-thu-9_20261119_2000', slug: 'loi-the-thu-9', dateStr: '2026-11-19T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 58 },
-  { _id: 'sch_loi-the-thu-9', slug: 'loi-the-thu-9', dateStr: '2026-11-24T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 58 },
-  { _id: 'sch_loi-the-thu-9_20261130_1930', slug: 'loi-the-thu-9', dateStr: '2026-11-30T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 59 },
+  // 5. Lời Thề Thứ 9 (Tỷ lệ lấp đầy rạp 79.1% ~ 79.0%)
+  { _id: 'sch_loi-the-thu-9_20261119_2000', slug: 'loi-the-thu-9', dateStr: '2026-11-19T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 141 },
+  { _id: 'sch_loi-the-thu-9', slug: 'loi-the-thu-9', dateStr: '2026-11-24T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 141 },
+  { _id: 'sch_loi-the-thu-9_20261130_1930', slug: 'loi-the-thu-9', dateStr: '2026-11-30T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 141 },
 
-  // 6. Quân Khu Nam Đồng (154 vé, tỷ lệ lấp đầy rạp 76.0%)
-  { _id: 'sch_quan-khu-nam-dong', slug: 'quan-khu-nam-dong', dateStr: '2026-11-22T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 76 },
-  { _id: 'sch_quan-khu-nam-dong_20261128_1930', slug: 'quan-khu-nam-dong', dateStr: '2026-11-28T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 78 }
+  // 6. Quân Khu Nam Đồng (Tỷ lệ lấp đầy rạp 76.4% ~ 76.0%)
+  { _id: 'sch_quan-khu-nam-dong', slug: 'quan-khu-nam-dong', dateStr: '2026-11-22T20:00:00+07:00', time: '20:00', hall: 'Khán phòng Broadway Opera', bookedSeats: 136 },
+  { _id: 'sch_quan-khu-nam-dong_20261128_1930', slug: 'quan-khu-nam-dong', dateStr: '2026-11-28T19:30:00+07:00', time: '19:30', hall: 'Khán phòng Grand A - Hoàng Gia', bookedSeats: 136 }
 ];
 
 const memMusicals = JSON.parse(JSON.stringify(sampleMusicalsFromFile));
@@ -87,7 +87,8 @@ const memUsers = [
   { _id: 'usr_admin_01', fullName: 'Trần Minh Đức', email: 'admin@nhackichthanhpho.vn', username: 'admin', password: 'Admin@gr06', phone: '0901888999', role: 'admin', department: 'Ban Giám Đốc Điều Hành', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80', isActive: true, createdAt: new Date() },
   { _id: 'usr_editor_02', fullName: 'Lê Thảo My', email: 'editor@nhackichthanhpho.vn', username: 'editor', password: 'Editor@gr06', phone: '0902777888', role: 'editor', department: 'Ban Biên Tập Sân Khấu & Truyền Thông', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80', isActive: true, createdAt: new Date() },
   { _id: 'usr_staff_03', fullName: 'Phạm Hùng Cường', email: 'staff@nhackichthanhpho.vn', username: 'staff', password: 'Staff@gr06', phone: '0904555666', role: 'staff', department: 'Tổ Trực Soát Vé Cửa Rạp', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80', isActive: true, createdAt: new Date() },
-  { _id: 'usr_customer_01', fullName: 'Nguyễn Văn An', email: 'khachhang@gmail.com', username: 'khachhang', password: 'Customer@gr06', phone: '0909123456', role: 'customer', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80', isActive: true, createdAt: new Date() }
+  { _id: 'usr_customer_01', fullName: 'Nguyễn Văn An', email: 'khachhang@gmail.com', username: 'khachhang', password: 'Customer@gr06', phone: '0909123456', role: 'customer', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80', isActive: true, createdAt: new Date() },
+  { _id: 'usr_customer_02', fullName: 'Lê Hoàng Nam (Khách VIP)', email: 'vip.khachhang@gmail.com', username: 'khachhang_vip', password: 'Customer@gr06', phone: '0908888999', role: 'customer', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80', isActive: true, createdAt: new Date() }
 ];
 
 const memReconciliations = JSON.parse(JSON.stringify(sampleReconciliations));

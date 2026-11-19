@@ -218,6 +218,16 @@ const sampleUsers = [
     role: 'customer',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
     isActive: true
+  },
+  {
+    fullName: 'Lê Hoàng Nam (Khách VIP)',
+    username: 'khachhang_vip',
+    password: 'Customer@gr06',
+    email: 'vip.khachhang@gmail.com',
+    phone: '0908888999',
+    role: 'customer',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+    isActive: true
   }
 ];
 

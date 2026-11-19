@@ -17,29 +17,53 @@
     </div>
 
     <!-- Header thông tin suất diễn -->
-    <!-- Header thông tin suất diễn -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom border-gold-glow">
-      <div>
-        <h2 class="display-6 fw-bold text-gold-gradient mb-1">
-          {{ scheduleInfo()?.musicalTitle || 'Vở Nhạc Kịch Sân Khấu' }}
-        </h2>
-        <div class="d-flex flex-wrap gap-3 text-secondary small">
-          <span><i class="bi bi-calendar3 text-gold me-1"></i> {{ scheduleInfo()?.performanceDate | date:'dd/MM/yyyy' }}</span>
-          <span><i class="bi bi-clock-fill text-gold me-1"></i> {{ scheduleInfo()?.time }}</span>
-          <span><i class="bi bi-geo-alt-fill text-ruby-glow me-1"></i> {{ scheduleInfo()?.hall }}</span>
-        </div>
-      </div>
-
-      <!-- THANH ĐẾM NGƯỢC GIỮ GHẾ TẠM THỜI (COUNTDOWN 10 PHÚT THEO BPMN 2.2.3) -->
-      @if (isHoldingActive()) {
-        <div class="hold-countdown-badge p-3 rounded-4 border border-gold-glow mt-3 mt-md-0 shadow-lg text-center">
-          <div class="d-flex align-items-center gap-2 text-gold-glow fw-bold mb-1">
-            <i class="bi bi-hourglass-split fs-4 animate-spin"></i>
-            <span class="fs-4">{{ formatTime(holdSecondsLeft()) }}</span>
+    <div class="card card-showman-glass border-gold-glow rounded-4 p-4 mb-4 shadow-lg">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge badge-showman-gold text-uppercase px-3 py-1 fw-bold">
+              <i class="bi bi-stars me-1"></i> Suất Diễn Đã Chọn
+            </span>
+            @if (scheduleInfo()?.scheduleId || scheduleId()) {
+              <span class="text-secondary small">
+                Mã suất: <code class="text-gold">{{ scheduleInfo()?.scheduleId || scheduleId() }}</code>
+              </span>
+            }
           </div>
-          <span class="x-small text-white opacity-90 d-block">Giữ ghế 10 phút chống trùng lặp</span>
+          <h1 class="display-6 fw-bold text-gold-gradient mb-3">
+            {{ scheduleInfo()?.musicalTitle || 'Vở Nhạc Kịch Sân Khấu' }}
+          </h1>
+          <div class="d-flex flex-wrap gap-2 gap-md-3 text-white small align-items-center">
+            <span class="d-inline-flex align-items-center bg-dark bg-opacity-75 px-3 py-2 rounded-pill border border-gold-glow">
+              <i class="bi bi-calendar-event-fill text-gold me-2"></i>
+              <span><strong>Ngày diễn:</strong> {{ (scheduleInfo()?.performanceDate | date:'dd/MM/yyyy') || 'Đang cập nhật' }}</span>
+            </span>
+            <span class="d-inline-flex align-items-center bg-dark bg-opacity-75 px-3 py-2 rounded-pill border border-gold-glow">
+              <i class="bi bi-clock-fill text-gold me-2"></i>
+              <span><strong>Khung giờ:</strong> {{ scheduleInfo()?.time || '19:30' }}</span>
+            </span>
+            <span class="d-inline-flex align-items-center bg-dark bg-opacity-75 px-3 py-2 rounded-pill border border-gold-glow">
+              <i class="bi bi-building-fill text-ruby-glow me-2"></i>
+              <span><strong>Khán phòng:</strong> {{ scheduleInfo()?.hall || 'Khán phòng Grand A - Hoàng Gia' }}</span>
+            </span>
+            <span class="d-inline-flex align-items-center bg-dark bg-opacity-75 px-3 py-2 rounded-pill border border-gold-glow">
+              <i class="bi bi-geo-alt-fill text-gold me-2"></i>
+              <span>{{ scheduleInfo()?.venue || 'Nhà Hát Thành Phố' }}</span>
+            </span>
+          </div>
         </div>
-      }
+
+        <!-- THANH ĐẾM NGƯỢC GIỮ GHẾ TẠM THỜI (COUNTDOWN 10 PHÚT THEO BPMN 2.2.3) -->
+        @if (isHoldingActive()) {
+          <div class="hold-countdown-badge p-3 rounded-4 border border-gold-glow shadow-lg text-center flex-shrink-0">
+            <div class="d-flex align-items-center justify-content-center gap-2 text-gold-glow fw-bold mb-1">
+              <i class="bi bi-hourglass-split fs-4 animate-spin"></i>
+              <span class="fs-4">{{ formatTime(holdSecondsLeft()) }}</span>
+            </div>
+            <span class="x-small text-white opacity-90 d-block">Giữ ghế 10 phút chống trùng lặp</span>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Cảnh báo tính khả dụng của ghế (BPMN 2.2.3 Bước 6) -->
@@ -76,7 +100,7 @@
                   {{ s.seatCode }} ({{ s.type }})
                 </span>
               } @empty {
-                <span class="text-secondary small fst-italic">Chưa có ghế nào được chọn. Vui lòng bấm vào ghế trên sơ đồ.</span>
+                <span class="text-white text-secondary small fst-italic">Chưa có ghế nào được chọn. Vui lòng bấm vào ghế trên sơ đồ.</span>
               }
             </div>
           </div>

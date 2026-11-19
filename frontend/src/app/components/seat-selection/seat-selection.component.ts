@@ -74,29 +74,84 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
     }
   }
 
-loadSeatMap(scheduleId: string): void {
-  this.musicalService.getScheduleSeats(scheduleId).subscribe({
-    next: (res) => {
-      this.scheduleInfo.set(res);
-      if (res.seats && res.seats.length > 0) {
-        this.seats.set(res.seats);
-      } else {
+  loadSeatMap(scheduleId: string): void {
+    this.musicalService.getScheduleSeats(scheduleId).subscribe({
+      next: (res: any) => {
+        this.scheduleInfo.set(res);
+        if (res && res.seats && res.seats.length > 0) {
+          this.seats.set(res.seats);
+        } else {
+          this.seats.set(this.generateFallbackSeats(scheduleId));
+        }
+      },
+      error: () => {
+        const fallback = this.resolveScheduleFallback(scheduleId);
+        this.scheduleInfo.set(fallback);
         this.seats.set(this.generateFallbackSeats(scheduleId));
       }
-    },
-    error: () => {
-      this.scheduleInfo.set({
-        scheduleId,
-        musicalTitle: 'Lọ Lem - Chiếc giày thủy tinh',
-        musicalSlug: 'lo-lem-chiec-giay-thuy-tinh',
-        performanceDate: '2026-11-20T19:30:00+07:00',
+    });
+  }
+
+  private resolveScheduleFallback(scheduleId: string): any {
+    const idLower = (scheduleId || '').toLowerCase();
+    const lookup: Record<string, { title: string; slug: string; time: string; hall: string }> = {
+      'loi-the-thu-9': {
+        title: 'Lời Thề Thứ 9',
+        slug: 'loi-the-thu-9',
+        time: '20:00',
+        hall: 'Khán phòng Grand A - Hoàng Gia'
+      },
+      'lo-lem': {
+        title: 'Lọ Lem - Chiếc Giày Thủy Tinh',
+        slug: 'lo-lem-chiec-giay-thuy-tinh',
         time: '19:30',
         hall: 'Khán phòng Grand A - Hoàng Gia'
-      });
-      this.seats.set(this.generateFallbackSeats(scheduleId));
+      },
+      'hon-truong-ba': {
+        title: 'Hồn Trương Ba, Da Hàng Thịt',
+        slug: 'hon-truong-ba-da-hang-thit',
+        time: '20:00',
+        hall: 'Khán phòng Broadway Opera'
+      },
+      'tuoi-tho-du-doi': {
+        title: 'Tuổi Thơ Dữ Dội',
+        slug: 'tuoi-tho-du-doi',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia'
+      },
+      'giac-mo-cua-bom': {
+        title: 'Giấc Mơ Của Bờm',
+        slug: 'giac-mo-cua-bom',
+        time: '20:00',
+        hall: 'Khán phòng Broadway Opera'
+      },
+      'quan-khu-nam-dong': {
+        title: 'Quân Khu Nam Đồng',
+        slug: 'quan-khu-nam-dong',
+        time: '19:30',
+        hall: 'Khán phòng Grand A - Hoàng Gia'
+      }
+    };
+
+    const matched = Object.entries(lookup).find(([k]) => idLower.includes(k));
+    const info = matched ? matched[1] : lookup['loi-the-thu-9'];
+
+    let perfDate = '2026-11-20T19:30:00+07:00';
+    const dateMatch = idLower.match(/(\d{4})(\d{2})(\d{2})/);
+    if (dateMatch) {
+      perfDate = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T${info.time}:00+07:00`;
     }
-  });
-}
+
+    return {
+      scheduleId,
+      musicalTitle: info.title,
+      musicalSlug: info.slug,
+      performanceDate: perfDate,
+      time: info.time,
+      hall: info.hall,
+      venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1'
+    };
+  }
 
 private generateFallbackSeats(scheduleId: string): any[] {
   const generated: any[] = [];
@@ -295,14 +350,16 @@ private generateFallbackSeats(scheduleId: string): any[] {
       price: s.price
     }));
 
+    const info = this.scheduleInfo() || this.resolveScheduleFallback(this.scheduleId());
+
     // Lưu vào sessionStorage để Checkout Funnel nhận
     sessionStorage.setItem('city_musical_checkout', JSON.stringify({
       scheduleId: this.scheduleId(),
-      musicalSlug: this.scheduleInfo()?.musicalSlug || 'bong-bong-bay',
-      musicalTitle: this.scheduleInfo()?.musicalTitle || 'Bông Bóng Bay',
-      performanceDate: this.scheduleInfo()?.performanceDate,
-      performanceTime: this.scheduleInfo()?.time || '19:30',
-      hall: this.scheduleInfo()?.hall || 'Khán phòng Grand A',
+      musicalSlug: info.musicalSlug || 'loi-the-thu-9',
+      musicalTitle: info.musicalTitle || 'Lời Thề Thứ 9',
+      performanceDate: info.performanceDate,
+      performanceTime: info.time || '20:00',
+      hall: info.hall || 'Khán phòng Grand A - Hoàng Gia',
       seats: bookedSeats,
       totalPrice: this.totalSeatPrice()
     }));

@@ -66,7 +66,7 @@
          TAB 1: DASHBOARD
          ============================================================ -->
     @if (activeTab() === 'dashboard') {
-      <div class="tab-pane-content fade show">
+      <div class="tab-pane-content fade show dashboard-view">
         <!-- 1. Header Toolbar -->
         <div class="dashboard-heading mb-3">
           <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -92,17 +92,18 @@
             <p class="text-slate-light mt-2">Đang tải dữ liệu tổng quan thời gian thực...</p>
           </div>
         } @else if (stats()) {
-          <!-- HÀNG 1: TOP KPIS BAR (4 CỘT CÂN ĐỐI) -->
-          <div class="row g-3 mb-3">
+          <!-- HÀNG 1: TOP KPIS BAR (4 CỘT CÂN ĐỐI, RỘNG RÃI & KHÔNG CỤM CHỮ RƯỜM RÀ) -->
+          <div class="row g-4 mb-4">
             <!-- Thẻ 1: Tổng doanh thu (Hero Metric) -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium stat-card-hero p-3.5 rounded-4 h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="stat-label-gold text-uppercase fw-bold">Tổng doanh thu</span>
-                  <span class="badge badge-hero-kpi">KPI CHỦ LỰC</span>
-                </div>
-                <div class="stat-value-hero fw-bold mb-2 fs-3">
-                  {{ stats()!.totalRevenue | number:'1.0-0' }} <span class="stat-currency">₫</span>
+              <div class="stat-card-premium stat-card-hero rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label-gold text-uppercase fw-bold">Tổng doanh thu</span>
+                  </div>
+                  <div class="stat-value-hero fw-bold mb-3 fs-2">
+                    {{ stats()!.totalRevenue | number:'1.0-0' }} <span class="stat-currency">₫</span>
+                  </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                   <span class="badge badge-growth-success">+14.8% tuần này</span>
@@ -113,66 +114,67 @@
 
             <!-- Thẻ 2: Vé đã phát hành -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium p-3.5 rounded-4 h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="stat-label text-uppercase fw-bold">Vé đã phát hành</span>
-                  <span class="badge badge-tag-info">100% Mã QR</span>
+              <div class="stat-card-premium rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label text-uppercase fw-bold">Vé đã phát hành</span>
+                  </div>
+                  <div class="stat-value-white fw-bold mb-3 fs-2">
+                    {{ stats()!.totalTicketsSold | number }} <span class="stat-unit text-slate-light fs-5">vé</span>
+                  </div>
                 </div>
-                <div class="stat-value-white fw-bold mb-2 fs-3">
-                  {{ stats()!.totalTicketsSold | number }} <span class="stat-unit text-slate-light fs-6">vé</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="stat-subtext text-slate-light small">Tự động đối soát qua e-Gate & QR scanner</span>
+                <div class="stat-subtext text-slate-light small">
+                  Vé xuất thành công qua các kênh
                 </div>
               </div>
             </div>
 
             <!-- Thẻ 3: Tỷ lệ lấp đầy rạp -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium p-3.5 rounded-4 h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="stat-label-gold text-uppercase fw-bold">Tỷ lệ lấp đầy rạp</span>
-                  <span class="badge badge-tag-warning">Khung giờ vàng</span>
+              <div class="stat-card-premium rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label-gold text-uppercase fw-bold">Tỷ lệ lấp đầy rạp</span>
+                  </div>
+                  <div class="stat-value-gold fw-bold mb-3 fs-2">
+                    {{ stats()!.occupancyRate }}<span class="stat-percent fs-4">%</span>
+                  </div>
                 </div>
-                <div class="stat-value-gold fw-bold mb-2 fs-3">
-                  {{ stats()!.occupancyRate }}<span class="stat-percent fs-5">%</span>
-                </div>
-                <div class="progress stat-progress-track mb-2" style="height: 6px;">
-                  <div class="progress-bar stat-progress-fill" [style.width.%]="stats()!.occupancyRate"></div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="stat-subtext text-slate-light small">Grand A & Broadway Opera</span>
-                  <span class="stat-subtext text-gold-spark fw-semibold small">Suất tối</span>
+                <div>
+                  <div class="progress stat-progress-track" style="height: 7px;">
+                    <div class="progress-bar stat-progress-fill" [style.width.%]="stats()!.occupancyRate"></div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- Thẻ 4: Vở đang công diễn -->
             <div class="col-xl-3 col-md-6">
-              <div class="stat-card-premium p-3.5 rounded-4 h-100">
-                <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span class="stat-label text-uppercase fw-bold">Vở đang công diễn</span>
-                  <span class="badge badge-tag-warning">Đang công chiếu</span>
+              <div class="stat-card-premium rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="stat-label text-uppercase fw-bold">Vở đang công diễn</span>
+                  </div>
+                  <div class="stat-value-white fw-bold mb-3 fs-2">
+                    {{ stats()!.activeShowsCount }} <span class="stat-unit text-slate-light fs-5">vở diễn</span>
+                  </div>
                 </div>
-                <div class="stat-value-white fw-bold mb-2 fs-3">
-                  {{ stats()!.activeShowsCount }} <span class="stat-unit text-slate-light fs-6">vở diễn</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="stat-subtext text-slate-light small">12 suất diễn/tuần trên toàn hệ thống</span>
+                <div class="stat-subtext text-slate-light small">
+                  Đang mở bán vé trực tuyến
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- HÀNG 2: BIỂU ĐỒ DOANH THU & PHÂN BỔ CỔNG THANH TOÁN (ONE-PAGE ARCHITECTURE) -->
-          <div class="row g-3 mb-3">
+          <!-- HÀNG 2: BIỂU ĐỒ DOANH THU & PHÂN BỔ CỔNG THANH TOÁN (KHUNG TO RỘNG RÃI, FIT NỘI DUNG) -->
+          <div class="row g-4 mb-4">
             <!-- Cột trái (8 cols): Biểu đồ xu hướng doanh thu -->
             <div class="col-xl-8 col-lg-7">
-              <div class="dashboard-panel-card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between">
+              <div class="dashboard-panel-card rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
                 <div>
-                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-gold-subtle">
                     <div>
-                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-5">
                         <i class="bi bi-graph-up-arrow text-gold me-2"></i>Xu Hướng Doanh Thu Bán Vé
                       </h2>
                       <p class="text-slate-light small mb-0">Biến động doanh số bán vé trực tuyến theo chu kỳ</p>
@@ -193,13 +195,13 @@
                     </div>
                   </div>
 
-                  <div style="position: relative; height: 215px; width: 100%;">
+                  <div class="dashboard-revenue-chart my-3">
                     <canvas id="revenueTrendChart"></canvas>
                   </div>
                 </div>
 
                 <!-- Footer Summary Chips -->
-                <div class="d-flex flex-wrap gap-2 pt-2.5 mt-2 border-top border-gold-subtle">
+                <div class="d-flex flex-wrap gap-2 pt-3 mt-2 border-top border-gold-subtle">
                   <span class="dashboard-stat-chip">
                     <i class="bi bi-star-fill text-gold me-1"></i>
                     <span>Đỉnh doanh thu: <strong class="text-white">192.000.000 ₫</strong> (Chủ Nhật)</span>
@@ -218,31 +220,28 @@
 
             <!-- Cột phải (4 cols): Thống kê cổng thanh toán thu gọn -->
             <div class="col-xl-4 col-lg-5">
-              <div class="dashboard-panel-card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between">
+              <div class="dashboard-panel-card rounded-4 h-100 p-4 d-flex flex-column justify-content-between">
                 <div>
                   <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
                     <div>
-                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-5">
                         <i class="bi bi-pie-chart text-gold me-2"></i>Tỷ Trọng Cổng Thanh Toán
                       </h2>
                       <p class="text-slate-light small mb-0">Phân bổ nguồn thu các kênh Gateway</p>
                     </div>
-                    <span class="badge badge-outline-gold px-2 py-1 small">
-                      Tự động
-                    </span>
                   </div>
 
                   <!-- Donut Chart Canvas -->
-                  <div class="d-flex justify-content-center align-items-center mb-2" style="position: relative; height: 110px;">
+                  <div class="d-flex justify-content-center align-items-center my-3 dashboard-payment-chart">
                     <canvas id="paymentDonutChart"></canvas>
                   </div>
 
-                  <!-- 4 Compact Payment Breakdown Rows -->
-                  <div class="d-flex flex-column gap-2">
+                  <!-- 4 Compact Payment Breakdown Rows (MÀU ĐẬM SANG TRỌNG, KHÔNG DÙNG PASTEL LÓE) -->
+                  <div class="d-flex flex-column gap-2 mt-2">
                     <!-- VietQR -->
-                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #10B981;">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-success-subtle text-success border border-success border-opacity-25 py-0 px-1.5 small">
+                    <div class="payment-breakdown-row payment-breakdown-vietqr d-flex align-items-center justify-content-between px-3 py-2.5 rounded-3">
+                      <div class="d-flex align-items-center gap-2.5">
+                        <span class="badge payment-share-badge payment-share-vietqr">
                           {{ (stats()!.paymentPercentages?.VIETQR ?? 44.0) | number:'1.1-1' }}%
                         </span>
                         <span class="text-white small fw-semibold">VietQR</span>
@@ -251,9 +250,9 @@
                     </div>
 
                     <!-- VNPAY -->
-                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #0EA5E9;">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-info-subtle text-info border border-info border-opacity-25 py-0 px-1.5 small">
+                    <div class="payment-breakdown-row payment-breakdown-vnpay d-flex align-items-center justify-content-between px-3 py-2.5 rounded-3">
+                      <div class="d-flex align-items-center gap-2.5">
+                        <span class="badge payment-share-badge payment-share-vnpay">
                           {{ (stats()!.paymentPercentages?.VNPAY ?? 31.0) | number:'1.1-1' }}%
                         </span>
                         <span class="text-white small fw-semibold">VNPAY QR</span>
@@ -262,9 +261,9 @@
                     </div>
 
                     <!-- MoMo -->
-                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #F43F5E;">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-danger-subtle text-danger border border-danger border-opacity-25 py-0 px-1.5 small">
+                    <div class="payment-breakdown-row payment-breakdown-momo d-flex align-items-center justify-content-between px-3 py-2.5 rounded-3">
+                      <div class="d-flex align-items-center gap-2.5">
+                        <span class="badge payment-share-badge payment-share-momo">
                           {{ (stats()!.paymentPercentages?.MOMO ?? 17.0) | number:'1.1-1' }}%
                         </span>
                         <span class="text-white small fw-semibold">Ví MoMo</span>
@@ -273,9 +272,9 @@
                     </div>
 
                     <!-- ZaloPay -->
-                    <div class="d-flex align-items-center justify-content-between px-2.5 py-1.5 rounded-2" style="background: rgba(28, 43, 76, 0.45); border-left: 3px solid #8B5CF6;">
-                      <div class="d-flex align-items-center gap-2">
-                        <span class="badge bg-purple text-light border border-purple border-opacity-25 py-0 px-1.5 small">
+                    <div class="payment-breakdown-row payment-breakdown-zalopay d-flex align-items-center justify-content-between px-3 py-2.5 rounded-3">
+                      <div class="d-flex align-items-center gap-2.5">
+                        <span class="badge payment-share-badge payment-share-zalopay">
                           {{ (stats()!.paymentPercentages?.ZALOPAY ?? 8.0) | number:'1.1-1' }}%
                         </span>
                         <span class="text-white small fw-semibold">Ví ZaloPay</span>
@@ -288,19 +287,19 @@
             </div>
           </div>
 
-          <!-- HÀNG 3: BẢNG TÓM TẮT DỮ LIỆU THỜI GIAN THỰC (TOP VỞ DIỄN & SUBSCRIBERS MỚI) -->
-          <div class="row g-3">
-            <!-- Cột trái (7 cols): Top Vở Nhạc Kịch Doanh Thu Cao -->
-            <div class="col-xl-7 col-lg-6">
-              <div class="dashboard-panel-card p-3.5 rounded-4 h-100">
-                <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
+          <!-- HÀNG 3: BẢNG TÓM TẮT DỮ LIỆU THỜI GIAN THỰC (RỘNG RÃI, FIT NỘI DUNG) -->
+          <div class="row g-4">
+            <!-- Top Vở Nhạc Kịch Doanh Thu Cao -->
+            <div class="col-12">
+              <div class="dashboard-panel-card rounded-4 p-4">
+                <div class="d-flex align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-gold-subtle">
                   <div>
-                    <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
+                    <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-5">
                       <i class="bi bi-trophy text-gold me-2"></i>Top Vở Kịch Doanh Thu Cao Nhất
                     </h2>
                     <p class="text-slate-light small mb-0">Xếp hạng các tác phẩm kịch có sức hút phòng vé lớn nhất</p>
                   </div>
-                  <button type="button" class="btn btn-outline-gold-subtle" (click)="setTab('musicals')">
+                  <button type="button" class="btn btn-outline-gold-subtle btn-sm px-3 py-2 rounded-pill fw-semibold" (click)="setTab('musicals')">
                     Quản lý vở kịch <i class="bi bi-arrow-right ms-1"></i>
                   </button>
                 </div>
@@ -309,11 +308,11 @@
                   <table class="table showman-table align-middle mb-0">
                     <thead>
                       <tr>
-                        <th style="width: 48px;">VỞ DIỄN</th>
+                        <th style="width: 70px;">VỞ DIỄN</th>
                         <th>TÊN TÁC PHẨM</th>
-                        <th class="text-center">VÉ ĐÃ BÁN</th>
-                        <th class="text-center">LẤP ĐẦY</th>
-                        <th class="text-end">DOANH THU</th>
+                        <th class="text-center" style="width: 140px;">VÉ ĐÃ BÁN</th>
+                        <th class="text-center" style="width: 200px;">LẤP ĐẦY</th>
+                        <th class="text-end" style="width: 180px;">DOANH THU</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -324,24 +323,24 @@
                               (error)="item.posterUrl = 'images/musicals/lo-lem.jpg'">
                           </td>
                           <td>
-                            <div class="fw-bold text-white small text-truncate" style="max-width: 220px;" [title]="item.title">
+                            <div class="fw-bold text-white small mb-1" [title]="item.title">
                               {{ item.title }}
                             </div>
                             <span class="text-slate-light x-small">{{ item.genre }}</span>
                           </td>
                           <td class="text-center">
-                            <span class="badge bg-dark text-slate-light border border-slate-700 px-2 py-1 small">
+                            <span class="badge bg-dark text-slate-light border border-slate-700 px-3 py-1.5 small fw-semibold">
                               {{ item.ticketsSold | number }} vé
                             </span>
                           </td>
                           <td class="text-center">
-                            <span class="text-gold-spark fw-bold small">{{ item.occupancyRate }}%</span>
-                            <div class="progress mt-1" style="height: 4px; background: rgba(255,255,255,0.08); min-width: 50px;">
-                              <div class="progress-bar bg-warning" [style.width.%]="item.occupancyRate"></div>
+                            <span class="text-gold fw-bold small">{{ item.occupancyRate }}%</span>
+                            <div class="progress mt-1.5 mx-auto" style="height: 6px; background: rgba(255,255,255,0.08); width: 140px; border-radius: 999px;">
+                              <div class="progress-bar stat-progress-fill" [style.width.%]="item.occupancyRate"></div>
                             </div>
                           </td>
                           <td class="text-end">
-                            <span class="text-gold fw-bold small">{{ item.revenue | number }} ₫</span>
+                            <span class="text-gold fw-bold fs-6">{{ item.revenue | number }} ₫</span>
                           </td>
                         </tr>
                       }
@@ -351,64 +350,6 @@
               </div>
             </div>
 
-            <!-- Cột phải (5 cols): Khách Hàng Đăng Ký Mới (Subscribers / Leads) -->
-            <div class="col-xl-5 col-lg-6">
-              <div class="dashboard-panel-card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between">
-                <div>
-                  <div class="d-flex align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom border-gold-subtle">
-                    <div>
-                      <h2 class="dashboard-section-title text-gold-gradient fw-bold mb-0 fs-6">
-                        <i class="bi bi-envelope-heart text-gold me-2"></i>Khách Hàng Đăng Ký Mới
-                      </h2>
-                      <p class="text-slate-light small mb-0">Thu thập email tiềm năng & khách quan tâm</p>
-                    </div>
-                    <button type="button" class="btn btn-outline-gold-subtle" (click)="setTab('subscribers')">
-                      Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
-                    </button>
-                  </div>
-
-                  <div class="d-flex flex-column gap-2">
-                    @for (sub of recentSubscribers(); track sub._id || sub.email; let idx = $index) {
-                      <div class="sub-list-item d-flex align-items-center justify-content-between gap-2">
-                        <div class="d-flex align-items-center gap-2.5 overflow-hidden">
-                          <div class="sub-avatar-circle">
-                            <i class="bi bi-person-fill"></i>
-                          </div>
-                          <div class="overflow-hidden">
-                            <div class="text-white small fw-bold text-truncate" style="max-width: 210px;" [title]="sub.email">
-                              {{ sub.email }}
-                            </div>
-                            <div class="d-flex align-items-center gap-1.5 mt-0.5">
-                              @if (sub.musicalTitle) {
-                                <span class="badge bg-purple text-light border border-purple border-opacity-50 py-0 px-1.5 x-small text-truncate" style="max-width: 170px;" [title]="sub.musicalTitle">
-                                  <i class="bi bi-film me-1"></i>{{ sub.musicalTitle }}
-                                </span>
-                              } @else {
-                                <span class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 py-0 px-1.5 x-small">
-                                  <i class="bi bi-star-fill me-1"></i>VIP Trang Chủ
-                                </span>
-                              }
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="text-end flex-shrink-0">
-                          <span class="text-slate-light x-small">
-                            {{ sub.createdAt ? (sub.createdAt | date:'dd/MM HH:mm') : 'Gần đây' }}
-                          </span>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-
-                <div class="pt-2.5 mt-2 border-top border-gold-subtle text-center">
-                  <span class="text-slate-light small">
-                    Tổng cộng <strong class="text-gold">{{ subscribers().length || 4 }}</strong> khách hàng đăng ký quan tâm
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
         }
       </div>
