@@ -255,7 +255,7 @@ export class MyTicketsComponent implements OnInit {
       <line x1="72" y1="137" x2="1128" y2="137" stroke="#6B5524" stroke-width="2"/>
       ${titleSvg}
       <text x="72" y="${dateY}" fill="#FDE68A" font-size="27" font-weight="600">${escapeXml(this.formatPerformanceDate(order.performanceDate))} · ${escapeXml(order.performanceTime)}</text>
-      <text x="72" y="${venueY}" class="body">${escapeXml(order.hall)} · ${escapeXml(order.venue || 'Nhà hát Thành phố')}</text>
+      <text x="72" y="${venueY}" class="body">${escapeXml(order.hall)} · ${escapeXml(order.venue || 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM')}</text>
       <text x="72" y="${nameY}" class="muted">Khán giả: <tspan fill="#F8FAFC">${escapeXml(order.customerName)}</tspan></text>
       <text x="72" y="${seatLabelY}" class="muted">MÃ VÉ: <tspan fill="#FDE68A" font-weight="700">${escapeXml(order.bookingCode)}</tspan></text>
       <text x="72" y="${seatLabelY + 32}" class="muted">GHẾ NGỒI</text>

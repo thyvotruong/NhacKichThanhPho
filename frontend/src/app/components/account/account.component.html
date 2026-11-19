@@ -85,9 +85,6 @@
             <h4 class="text-gold-gradient fw-bold mb-1">THÔNG TIN CÁ NHÂN</h4>
             
           </div>
-          @if (musicalService.currentUser()?._id) {
-            <span class="account-id small text-secondary">Mã tài khoản: {{ musicalService.currentUser()?._id }}</span>
-          }
         </div>
 
         @if (profileMessage()) {

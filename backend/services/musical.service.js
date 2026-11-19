@@ -95,7 +95,7 @@ class MusicalService {
       musicalSlug: s.musicalSlug || found.slug,
       performanceDate: s.performanceDate,
       time: s.time,
-      venue: s.venue || 'Nhà Hát Lớn Thành Phố',
+      venue: s.venue || 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM',
       hall: s.hall || 'Khán phòng Grand A - Hoàng Gia',
       totalSeats: s.totalSeats || (s.seats ? s.seats.length : 182),
       bookedSeats: s.bookedSeats || 0,

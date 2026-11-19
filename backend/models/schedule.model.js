@@ -45,7 +45,7 @@ const ScheduleSchema = new mongoose.Schema(
     },
     venue: {
       type: String,
-      default: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Bến Nghé, Quận 1, TP.HCM'
+      default: 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM'
     },
     hall: {
       type: String,

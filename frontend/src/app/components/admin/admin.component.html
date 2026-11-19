@@ -8,7 +8,8 @@
 <div class="admin-portal-page position-relative py-2.5">
   <div class="container-fluid px-3 px-xl-4 position-relative z-2">
     <!-- 10-Tab Navigation Bar -->
-    <div class="admin-tab-strip">
+    @if (currentUser()?.role !== 'editor') {
+      <div class="admin-tab-strip">
       @if (currentUser()?.role === 'admin') {
         <button class="btn admin-tab-btn" [class.active]="activeTab() === 'dashboard'" (click)="setTab('dashboard')">
           Dashboard
@@ -60,7 +61,8 @@
           <i class="bi bi-shield-shaded me-1 text-gold"></i> Nhật Ký Hoạt Động
         </button>
       }
-    </div>
+      </div>
+    }
 
     <!-- ============================================================
          TAB 1: DASHBOARD

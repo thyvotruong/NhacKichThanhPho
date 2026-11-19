@@ -6,11 +6,7 @@
 <app-staff-header></app-staff-header>
 
 <div class="ops-checkin-page position-relative py-2.5">
-  <div class="stardust-container" aria-hidden="true">
-    <span class="stardust-sparkle" style="top: 10%; left: 15%;">✦</span>
-    <span class="stardust-sparkle" style="top: 20%; left: 85%;">✧</span>
-    <span class="stardust-dot" style="top: 30%; left: 50%;"></span>
-  </div>
+  
 
   <div class="container-fluid px-3 px-xl-4 position-relative z-2">
 
@@ -81,26 +77,30 @@
             </button>
           </div>
 
-          <!-- Danh sách mã vé mẫu để nhân viên/tester bấm thử nhanh -->
+          <!-- Hai trường hợp mẫu để nhân viên/tester thử nhanh -->
           <div class="pt-3 border-top border-secondary border-opacity-25">
             <label class="form-label text-secondary small fw-bold mb-2">
-              <i class="bi bi-lightning-charge text-gold me-1"></i> BẤM CHỌN NHANH VÉ MẪU TRÊN HỆ THỐNG ĐỂ THỬ NGHIỆM:
+              <i class="bi bi-lightning-charge text-gold me-1"></i> CHỌN TÌNH HUỐNG THỬ NGHIỆM:
             </label>
             <div class="d-flex flex-wrap gap-2">
-              @for (b of sampleBookings(); track b.bookingCode) {
-                <button
-                  type="button"
-                  class="btn btn-sm sample-ticket-pill"
-                  [class.pill-confirmed]="b.bookingStatus === 'CONFIRMED'"
-                  [class.pill-checked]="b.bookingStatus === 'CHECKED_IN'"
-                  [class.pill-cancelled]="b.bookingStatus === 'CANCELLED'"
-                  (click)="useSampleCode(b.bookingCode)"
-                >
-                  <span class="fw-bold">{{ b.bookingCode }}</span>
-                  <span class="small opacity-75 ms-1">({{ b.bookingStatus }})</span>
-                </button>
-              }
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success fw-bold"
+                (click)="useSampleCode(validSampleCode)"
+              >
+                <i class="bi bi-check-circle-fill me-1"></i>
+                Vé hợp lệ · {{ validSampleCode }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-danger fw-bold"
+                (click)="useSampleCode(invalidSampleCode)"
+              >
+                <i class="bi bi-x-circle-fill me-1"></i>
+                Vé không hợp lệ · {{ invalidSampleCode }}
+              </button>
             </div>
+            <small class="text-secondary d-block mt-2">Chọn một mã mẫu để chạy tình huống soát vé ngay.</small>
           </div>
         </div>
 

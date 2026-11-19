@@ -108,9 +108,9 @@ export class AuthComponent implements OnInit {
   private initForms(): void {
     // Form Đăng nhập
     this.loginForm = this.fb.group({
-      email: ['khachhang@gmail.com', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]],
       phone: ['0909123456', [Validators.required, Validators.pattern(/^(0[3|5|7|8|9])[0-9]{8}$/)]],
-      password: ['123456', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       otp: ['123456']
     });
 
@@ -190,11 +190,12 @@ export class AuthComponent implements OnInit {
     const formVal = this.loginForm.value;
 
     if (m === 'email') {
+      identifier = (formVal.email || '').trim().toLowerCase();
+      this.loginForm.get('email')?.setValue(identifier);
       if (this.loginForm.get('email')?.invalid || this.loginForm.get('password')?.invalid) {
         this.errorMessage.set('Vui lòng điền đúng Email và Mật khẩu (tối thiểu 6 ký tự)');
         return;
       }
-      identifier = formVal.email;
     } else if (m === 'phone') {
       if (this.loginForm.get('phone')?.invalid) {
         this.errorMessage.set('Vui lòng nhập đúng số điện thoại (10 số)');
@@ -260,6 +261,8 @@ export class AuthComponent implements OnInit {
     this.successMessage.set(null);
 
     const val = this.registerForm.value;
+    const email = (val.email || '').trim().toLowerCase();
+    this.registerForm.get('email')?.setValue(email);
 
     // Kiểm tra hợp lệ các trường bắt buộc
     if (!val.fullName || val.fullName.length < 2) {
@@ -292,7 +295,7 @@ export class AuthComponent implements OnInit {
     this.musicalService.register({
       method: this.registerMethod(),
       fullName: val.fullName,
-      email: val.email,
+      email,
       phone: val.phone,
       password: val.password
     }).subscribe({
@@ -300,7 +303,7 @@ export class AuthComponent implements OnInit {
         this.isSubmitting.set(false);
         this.successMessage.set('🎉 Đăng ký thành công! Hệ thống đã tạo phiên làm việc.');
         setTimeout(() => {
-          this.router.navigateByUrl(this.returnUrl());
+          this.router.navigateByUrl(this.getSafeRedirectUrl());
         }, 1000);
       },
       error: (err) => {

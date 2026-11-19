@@ -56,7 +56,7 @@ const BookingSchema = new mongoose.Schema(
     },
     venue: {
       type: String,
-      default: 'Nhà Hát Thành Phố HCM'
+      default: 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM'
     },
     hall: {
       type: String,

@@ -55,6 +55,8 @@ export class OpsCheckinComponent implements OnInit {
 
   // Danh sách vé mẫu để test nhanh
   sampleBookings = signal<BookingOrder[]>([]);
+  readonly validSampleCode = 'NK-20261115-LL82A';
+  readonly invalidSampleCode = 'NK-DEMO-INVALID-0000';
 
   readonly gates = [
     'Cửa Chính Khán Phòng Grand A',
@@ -136,7 +138,7 @@ export class OpsCheckinComponent implements OnInit {
 
   useSampleCode(code: string): void {
     this.ticketCodeInput.set(code);
-    this.clearResults();
+    this.onExecuteCheckIn();
   }
 
   clearResults(): void {

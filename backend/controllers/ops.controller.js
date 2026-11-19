@@ -17,7 +17,34 @@ class OpsController {
         return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mã vé hoặc dữ liệu QR' });
       }
       const result = await bookingService.checkInTicket(target, gate, req);
-      return res.status(200).json(result);
+      if (result.alreadyCheckedIn) {
+        return res.status(409).json({
+          success: false,
+          code: 'ALREADY_CHECKED_IN',
+          message: result.message,
+          details: {
+            checkedInAt: result.booking.checkInInfo?.checkedInAt,
+            checkedInBy: result.booking.checkInInfo?.checkedInBy
+          }
+        });
+      }
+
+      const booking = result.booking;
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+        data: {
+          bookingCode: booking.bookingCode,
+          customerName: booking.customerName,
+          musicalTitle: booking.musicalTitle,
+          performanceTime: booking.performanceTime,
+          hall: booking.hall,
+          seats: booking.seats.map(seat => seat.seatCode).join(', '),
+          quantity: booking.quantity,
+          checkedInAt: booking.checkInInfo.checkedInAt,
+          checkedInBy: booking.checkInInfo.checkedInBy
+        }
+      });
     } catch (err) {
       return res.status(400).json({ success: false, message: err.message });
     }

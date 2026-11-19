@@ -20,6 +20,8 @@ const Subscriber = require('../models/subscriber.model');
 const AuditLog = require('../models/audit-log.model');
 const Ticket = require('../models/ticket.model');
 
+const THEATER_ADDRESS = 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM';
+
 const connectDatabase = async () => {
   const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/nhac_kich_thanh_pho';
 
@@ -61,6 +63,10 @@ const connectDatabase = async () => {
           { upsert: true, new: true, setDefaultsOnInsert: true }
         );
       }
+      await Schedule.updateMany(
+        { venue: { $ne: THEATER_ADDRESS } },
+        { $set: { venue: THEATER_ADDRESS } }
+      );
 
       // 5. Đồng bộ bảng đối soát giao dịch mẫu vào MongoDB
       await Reconciliation.deleteMany({ gateway: { $nin: ['VIETQR', 'VNPAY', 'MOMO', 'ZALOPAY'] } });
@@ -109,6 +115,10 @@ const connectDatabase = async () => {
       if (await Booking.countDocuments() === 0) {
         await Booking.insertMany(store.memBookings);
       }
+      await Booking.updateMany(
+        { venue: { $ne: THEATER_ADDRESS } },
+        { $set: { venue: THEATER_ADDRESS } }
+      );
 
       // 12. Đồng bộ 1.270 vé xem kịch (Tickets) vào MongoDB
       if (await Ticket.countDocuments() === 0) {

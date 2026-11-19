@@ -634,7 +634,7 @@ async function seedDatabase() {
         subtitle: m ? (m.subtitle || m.synopsis) : '',
         performanceDate: new Date(def.dateStr),
         time: def.time,
-        venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1',
+        venue: 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM',
         hall: def.hall,
         totalSeats: layout.length,
         bookedSeats: def.bookedSeats,

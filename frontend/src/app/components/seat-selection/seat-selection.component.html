@@ -24,11 +24,6 @@
             <span class="badge badge-showman-gold text-uppercase px-3 py-1 fw-bold">
               <i class="bi bi-stars me-1"></i> Suất Diễn Đã Chọn
             </span>
-            @if (scheduleInfo()?.scheduleId || scheduleId()) {
-              <span class="text-secondary small">
-                Mã suất: <code class="text-gold">{{ scheduleInfo()?.scheduleId || scheduleId() }}</code>
-              </span>
-            }
           </div>
           <h1 class="display-6 fw-bold text-gold-gradient mb-3">
             {{ scheduleInfo()?.musicalTitle || 'Vở Nhạc Kịch Sân Khấu' }}
@@ -48,7 +43,7 @@
             </span>
             <span class="d-inline-flex align-items-center bg-dark bg-opacity-75 px-3 py-2 rounded-pill border border-gold-glow">
               <i class="bi bi-geo-alt-fill text-gold me-2"></i>
-              <span>{{ scheduleInfo()?.venue || 'Nhà Hát Thành Phố' }}</span>
+              <span>{{ scheduleInfo()?.venue || 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM' }}</span>
             </span>
           </div>
         </div>

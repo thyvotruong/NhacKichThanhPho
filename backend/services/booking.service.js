@@ -79,7 +79,7 @@ class BookingService {
       scheduleId,
       performanceDate: schedule ? schedule.performanceDate : new Date(),
       performanceTime: schedule ? schedule.time : '19:30',
-      venue: schedule ? schedule.venue : 'Nhà Hát Thành Phố HCM',
+      venue: schedule ? schedule.venue : 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM',
       hall: schedule ? schedule.hall : 'Khán phòng Grand A',
       customerName,
       customerEmail,

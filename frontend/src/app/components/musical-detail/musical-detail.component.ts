@@ -194,7 +194,7 @@ export class MusicalDetailComponent implements OnInit {
       musicalSlug: musical.slug,
       performanceDate: new Date(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes),
       time,
-      venue: 'Nhà Hát Thành Phố',
+      venue: 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM',
       hall: 'Khán phòng chính',
       totalSeats: 120,
       bookedSeats: 0,

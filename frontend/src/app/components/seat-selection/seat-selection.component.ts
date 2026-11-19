@@ -149,7 +149,7 @@ export class SeatSelectionComponent implements OnInit, OnDestroy {
       performanceDate: perfDate,
       time: info.time,
       hall: info.hall,
-      venue: 'Nhà Hát Thành Phố - Số 07 Công Trường Lam Sơn, Q.1'
+      venue: 'Nhạc kịch Thành phố - 669 Đỗ Mười, khu phố 3, Linh Xuân, TP.HCM'
     };
   }
 

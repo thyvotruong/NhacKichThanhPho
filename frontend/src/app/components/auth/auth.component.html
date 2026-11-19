@@ -92,7 +92,7 @@
             </div>
 
             <!-- Form Đăng nhập -->
-            <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
+            <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" autocomplete="on">
               <!-- Nhánh Email -->
               @if (loginMethod() === 'email') {
                 <div class="mb-3">
@@ -103,6 +103,8 @@
                     </span>
                     <input
                       type="email"
+                      name="email"
+                      autocomplete="username"
                       class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
                       placeholder="VD: khachhang@gmail.com"
                       formControlName="email"
@@ -123,6 +125,8 @@
                     </span>
                     <input
                       type="password"
+                      name="password"
+                      autocomplete="current-password"
                       class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
                       placeholder="Nhập mật khẩu..."
                       formControlName="password"
@@ -212,7 +216,7 @@
           <!-- 2: TAB ĐĂNG KÝ (BPMN 2.2.2.2) -->
           <!-- ========================================== -->
           @if (activeTab() === 'register') {
-            <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()">
+            <form [formGroup]="registerForm" (ngSubmit)="onRegisterSubmit()" autocomplete="on">
               <div class="mb-3">
                 <label class="form-label text-secondary small fw-bold">HỌ VÀ TÊN KHÁN GIẢ *</label>
                 <div class="input-group">
@@ -237,6 +241,8 @@
                     </span>
                     <input
                       type="email"
+                      name="email"
+                      autocomplete="email"
                       class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
                       placeholder="email@vidu.com"
                       formControlName="email"
@@ -269,6 +275,8 @@
                     </span>
                     <input
                       type="password"
+                      name="password"
+                      autocomplete="new-password"
                       class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
                       placeholder="Tối thiểu 6 ký tự"
                       formControlName="password"
@@ -284,6 +292,8 @@
                     </span>
                     <input
                       type="password"
+                      name="confirmPassword"
+                      autocomplete="new-password"
                       class="form-control bg-dark-glass text-white border-secondary border-opacity-25"
                       placeholder="Nhập lại mật khẩu"
                       formControlName="confirmPassword"
