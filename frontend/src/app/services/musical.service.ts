@@ -86,7 +86,7 @@ export class MusicalService {
         localStorage.removeItem(this.legacySessionKey);
       }
 
-      const isInternalRoute = /^\/(internal|admin|ops)(\/|$)/.test(window.location.pathname);
+      const isInternalRoute = /^\/(admin|ops)(\/|$)/.test(window.location.pathname);
       const sessionKey = isInternalRoute ? this.staffSessionKey : this.customerSessionKey;
       const saved = localStorage.getItem(sessionKey);
       if (saved) {
@@ -223,6 +223,22 @@ export class MusicalService {
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem(sessionKey);
       localStorage.removeItem(this.legacySessionKey);
+    }
+  }
+
+  clearStaffSession(): void {
+    if (this.currentUser()?.role !== 'customer') {
+      this.isLoggedIn.set(false);
+      this.currentUser.set({
+        fullName: 'Khách Hàng',
+        email: 'khachhang@gmail.com',
+        phone: '0909123456',
+        role: 'customer',
+        isActive: true
+      });
+    }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem(this.staffSessionKey);
     }
   }
 
@@ -909,7 +925,7 @@ export class MusicalService {
 
   // --- ĐĂNG NHẬP NỘI BỘ DÀNH CHO CÁN BỘ (/internal) ---
   staffLogin(identifier: string, password: string): Observable<{ success: boolean; user: UserStaff; token: string }> {
-    return this.http.post<any>(`${this.apiUrl}/auth/staff-login`, { identifier, password }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/auth/staff-login`, { identifier, username: identifier, password }).pipe(
       map(res => {
         if (res.success && res.data?.user) {
           const user: UserStaff = {

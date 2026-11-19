@@ -47,7 +47,8 @@ class AuthController {
 
   async staffLogin(req, res) {
     try {
-      const { username, password } = req.body;
+      const username = req.body.username || req.body.identifier;
+      const { password } = req.body;
       if (!username || !password) {
         return res.status(400).json({ success: false, message: 'Vui lòng nhập tài khoản và mật khẩu nội bộ' });
       }

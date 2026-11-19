@@ -46,17 +46,9 @@ export class InternalGatewayComponent implements OnInit {
       if (authMsg) this.errorMessage.set(authMsg);
     });
 
-    // Nếu đã đăng nhập với vai trò nội bộ hợp lệ, tự động điều hướng đúng phân hệ
-    if (this.musicalService.isLoggedIn()) {
-      const user = this.musicalService.currentUser();
-      if (user.role === 'admin') {
-        this.router.navigateByUrl(this.returnUrl() || '/admin');
-      } else if (user.role === 'editor') {
-        this.router.navigateByUrl('/admin/musicals');
-      } else if (user.role === 'staff' || user.role === 'ticket_checker') {
-        this.router.navigateByUrl('/ops/check-in');
-      }
-    }
+    // Luôn luôn hiển thị màn hình đăng nhập quản trị khi truy cập /internal
+    // Reset phiên nhân sự để bắt buộc xác thực bảo mật tài khoản
+    this.musicalService.clearStaffSession();
   }
 
   toggleShowPassword(): void {
